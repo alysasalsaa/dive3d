@@ -15,6 +15,19 @@ interface GalleryItem {
 export default function CommunityGallery() {
     const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
     const [loading, setLoading] = useState(true);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [selectedCategory, setSelectedCategory] = useState("all");
+
+    // Filter data berdasarkan input search dan select kategori
+    const filteredItems = galleryItems.filter(item => {
+        const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                              item.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                              item.author.toLowerCase().includes(searchQuery.toLowerCase());
+        
+        const matchesCategory = selectedCategory === "all" || item.category === selectedCategory;
+        
+        return matchesSearch && matchesCategory;
+    });
 
     useEffect(() => {
         fetch('http://localhost:8000/api/gallery')
@@ -77,14 +90,20 @@ export default function CommunityGallery() {
                 <div className="flex flex-col md:flex-row gap-4 mb-10 bg-white p-4 rounded-2xl shadow-sm border border-blue-100">
                     <input
                         type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder="Cari biota, karang, atau lokasi..."
                         className="flex-grow p-4 bg-gray-50 border-2 border-transparent text-gray-900 placeholder-gray-500 rounded-xl focus:outline-none focus:border-blue-400 focus:bg-white transition-colors"
                     />
-                    <select className="p-4 bg-gray-50 border-2 border-transparent text-gray-900 rounded-xl focus:outline-none focus:border-blue-400 focus:bg-white transition-colors cursor-pointer min-w-[200px]">
+                    <select 
+                        value={selectedCategory}
+                        onChange={(e) => setSelectedCategory(e.target.value)}
+                        className="p-4 bg-gray-50 border-2 border-transparent text-gray-900 rounded-xl focus:outline-none focus:border-blue-400 focus:bg-white transition-colors cursor-pointer min-w-[200px]"
+                    >
                         <option value="all">Semua Kategori</option>
-                        <option value="coral">Terumbu Karang</option>
-                        <option value="fish">Ikan & Biota Laut</option>
-                        <option value="environment">Lingkungan</option>
+                        <option value="Terumbu Karang">Terumbu Karang</option>
+                        <option value="Ikan & Biota Laut">Ikan & Biota Laut</option>
+                        <option value="Lingkungan">Lingkungan</option>
                     </select>
                 </div>
 
@@ -93,10 +112,22 @@ export default function CommunityGallery() {
                         <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
                         <p className="mt-4 text-blue-600 font-semibold animate-pulse">Menyelam mencari karya...</p>
                     </div>
+                ) : filteredItems.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-16 bg-white rounded-2xl border border-gray-100 shadow-sm">
+                        <span className="text-5xl mb-4">🐠</span>
+                        <h3 className="text-xl font-bold text-gray-800">Karya Tidak Ditemukan</h3>
+                        <p className="text-gray-500 mt-2 text-center max-w-md">Tidak ada karya yang cocok dengan pencarian atau kategori yang Anda pilih.</p>
+                        <button 
+                            onClick={() => { setSearchQuery(""); setSelectedCategory("all"); }} 
+                            className="mt-6 text-blue-600 font-semibold hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-6 py-2 rounded-full transition-colors"
+                        >
+                            Reset Pencarian
+                        </button>
+                    </div>
                 ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-                        {galleryItems.map((item) => (
-                            <div key={item.id} className="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 transform-gpu overflow-hidden cursor-pointer border border-gray-100 hover:border-blue-200 hover:-translate-y-2">
+                    <div className="flex-grow grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+                        {filteredItems.map((item) => (
+                            <div key={item.id} className="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 transform-gpu overflow-hidden cursor-pointer border border-gray-100 hover:border-blue-200 hover:-translate-y-2 flex flex-col h-full">
                                 <div className="h-56 bg-gradient-to-br from-blue-100 to-cyan-100 flex items-center justify-center relative overflow-hidden">
                                     <img src={item.image} alt={item.title} className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-500" />
                                     <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-md text-white text-[10px] uppercase tracking-wider font-bold px-3 py-1.5 rounded-full">
