@@ -1,6 +1,8 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import ModelViewer from '../components/ModelViewer';
+
 
 // Komponen Loading Screen (WP 2.3.1)
 const LoadingScreen = () => (
@@ -104,6 +106,25 @@ export default function HomePage() {
               <span className="w-12 h-12 flex items-center justify-center rounded-full border border-white/20">▶</span>
               Lihat Trailer
             </button>
+          </div>
+        </div>
+      </section>
+
+      {/* 3. SHOWCASE 3D KURAL (Hasil Import Teman) */}
+      <section className="py-24 relative overflow-hidden bg-[#000612]">
+        <div className="absolute inset-0 bg-blue-900/10 blur-[100px] z-0"></div>
+        <div className="max-w-7xl mx-auto px-6 relative z-10">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-black text-white mb-6">Jelajahi Terumbu Karang</h2>
+            <p className="text-gray-400 max-w-2xl mx-auto">
+              Perhatikan dengan saksama bentuk, tekstur, dan lekukan karang sesungguhnya hasil rekonstruksi teman Anda! Putar menggunakan kursor Anda.
+            </p>
+          </div>
+          <div className="w-full">
+            <ModelViewer
+              url="/models/usnm_74016-100k-2048-gltf_std/usnm_74016-100k-2048.gltf"
+              className="w-full h-[600px] mb-10"
+            />
           </div>
         </div>
       </section>
