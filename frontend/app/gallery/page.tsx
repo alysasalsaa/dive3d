@@ -1,8 +1,35 @@
 'use client';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 
+interface GalleryItem {
+  id: number;
+  title: string;
+  category: string;
+  image: string;
+  likes: number;
+  author: string;
+  description: string;
+}
+
 export default function CommunityGallery() {
+    const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        fetch('http://localhost:8000/api/gallery')
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    setGalleryItems(data.data);
+                }
+                setLoading(false);
+            })
+            .catch(err => {
+                console.error("Error fetching gallery:", err);
+                setLoading(false);
+            });
+    }, []);
     return (
         <div className="min-h-screen flex flex-col bg-gradient-to-b from-blue-50 to-cyan-50 font-sans">
 
@@ -61,20 +88,37 @@ export default function CommunityGallery() {
                     </select>
                 </div>
 
-                {/* Grid Gambar */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-                    {[1, 2, 3, 4, 5, 6, 7, 8].map((item) => (
-                        <div key={item} className="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 transform-gpu overflow-hidden cursor-pointer border border-gray-100 hover:border-blue-200 hover:-translate-y-2">
-                            <div className="h-56 bg-gradient-to-br from-blue-100 to-cyan-100 flex items-center justify-center">
-                                <span className="text-blue-400/80 font-bold text-lg">Karya {item}</span>
+                {loading ? (
+                    <div className="flex flex-col items-center justify-center py-20">
+                        <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+                        <p className="mt-4 text-blue-600 font-semibold animate-pulse">Menyelam mencari karya...</p>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+                        {galleryItems.map((item) => (
+                            <div key={item.id} className="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 transform-gpu overflow-hidden cursor-pointer border border-gray-100 hover:border-blue-200 hover:-translate-y-2">
+                                <div className="h-56 bg-gradient-to-br from-blue-100 to-cyan-100 flex items-center justify-center relative overflow-hidden">
+                                    <img src={item.image} alt={item.title} className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-500" />
+                                    <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-md text-white text-[10px] uppercase tracking-wider font-bold px-3 py-1.5 rounded-full">
+                                        {item.category}
+                                    </div>
+                                </div>
+                                <div className="p-5 flex flex-col justify-between h-40">
+                                    <div>
+                                        <h3 className="font-bold text-gray-800 text-lg group-hover:text-blue-600 line-clamp-1">{item.title}</h3>
+                                        <p className="text-sm text-gray-500 font-medium mt-1">oleh {item.author}</p>
+                                    </div>
+                                    <div className="flex justify-between items-center mt-3 border-t border-gray-50 pt-3">
+                                        <p className="text-xs text-gray-400 line-clamp-1 flex-1 mr-2">{item.description}</p>
+                                        <div className="flex items-center text-rose-500 text-sm font-bold bg-rose-50 px-2 py-1 rounded-lg">
+                                            <span className="mr-1">❤️</span> {item.likes}
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div className="p-5">
-                                <h3 className="font-bold text-gray-800 text-lg group-hover:text-blue-600">Keindahan Alam {item}</h3>
-                                <p className="text-sm text-gray-500 font-medium mt-1">Penyelam {item}</p>
-                            </div>
-                        </div>
-                    ))}
-                </div>
+                        ))}
+                    </div>
+                )}
             </main>
 
             {/* AREA FOOTER BARU */}
