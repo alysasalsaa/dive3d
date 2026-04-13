@@ -47,19 +47,30 @@ export default function DashboardWireframe() {
                 {/* Main Content Area */}
                 <main className="flex-1 flex flex-col overflow-y-auto">
 
-                    {/* NAVIGASI KONTROL: Header */}
-                    <header className="bg-white px-8 py-4 border-b border-gray-200 flex justify-between items-center sticky top-0 z-10">
-                        <div className="text-xl font-semibold text-gray-800">Learning Page</div>
+                    {/* NAVIGASI KONTROL: Header (BAGIAN INI YANG DIUBAH) */}
+                    <header className="bg-white/40 backdrop-blur-2xl px-6 py-5 border-b border-gray-200 flex justify-between items-center sticky top-0 z-10 transition-all">
+                        {/* Bagian Kiri: Profile Menu, Notifikasi, dan Judul dipindah ke kiri */}
                         <div className="flex items-center gap-4">
+                            <div className="w-10 h-10 bg-gradient-to-tr from-blue-400 to-cyan-400 rounded-full cursor-pointer shadow-sm border-2 border-white" title="Profile Menu"></div>
                             <div className="relative cursor-pointer p-2 hover:bg-gray-100 rounded-full transition-colors" title="Notifikasi">
                                 <span role="img" aria-label="bell" className="text-xl">🔔</span>
                                 <div className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></div>
                             </div>
-                            <div className="w-10 h-10 bg-gradient-to-tr from-blue-400 to-cyan-400 rounded-full cursor-pointer shadow-sm border-2 border-white" title="Profile Menu"></div>
+                            <div className="text-xl font-semibold text-gray-800 ml-2">Learning Page</div>
+                        </div>
+
+                        {/* Bagian Kanan: Global Navigation Bar (Desain persis seperti Gallery) */}
+                        <div className="hidden md:flex items-center gap-1 bg-white/40 backdrop-blur-2xl p-1.5 rounded-full border border-blue-100 shadow-xl">
+                            <Link href="/" className="px-6 py-2 rounded-full hover:bg-white/50 text-gray-600 hover:text-blue-600 transition-all text-sm font-semibold">Beranda</Link>
+                            <Link href="/gallery" className="px-6 py-2 rounded-full hover:bg-white/50 text-gray-600 hover:text-blue-600 transition-all text-sm font-semibold">Galeri</Link>
+                            <Link href="/dashboard" className="px-6 py-2 rounded-full bg-blue-600 text-white font-bold text-sm shadow-md">Dashboard</Link>
+                            <Link href="/tutorial" className="ml-4 px-6 py-2 bg-gradient-to-r from-blue-600 to-cyan-500 text-white rounded-full font-bold text-sm shadow-lg shadow-blue-600/20 transition-all">
+                                Mulai Belajar
+                            </Link>
                         </div>
                     </header>
 
-                    {/* Dashboard Content */}
+                    {/* Dashboard Content (SAMA PERSIS, TIDAK ADA YANG DIUBAH) */}
                     <div className="p-8 max-w-7xl mx-auto w-full space-y-6">
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
