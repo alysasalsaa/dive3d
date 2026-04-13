@@ -1,32 +1,7 @@
-'use client';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 
 export default function DashboardWireframe() {
-    const [dashboardData, setDashboardData] = useState<any>(null);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        fetch('http://localhost:8000/api/dashboard')
-            .then(res => res.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    setDashboardData(data.data);
-                }
-                setLoading(false);
-            })
-            .catch(err => {
-                console.error("Error fetching dashboard:", err);
-                setLoading(false);
-            });
-    }, []);
-
-    if (loading) {
-        return <div className="flex h-screen items-center justify-center bg-blue-50 text-blue-600 font-bold text-2xl animate-pulse">Menyelam ke Dashboard...</div>;
-    }
-
-    if (!dashboardData) return null;
-
     return (
         <>
             <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
@@ -103,16 +78,16 @@ export default function DashboardWireframe() {
                             <div className="md:col-span-2 bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center gap-6">
                                 <div className="w-24 h-24 bg-gradient-to-tr from-blue-400 to-cyan-400 rounded-full shadow-inner flex-shrink-0"></div>
                                 <div className="flex-1">
-                                    <div className="text-2xl font-bold text-gray-900">{dashboardData.user.name}</div>
+                                    <div className="text-2xl font-bold text-gray-900">Maulana Yudo Yudistira</div>
                                     <div className="text-blue-600 font-medium mt-1 flex items-center gap-1">
-                                        <span role="img" aria-label="stars">✨</span> Level {dashboardData.user.level} : {dashboardData.user.rank_name}
+                                        <span role="img" aria-label="stars">✨</span> Level 0 : Rookie
                                     </div>
                                     <div className="mt-4 bg-gray-100 rounded-full h-3 w-full overflow-hidden">
-                                        <div className="bg-blue-500 h-full rounded-full" style={{ width: `${(dashboardData.user.current_xp / dashboardData.user.next_level_xp) * 100}%` }}></div>
+                                        <div className="bg-blue-500 h-full rounded-full" style={{ width: '0%' }}></div>
                                     </div>
                                     <div className="flex justify-between text-sm text-gray-500 mt-2 font-medium">
-                                        <span>{dashboardData.user.current_xp} XP Saat Ini</span>
-                                        <span>Dibutuhkan {dashboardData.user.next_level_xp} XP untuk Level Up</span>
+                                        <span>0 XP Saat Ini</span>
+                                        <span>Dibutuhkan 5,000 XP untuk Level Up</span>
                                     </div>
                                 </div>
                             </div>
@@ -123,11 +98,9 @@ export default function DashboardWireframe() {
                                     <span role="img" aria-label="medal" className="text-xl">🏅</span> Koleksi Lencana
                                 </div>
                                 <div className="flex gap-4 justify-center">
-                                    {dashboardData.badges.map((badge: any) => (
-                                        <div key={badge.id} className={`w-14 h-14 rounded-full flex items-center justify-center text-2xl cursor-pointer transition-all ${badge.achieved ? 'bg-blue-50 border-2 border-blue-400 shadow-sm' : 'bg-gray-50 border-2 border-dashed border-gray-300'}`} title={`${badge.name}: ${badge.tooltip}`}>
-                                            <span role="img" aria-label={badge.name} className={badge.achieved ? 'opacity-100' : 'opacity-50 hover:opacity-100'}>{badge.icon}</span>
-                                        </div>
-                                    ))}
+                                    <div className="w-14 h-14 bg-gray-50 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center text-2xl hover:border-blue-400 hover:bg-blue-50 transition-all cursor-pointer" title="Pembelajar Cepat"><span role="img" aria-label="lightning" className="opacity-50 hover:opacity-100">⚡</span></div>
+                                    <div className="w-14 h-14 bg-gray-50 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center text-2xl hover:border-blue-400 hover:bg-blue-50 transition-all cursor-pointer" title="Nilai Sempurna"><span role="img" aria-label="target" className="opacity-50 hover:opacity-100">🎯</span></div>
+                                    <div className="w-14 h-14 bg-gray-50 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center text-2xl hover:border-blue-400 hover:bg-blue-50 transition-all cursor-pointer" title="Login Beruntun 7 Hari"><span role="img" aria-label="fire" className="opacity-50 hover:opacity-100">🔥</span></div>
                                 </div>
                             </div>
                         </div>
@@ -140,19 +113,33 @@ export default function DashboardWireframe() {
                                 </div>
 
                                 <div className="space-y-5">
-                                    {dashboardData.learning_progress.map((progress: any) => {
-                                        const c = progress.color || "blue";
-                                        return (
-                                        <div key={progress.course_id}>
-                                            <div className="flex justify-between text-sm font-medium mb-2">
-                                                <span className="text-gray-700">{progress.title}</span>
-                                                <span className={c === 'emerald' ? 'text-emerald-500' : c === 'amber' ? 'text-amber-500' : 'text-blue-500'}>{progress.progress_percentage}%</span>
-                                            </div>
-                                            <div className="bg-gray-100 rounded-full h-2 w-full overflow-hidden">
-                                                <div className={c === 'emerald' ? 'bg-emerald-500 h-full rounded-full' : c === 'amber' ? 'bg-amber-500 h-full rounded-full' : 'bg-blue-500 h-full rounded-full'} style={{ width: `${progress.progress_percentage}%` }}></div>
-                                            </div>
+                                    <div>
+                                        <div className="flex justify-between text-sm font-medium mb-2">
+                                            <span className="text-gray-700">Desain UI/UX Masterclass</span>
+                                            <span className="text-emerald-500">0%</span>
                                         </div>
-                                    )})}
+                                        <div className="bg-gray-100 rounded-full h-2 w-full overflow-hidden">
+                                            <div className="bg-emerald-500 h-full rounded-full" style={{ width: "0%" }}></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div className="flex justify-between text-sm font-medium mb-2">
+                                            <span className="text-gray-700">Pemrograman JavaScript Dasar</span>
+                                            <span className="text-blue-500">0%</span>
+                                        </div>
+                                        <div className="bg-gray-100 rounded-full h-2 w-full overflow-hidden">
+                                            <div className="bg-blue-500 h-full rounded-full" style={{ width: "0%" }}></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div className="flex justify-between text-sm font-medium mb-2">
+                                            <span className="text-gray-700">Pengantar Data Science</span>
+                                            <span className="text-amber-500">0%</span>
+                                        </div>
+                                        <div className="bg-gray-100 rounded-full h-2 w-full overflow-hidden">
+                                            <div className="bg-amber-500 h-full rounded-full" style={{ width: "0%" }}></div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -162,17 +149,18 @@ export default function DashboardWireframe() {
                                     <span role="img" aria-label="memo" className="text-xl">📝</span> Ringkasan Skor Kuis
                                 </div>
                                 <div className="space-y-4">
-                                    {dashboardData.recent_quizzes.map((quiz: any) => {
-                                        const c = quiz.color || 'blue';
-                                        const borderClass = c === 'emerald' ? 'border-emerald-100 bg-emerald-50/30' : c === 'amber' ? 'border-amber-100 bg-amber-50/30' : 'border-blue-100 bg-blue-50/30';
-                                        const textClass = c === 'emerald' ? 'text-emerald-600' : c === 'amber' ? 'text-amber-600' : 'text-blue-600';
-                                        
-                                        return (
-                                        <div key={quiz.quiz_id} className={`flex justify-between items-center p-3 rounded-lg border ${borderClass}`}>
-                                            <span className="text-sm font-medium text-gray-700">{quiz.title}</span>
-                                            <span className={`text-sm font-bold ${textClass}`}>{quiz.score} / 100</span>
-                                        </div>
-                                    )})}
+                                    <div className="flex justify-between items-center p-3 rounded-lg border border-emerald-100 bg-emerald-50/30">
+                                        <span className="text-sm font-medium text-gray-700">Kuis: Teori Warna (UI/UX)</span>
+                                        <span className="text-sm font-bold text-emerald-600">0 / 100</span>
+                                    </div>
+                                    <div className="flex justify-between items-center p-3 rounded-lg border border-amber-100 bg-amber-50/30">
+                                        <span className="text-sm font-medium text-gray-700">Kuis: Logika Percabangan (JS)</span>
+                                        <span className="text-sm font-bold text-amber-600">0 / 100</span>
+                                    </div>
+                                    <div className="flex justify-between items-center p-3 rounded-lg border border-blue-100 bg-blue-50/30">
+                                        <span className="text-sm font-medium text-gray-700">Ujian Tengah Semester</span>
+                                        <span className="text-sm font-bold text-blue-600">0 / 100</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -186,32 +174,30 @@ export default function DashboardWireframe() {
                                     <span role="img" aria-label="crown" className="text-xl">👑</span> Leaderboard Top 3
                                 </div>
                                 <div className="space-y-4">
-                                    {dashboardData.leaderboard.map((user: any) => {
-                                        const rankColors: any = {
-                                            1: "bg-yellow-50/50 border-transparent",
-                                            2: "bg-gray-50 border-transparent",
-                                            3: "bg-orange-50/50 border-orange-100"
-                                        };
-                                        const textColors: any = {
-                                            1: "text-yellow-600",
-                                            2: "text-gray-600",
-                                            3: "text-orange-600"
-                                        };
-                                        const badgeColors: any = {
-                                            1: "bg-yellow-400",
-                                            2: "bg-gray-300",
-                                            3: "bg-orange-400"
-                                        };
-                                        return (
-                                        <div key={user.rank} className={`flex items-center gap-3 p-2 rounded-lg border ${rankColors[user.rank] || 'bg-white border-gray-100'}`}>
-                                            <div className={`w-8 h-8 rounded-full ${badgeColors[user.rank] || 'bg-blue-300'} text-white flex items-center justify-center font-bold text-sm shadow-sm`}>{user.rank}</div>
-                                            <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-xl">{user.avatar_emoji}</div>
-                                            <div className="flex-1">
-                                                <div className={`text-sm font-bold ${user.rank === 3 ? 'text-blue-700' : 'text-gray-800'}`}>{user.name}</div>
-                                                <div className={`text-xs font-medium ${textColors[user.rank] || 'text-gray-500'}`}>{user.xp} XP</div>
-                                            </div>
+                                    <div className="flex items-center gap-3 p-2 rounded-lg bg-yellow-50/50">
+                                        <div className="w-8 h-8 rounded-full bg-yellow-400 text-white flex items-center justify-center font-bold text-sm shadow-sm">1</div>
+                                        <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-xl">👨</div>
+                                        <div className="flex-1">
+                                            <div className="text-sm font-bold text-gray-800">Rama Putra M.</div>
+                                            <div className="text-xs text-yellow-600 font-medium">0 XP</div>
                                         </div>
-                                    )})}
+                                    </div>
+                                    <div className="flex items-center gap-3 p-2 rounded-lg bg-gray-50">
+                                        <div className="w-8 h-8 rounded-full bg-gray-300 text-white flex items-center justify-center font-bold text-sm shadow-sm">2</div>
+                                        <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-xl">👨‍🦱</div>
+                                        <div className="flex-1">
+                                            <div className="text-sm font-bold text-gray-800">Abyan Bergas I.</div>
+                                            <div className="text-xs text-gray-600 font-medium">0 XP</div>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-3 p-2 rounded-lg bg-orange-50/50 border border-orange-100">
+                                        <div className="w-8 h-8 rounded-full bg-orange-400 text-white flex items-center justify-center font-bold text-sm shadow-sm">3</div>
+                                        <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-xl">👨</div>
+                                        <div className="flex-1">
+                                            <div className="text-sm font-bold text-blue-700">Maulana Yudo Y.</div>
+                                            <div className="text-xs text-orange-600 font-medium">0 XP</div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -221,17 +207,24 @@ export default function DashboardWireframe() {
                                     <span role="img" aria-label="crossed_swords" className="text-xl">⚔️</span> Tantangan Harian
                                 </div>
                                 <div className="space-y-4">
-                                    {dashboardData.daily_challenges.map((challenge: any) => (
-                                        <div key={challenge.id} className="p-4 rounded-xl border border-gray-100 bg-gray-50">
-                                            <div className="text-sm font-bold text-gray-800 mb-2">{challenge.title}</div>
-                                            <div className="bg-gray-200 rounded-full h-1.5 w-full overflow-hidden mb-2">
-                                                <div className={`${challenge.id % 2 === 0 ? 'bg-emerald-500' : 'bg-blue-500'} h-full rounded-full`} style={{ width: `${challenge.progress_percentage}%` }}></div>
-                                            </div>
-                                            <div className={`text-xs font-semibold flex items-center gap-1 ${challenge.id % 2 === 0 ? 'text-emerald-600' : 'text-blue-600'}`}>
-                                                <span role="img" aria-label="reward">{challenge.reward_icon}</span> {challenge.reward_text}
-                                            </div>
+                                    <div className="p-4 rounded-xl border border-gray-100 bg-gray-50">
+                                        <div className="text-sm font-bold text-gray-800 mb-2">Selesaikan 2 Materi Video</div>
+                                        <div className="bg-gray-200 rounded-full h-1.5 w-full overflow-hidden mb-2">
+                                            <div className="bg-blue-500 h-full rounded-full" style={{ width: "0%" }}></div>
                                         </div>
-                                    ))}
+                                        <div className="text-xs font-semibold text-blue-600 flex items-center gap-1">
+                                            <span role="img" aria-label="gem">💎</span> +150 Gems & 1 Mystery Box
+                                        </div>
+                                    </div>
+                                    <div className="p-4 rounded-xl border border-gray-100 bg-gray-50">
+                                        <div className="text-sm font-bold text-gray-800 mb-2">Dapatkan Skor Penuh di Kuis</div>
+                                        <div className="bg-gray-200 rounded-full h-1.5 w-full overflow-hidden mb-2">
+                                            <div className="bg-emerald-500 h-full rounded-full" style={{ width: "0%" }}></div>
+                                        </div>
+                                        <div className="text-xs font-semibold text-emerald-600 flex items-center gap-1">
+                                            <span role="img" aria-label="star">🌟</span> Lencana Emas Spesial
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -243,7 +236,7 @@ export default function DashboardWireframe() {
                                 <div className="mb-6">
                                     <div className="text-sm text-blue-200 font-medium mb-1">Total Gems Yang Anda Miliki:</div>
                                     <div className="text-4xl font-extrabold text-white flex items-center justify-center gap-2">
-                                        <span role="img" aria-label="gem">💎</span> {dashboardData.user.gems}
+                                        <span role="img" aria-label="gem">💎</span> 0
                                     </div>
                                 </div>
                                 <button className="w-full bg-gradient-to-r from-yellow-400 to-orange-400 hover:from-yellow-300 hover:to-orange-300 text-orange-950 font-bold py-3 px-4 rounded-xl transition-transform transform hover:-translate-y-1 shadow-lg">
