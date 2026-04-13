@@ -4,22 +4,29 @@ import Link from 'next/link';
 
 export default function CommunityGallery() {
     return (
-        // Menggunakan flex flex-col min-h-screen agar footer selalu terdorong ke bawah
         <div className="min-h-screen flex flex-col bg-gradient-to-b from-blue-50 to-cyan-50 font-sans">
 
-            {/* AREA KONTEN UTAMA */}
-            <main className="flex-grow p-8">
-                {/* Tombol Kembali ke Beranda */}
-                <Link
-                    href="/"
-                    className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium mb-8 transition-colors duration-300 group"
-                >
-                    <span className="group-hover:-translate-x-1 transition-transform duration-300 transform-gpu mr-2">
-                        ←
-                    </span>
-                    Kembali ke Beranda
-                </Link>
+            {/* GLOBAL NAVBAR (SAMA DENGAN BERANDA) */}
+            <nav className="fixed top-0 w-full z-50 px-6 py-5 flex justify-between items-center transition-all">
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-400 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
+                        <span className="text-xl text-white">🌊</span>
+                    </div>
+                    <span className="text-xl font-black tracking-widest text-blue-900">DIVEXPLORE</span>
+                </div>
 
+                <div className="hidden md:flex items-center gap-1 bg-white/40 backdrop-blur-2xl p-1.5 rounded-full border border-blue-100 shadow-xl">
+                    <Link href="/" className="px-6 py-2 rounded-full hover:bg-white/50 text-gray-600 hover:text-blue-600 transition-all text-sm font-semibold">Beranda</Link>
+                    <Link href="/gallery" className="px-6 py-2 rounded-full bg-blue-600 text-white font-bold text-sm shadow-md">Galeri</Link>
+                    <Link href="/dashboard" className="px-6 py-2 rounded-full hover:bg-white/50 text-gray-600 hover:text-blue-600 transition-all text-sm font-semibold">Dashboard</Link>
+                    <Link href="/tutorial" className="ml-4 px-6 py-2 bg-gradient-to-r from-blue-600 to-cyan-500 text-white rounded-full font-bold text-sm shadow-lg shadow-blue-600/20 transition-all">
+                        Mulai Belajar
+                    </Link>
+                </div>
+            </nav>
+
+            {/* KONTEN UTAMA - Ditambahkan padding top agar tidak tertutup Navbar */}
+            <main className="flex-grow pt-32 p-8">
                 {/* Header Section */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
                     <div>
@@ -31,7 +38,6 @@ export default function CommunityGallery() {
                         </p>
                     </div>
 
-                    {/* Tombol Upload */}
                     <button
                         onClick={() => alert('Pop-up UI Upload Karya akan muncul di sini!')}
                         className="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-bold py-3 px-8 rounded-full transition-transform duration-300 shadow-lg transform-gpu hover:-translate-y-1"
@@ -47,9 +53,7 @@ export default function CommunityGallery() {
                         placeholder="Cari biota, karang, atau lokasi..."
                         className="flex-grow p-4 bg-gray-50 border-2 border-transparent text-gray-900 placeholder-gray-500 rounded-xl focus:outline-none focus:border-blue-400 focus:bg-white transition-colors"
                     />
-                    <select
-                        className="p-4 bg-gray-50 border-2 border-transparent text-gray-900 rounded-xl focus:outline-none focus:border-blue-400 focus:bg-white transition-colors cursor-pointer min-w-[200px]"
-                    >
+                    <select className="p-4 bg-gray-50 border-2 border-transparent text-gray-900 rounded-xl focus:outline-none focus:border-blue-400 focus:bg-white transition-colors cursor-pointer min-w-[200px]">
                         <option value="all">Semua Kategori</option>
                         <option value="coral">Terumbu Karang</option>
                         <option value="fish">Ikan & Biota Laut</option>
@@ -57,28 +61,16 @@ export default function CommunityGallery() {
                     </select>
                 </div>
 
-                {/* Browse Grid Section */}
+                {/* Grid Gambar */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
                     {[1, 2, 3, 4, 5, 6, 7, 8].map((item) => (
                         <div key={item} className="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 transform-gpu overflow-hidden cursor-pointer border border-gray-100 hover:border-blue-200 hover:-translate-y-2">
-                            <div className="h-56 bg-gradient-to-br from-blue-100 to-cyan-100 flex items-center justify-center relative overflow-hidden">
-                                <div className="absolute inset-0 bg-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                                <span className="text-blue-400/80 font-bold text-lg z-10 transform-gpu group-hover:scale-110 transition-transform duration-300">
-                                    Karya {item}
-                                </span>
+                            <div className="h-56 bg-gradient-to-br from-blue-100 to-cyan-100 flex items-center justify-center">
+                                <span className="text-blue-400/80 font-bold text-lg">Karya {item}</span>
                             </div>
                             <div className="p-5">
-                                <h3 className="font-bold text-gray-800 text-lg group-hover:text-blue-600 transition-colors">
-                                    Keindahan Alam {item}
-                                </h3>
-                                <div className="flex items-center mt-3">
-                                    <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-xs">
-                                        P{item}
-                                    </div>
-                                    <p className="text-sm text-gray-500 font-medium ml-3">
-                                        Penyelam {item}
-                                    </p>
-                                </div>
+                                <h3 className="font-bold text-gray-800 text-lg group-hover:text-blue-600">Keindahan Alam {item}</h3>
+                                <p className="text-sm text-gray-500 font-medium mt-1">Penyelam {item}</p>
                             </div>
                         </div>
                     ))}
@@ -133,7 +125,6 @@ export default function CommunityGallery() {
                     &copy; {new Date().getFullYear()} Tim Divexplore-3D. Hak Cipta Dilindungi.
                 </div>
             </footer>
-
         </div>
     );
 }
