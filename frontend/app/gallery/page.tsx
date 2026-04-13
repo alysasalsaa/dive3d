@@ -1,72 +1,37 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 
-interface GalleryItem {
-  id: number;
-  title: string;
-  category: string;
-  image: string;
-  likes: number;
-  author: string;
-  description: string;
-}
-
 export default function CommunityGallery() {
-    const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [searchQuery, setSearchQuery] = useState("");
-    const [selectedCategory, setSelectedCategory] = useState("all");
+    // Sakelar untuk mengontrol pop-up UI
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
-    // Filter data berdasarkan input search dan select kategori
-    const filteredItems = galleryItems.filter(item => {
-        const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                              item.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                              item.author.toLowerCase().includes(searchQuery.toLowerCase());
-        
-        const matchesCategory = selectedCategory === "all" || item.category === selectedCategory;
-        
-        return matchesSearch && matchesCategory;
-    });
-
-    useEffect(() => {
-        fetch('http://localhost:8000/api/gallery')
-            .then(res => res.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    setGalleryItems(data.data);
-                }
-                setLoading(false);
-            })
-            .catch(err => {
-                console.error("Error fetching gallery:", err);
-                setLoading(false);
-            });
-    }, []);
     return (
-        <div className="min-h-screen flex flex-col bg-gradient-to-b from-blue-50 to-cyan-50 font-sans">
+        <div className="min-h-screen flex flex-col bg-gradient-to-b from-blue-50 to-cyan-50 font-['Outfit']">
 
-            {/* GLOBAL NAVBAR (SAMA DENGAN BERANDA) */}
+            {/* GLOBAL NAVBAR - LIGHT STYLE DENGAN CAPSULE LOGO */}
             <nav className="fixed top-0 w-full z-50 px-6 py-5 flex justify-between items-center transition-all">
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-400 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
-                        <span className="text-xl text-white">🌊</span>
+                {/* BAGIAN KIRI: Logo & Judul dibungkus background kapsul */}
+                <div className="flex items-center gap-3 bg-white/70 backdrop-blur-xl py-2 px-5 rounded-full border border-blue-100 shadow-sm">
+                    <div className="w-9 h-9 bg-gradient-to-br from-blue-600 to-blue-400 rounded-full flex items-center justify-center shadow-md">
+                        <span className="text-base text-white">🌊</span>
                     </div>
-                    <span className="text-xl font-black tracking-widest text-blue-900">DIVEXPLORE</span>
+                    <span className="text-lg font-black tracking-widest text-blue-900 pr-1">DIVEXPLORE</span>
                 </div>
 
-                <div className="hidden md:flex items-center gap-1 bg-white/40 backdrop-blur-2xl p-1.5 rounded-full border border-blue-100 shadow-xl">
+                {/* BAGIAN KANAN: Menu Navigasi */}
+                <div className="hidden md:flex items-center gap-1 bg-white/70 backdrop-blur-xl p-1.5 rounded-full border border-blue-100 shadow-sm">
                     <Link href="/" className="px-6 py-2 rounded-full hover:bg-white/50 text-gray-600 hover:text-blue-600 transition-all text-sm font-semibold">Beranda</Link>
                     <Link href="/gallery" className="px-6 py-2 rounded-full bg-blue-600 text-white font-bold text-sm shadow-md">Galeri</Link>
                     <Link href="/dashboard" className="px-6 py-2 rounded-full hover:bg-white/50 text-gray-600 hover:text-blue-600 transition-all text-sm font-semibold">Dashboard</Link>
-                    <Link href="/tutorial" className="ml-4 px-6 py-2 bg-gradient-to-r from-blue-600 to-cyan-500 text-white rounded-full font-bold text-sm shadow-lg shadow-blue-600/20 transition-all">
+                    <Link href="/tutorial" className="ml-4 px-6 py-2 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 text-white rounded-full font-bold text-sm shadow-lg shadow-blue-600/20 transition-all">
                         Mulai Belajar
                     </Link>
                 </div>
             </nav>
 
-            {/* KONTEN UTAMA - Ditambahkan padding top agar tidak tertutup Navbar */}
-            <main className="flex-grow pt-32 p-8">
+            {/* KONTEN UTAMA */}
+            <main className="flex-grow pt-32 p-8 max-w-7xl mx-auto w-full">
                 {/* Header Section */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
                     <div>
@@ -78,8 +43,9 @@ export default function CommunityGallery() {
                         </p>
                     </div>
 
+                    {/* Tombol pemicu Modal Pop-up */}
                     <button
-                        onClick={() => alert('Pop-up UI Upload Karya akan muncul di sini!')}
+                        onClick={() => setIsModalOpen(true)}
                         className="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-bold py-3 px-8 rounded-full transition-transform duration-300 shadow-lg transform-gpu hover:-translate-y-1"
                     >
                         + Unggah Karya
@@ -90,81 +56,48 @@ export default function CommunityGallery() {
                 <div className="flex flex-col md:flex-row gap-4 mb-10 bg-white p-4 rounded-2xl shadow-sm border border-blue-100">
                     <input
                         type="text"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder="Cari biota, karang, atau lokasi..."
-                        className="flex-grow p-4 bg-gray-50 border-2 border-transparent text-gray-900 placeholder-gray-500 rounded-xl focus:outline-none focus:border-blue-400 focus:bg-white transition-colors"
+                        className="flex-grow p-4 bg-gray-50 border-2 border-transparent text-gray-900 placeholder-gray-500 rounded-xl focus:outline-none focus:border-blue-400 focus:bg-white transition-colors font-medium"
                     />
-                    <select 
-                        value={selectedCategory}
-                        onChange={(e) => setSelectedCategory(e.target.value)}
-                        className="p-4 bg-gray-50 border-2 border-transparent text-gray-900 rounded-xl focus:outline-none focus:border-blue-400 focus:bg-white transition-colors cursor-pointer min-w-[200px]"
-                    >
+                    <select className="p-4 bg-gray-50 border-2 border-transparent text-gray-900 rounded-xl focus:outline-none focus:border-blue-400 focus:bg-white transition-colors cursor-pointer min-w-[200px] font-medium">
                         <option value="all">Semua Kategori</option>
-                        <option value="Terumbu Karang">Terumbu Karang</option>
-                        <option value="Ikan & Biota Laut">Ikan & Biota Laut</option>
-                        <option value="Lingkungan">Lingkungan</option>
+                        <option value="coral">Terumbu Karang</option>
+                        <option value="fish">Ikan & Biota Laut</option>
+                        <option value="environment">Lingkungan</option>
                     </select>
                 </div>
 
-                {loading ? (
-                    <div className="flex flex-col items-center justify-center py-20">
-                        <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
-                        <p className="mt-4 text-blue-600 font-semibold animate-pulse">Menyelam mencari karya...</p>
-                    </div>
-                ) : filteredItems.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-16 bg-white rounded-2xl border border-gray-100 shadow-sm">
-                        <span className="text-5xl mb-4">🐠</span>
-                        <h3 className="text-xl font-bold text-gray-800">Karya Tidak Ditemukan</h3>
-                        <p className="text-gray-500 mt-2 text-center max-w-md">Tidak ada karya yang cocok dengan pencarian atau kategori yang Anda pilih.</p>
-                        <button 
-                            onClick={() => { setSearchQuery(""); setSelectedCategory("all"); }} 
-                            className="mt-6 text-blue-600 font-semibold hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-6 py-2 rounded-full transition-colors"
-                        >
-                            Reset Pencarian
-                        </button>
-                    </div>
-                ) : (
-                    <div className="flex-grow grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-                        {filteredItems.map((item) => (
-                            <div key={item.id} className="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 transform-gpu overflow-hidden cursor-pointer border border-gray-100 hover:border-blue-200 hover:-translate-y-2 flex flex-col h-full">
-                                <div className="h-56 bg-gradient-to-br from-blue-100 to-cyan-100 flex items-center justify-center relative overflow-hidden">
-                                    <img src={item.image} alt={item.title} className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-500" />
-                                    <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-md text-white text-[10px] uppercase tracking-wider font-bold px-3 py-1.5 rounded-full">
-                                        {item.category}
+                {/* Grid Gambar */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+                    {[1, 2, 3, 4, 5, 6, 7, 8].map((item) => (
+                        <div key={item} className="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 transform-gpu overflow-hidden cursor-pointer border border-gray-100 hover:border-blue-200 hover:-translate-y-2">
+                            <div className="h-56 bg-gradient-to-br from-blue-100 to-cyan-100 flex items-center justify-center relative overflow-hidden">
+                                <div className="absolute inset-0 bg-blue-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                <span className="text-blue-400/80 font-bold text-lg transform-gpu group-hover:scale-110 transition-transform duration-300">Karya {item}</span>
+                            </div>
+                            <div className="p-5">
+                                <h3 className="font-bold text-gray-800 text-lg group-hover:text-blue-600 transition-colors">Keindahan Alam {item}</h3>
+                                <div className="flex items-center mt-3">
+                                    <div className="w-7 h-7 rounded-full bg-cyan-100 flex items-center justify-center text-cyan-700 font-bold text-[10px]">
+                                        P{item}
                                     </div>
-                                </div>
-                                <div className="p-5 flex flex-col justify-between h-40">
-                                    <div>
-                                        <h3 className="font-bold text-gray-800 text-lg group-hover:text-blue-600 line-clamp-1">{item.title}</h3>
-                                        <p className="text-sm text-gray-500 font-medium mt-1">oleh {item.author}</p>
-                                    </div>
-                                    <div className="flex justify-between items-center mt-3 border-t border-gray-50 pt-3">
-                                        <p className="text-xs text-gray-400 line-clamp-1 flex-1 mr-2">{item.description}</p>
-                                        <div className="flex items-center text-rose-500 text-sm font-bold bg-rose-50 px-2 py-1 rounded-lg">
-                                            <span className="mr-1">❤️</span> {item.likes}
-                                        </div>
-                                    </div>
+                                    <p className="text-sm text-gray-500 font-medium ml-2">Penyelam {item}</p>
                                 </div>
                             </div>
-                        ))}
-                    </div>
-                )}
+                        </div>
+                    ))}
+                </div>
             </main>
 
-            {/* AREA FOOTER BARU */}
+            {/* FOOTER */}
             <footer className="bg-blue-950 text-blue-100 pt-16 pb-8 px-8 mt-12 border-t-4 border-cyan-500">
                 <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10">
-
-                    {/* Kolom 1: Info Proyek */}
                     <div>
                         <h4 className="text-2xl font-bold text-white mb-4">Divexplore-3D</h4>
                         <p className="text-sm text-blue-200 leading-relaxed">
                             Platform pembelajaran konservasi laut interaktif berbasis 3D. Menjelajahi keindahan ekosistem dan biota laut Raja Ampat langsung dari layarmu.
                         </p>
                     </div>
-
-                    {/* Kolom 2: Tautan Cepat */}
                     <div>
                         <h4 className="text-lg font-semibold text-white mb-4">Tautan Cepat</h4>
                         <ul className="space-y-3 text-sm">
@@ -174,32 +107,103 @@ export default function CommunityGallery() {
                             <li><Link href="#" className="hover:text-cyan-400 transition-colors flex items-center"><span className="mr-2">›</span> Tentang Kami</Link></li>
                         </ul>
                     </div>
-
-                    {/* Kolom 3: Kontak & Alamat */}
                     <div>
                         <h4 className="text-lg font-semibold text-white mb-4">Hubungi Kami</h4>
                         <ul className="space-y-4 text-sm">
-                            <li className="flex items-start">
-                                <span className="text-cyan-400 mr-3 text-lg">📍</span>
-                                <span>Kampus UNY, Karangmalang,<br />Yogyakarta</span>
-                            </li>
-                            <li className="flex items-center">
-                                <span className="text-cyan-400 mr-3 text-lg">✉️</span>
-                                <span>hello@divexplore3d.com</span>
-                            </li>
-                            <li className="flex items-center">
-                                <span className="text-cyan-400 mr-3 text-lg">📞</span>
-                                <span>+62 812 3456 7890</span>
-                            </li>
+                            <li className="flex items-start"><span className="text-cyan-400 mr-3 text-lg">📍</span><span>Kampus UNY, Karangmalang,<br />Yogyakarta</span></li>
+                            <li className="flex items-center"><span className="text-cyan-400 mr-3 text-lg">✉️</span><span>hello@divexplore3d.com</span></li>
+                            <li className="flex items-center"><span className="text-cyan-400 mr-3 text-lg">📞</span><span>+62 812 3456 7890</span></li>
                         </ul>
                     </div>
                 </div>
-
-                {/* Copyright Section */}
                 <div className="max-w-7xl mx-auto border-t border-blue-800/50 mt-12 pt-8 text-center text-sm text-blue-400/80">
                     &copy; {new Date().getFullYear()} Tim Divexplore-3D. Hak Cipta Dilindungi.
                 </div>
             </footer>
+
+            {/* MODAL POP-UP UNGGAH KARYA */}
+            {isModalOpen && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                    {/* Latar Belakang Hitam Transparan */}
+                    <div
+                        className="absolute inset-0 bg-blue-900/40 backdrop-blur-sm transition-opacity"
+                        onClick={() => setIsModalOpen(false)}
+                    ></div>
+
+                    {/* Kotak Form Utama */}
+                    <div className="bg-white rounded-[32px] shadow-2xl w-full max-w-lg relative z-10 overflow-hidden transform transition-all">
+
+                        {/* Header Modal */}
+                        <div className="bg-gradient-to-r from-blue-600 to-cyan-500 p-6 flex justify-between items-center">
+                            <h3 className="text-white font-bold text-xl flex items-center gap-2">
+                                <span className="text-2xl">📸</span> Unggah Karya Baru
+                            </h3>
+                            <button
+                                onClick={() => setIsModalOpen(false)}
+                                className="w-8 h-8 flex items-center justify-center rounded-full bg-white/20 text-white hover:bg-white/30 transition-colors font-bold"
+                            >
+                                ✕
+                            </button>
+                        </div>
+
+                        {/* Isi Form */}
+                        <div className="p-6 space-y-5">
+
+                            {/* Area Drag & Drop Gambar */}
+                            <div className="border-2 border-dashed border-blue-200 rounded-2xl p-10 flex flex-col items-center justify-center bg-blue-50/50 hover:bg-blue-50 transition-colors cursor-pointer group">
+                                <div className="w-16 h-16 bg-white rounded-full shadow-sm flex items-center justify-center text-3xl mb-3 group-hover:scale-110 transition-transform">
+                                    📥
+                                </div>
+                                <p className="text-blue-700 font-bold">Pilih gambar atau tarik ke sini</p>
+                                <p className="text-xs text-gray-500 mt-2 font-medium">Format didukung: JPG, PNG. Maksimal 5MB.</p>
+                            </div>
+
+                            {/* Input Judul */}
+                            <div>
+                                <label className="block text-sm font-bold text-gray-700 mb-2">Judul Karya <span className="text-red-500">*</span></label>
+                                <input
+                                    type="text"
+                                    placeholder="Beri judul yang menarik..."
+                                    className="w-full p-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 focus:bg-white focus:outline-none transition-all font-medium"
+                                />
+                            </div>
+
+                            {/* Input Kategori */}
+                            <div>
+                                <label className="block text-sm font-bold text-gray-700 mb-2">Kategori Karya <span className="text-red-500">*</span></label>
+                                <select className="w-full p-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 focus:bg-white focus:outline-none transition-all font-medium cursor-pointer text-gray-700">
+                                    <option value="" disabled selected>Pilih kategori yang sesuai...</option>
+                                    <option value="coral">Terumbu Karang</option>
+                                    <option value="fish">Ikan & Biota Laut</option>
+                                    <option value="environment">Lingkungan Laut</option>
+                                </select>
+                            </div>
+
+                        </div>
+
+                        {/* Footer Modal (Tombol Aksi) */}
+                        <div className="p-6 bg-gray-50 flex justify-end gap-3 border-t border-gray-100">
+                            <button
+                                onClick={() => setIsModalOpen(false)}
+                                className="px-6 py-3 text-gray-600 font-bold hover:bg-gray-200 rounded-xl transition-colors"
+                            >
+                                Batal
+                            </button>
+                            <button
+                                onClick={() => {
+                                    alert('Fitur terhubung ke API akan dikerjakan di tahap selanjutnya!');
+                                    setIsModalOpen(false);
+                                }}
+                                className="px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-bold rounded-xl shadow-lg hover:shadow-blue-500/30 transition-all transform hover:-translate-y-0.5"
+                            >
+                                Kirim Karya
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            )}
+
         </div>
     );
 }
