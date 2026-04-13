@@ -79,7 +79,7 @@ export default function HomePage() {
         </div>
 
         <div className="relative z-10 text-center max-w-5xl px-6">
-          <div className="inline-block px-4 py-1.5 mb-6 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs font-bold tracking-[0.2em] uppercase animate-pulse">
+          <div className="inline-block px-5 py-2 mb-6 rounded-full bg-cyan-500/20 border border-cyan-400/60 text-cyan-100 text-xs font-black tracking-[0.25em] uppercase animate-pulse shadow-[0_0_25px_rgba(34,211,238,0.6)]">
             Eksplorasi Virtual 3D
           </div>
           <h1 className="text-6xl md:text-8xl font-black mb-8 leading-[1.1] tracking-tighter">
