@@ -36,14 +36,14 @@ class DashboardController extends Controller
                 [ "id" => 3, "name" => "Login Beruntun 7 Hari", "icon" => "🔥", "achieved" => false, "tooltip" => "Login 7 hari berturut-turut" ]
             ],
             "learning_progress" => [
-                [ "course_id" => 1, "title" => "Desain UI/UX Masterclass", "progress_percentage" => 45, "color" => "emerald" ],
-                [ "course_id" => 2, "title" => "Pemrograman JavaScript Dasar", "progress_percentage" => 20, "color" => "blue" ],
-                [ "course_id" => 3, "title" => "Pengantar Data Science", "progress_percentage" => 10, "color" => "amber" ]
+                [ "course_id" => 1, "title" => "Konservasi Terumbu Karang", "progress_percentage" => 45, "color" => "emerald" ],
+                [ "course_id" => 2, "title" => "Pengenalan Biota Laut Dasar", "progress_percentage" => 20, "color" => "blue" ],
+                [ "course_id" => 3, "title" => "Navigasi & Ekosistem Laut", "progress_percentage" => 10, "color" => "amber" ]
             ],
             "recent_quizzes" => [
-                [ "quiz_id" => 1, "title" => "Kuis: Teori Warna (UI/UX)", "score" => 85, "color" => "emerald" ],
-                [ "quiz_id" => 2, "title" => "Kuis: Logika Percabangan (JS)", "score" => 90, "color" => "amber" ],
-                [ "quiz_id" => 3, "title" => "Ujian Tengah Semester", "score" => 75, "color" => "blue" ]
+                [ "quiz_id" => 1, "title" => "Kuis: Anatomi Terumbu Karang", "score" => 85, "color" => "emerald" ],
+                [ "quiz_id" => 2, "title" => "Kuis: Fakta Ikan & Mamalia Laut", "score" => 90, "color" => "amber" ],
+                [ "quiz_id" => 3, "title" => "Ujian Sertifikasi Penyelam 3D", "score" => 75, "color" => "blue" ]
             ],
             "leaderboard" => [
                 [ "rank" => 1, "name" => "Rama Putra M.", "xp" => 4500, "avatar_emoji" => "👨" ],
