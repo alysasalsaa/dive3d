@@ -46,19 +46,23 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-[#00040a] text-white font-['Outfit'] overflow-x-hidden animate-in fade-in duration-1000">
       {/* 1. ULTRA NAVBAR */}
-      <nav className="fixed top-0 w-full z-50 px-6 py-5 flex justify-between items-center">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
-            <span className="text-xl">🌊</span>
+      {/* GLOBAL NAVBAR - DARK STYLE WITH CAPSULE LOGO */}
+      <nav className="fixed top-0 w-full z-50 px-6 py-5 flex justify-between items-center transition-all">
+
+        {/* BAGIAN KIRI: Logo & Judul dengan Kapsul Gelap */}
+        <div className="flex items-center gap-3 bg-white/10 backdrop-blur-xl py-2 px-5 rounded-full border border-white/10 shadow-2xl">
+          <div className="w-9 h-9 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-full flex items-center justify-center shadow-lg shadow-blue-500/20">
+            <span className="text-base">🌊</span>
           </div>
-          <span className="text-xl font-black tracking-widest text-white">DIVEXPLORE</span>
+          <span className="text-lg font-black tracking-widest text-white pr-1">DIVEXPLORE</span>
         </div>
 
-        <div className="hidden md:flex items-center gap-1 bg-white/5 backdrop-blur-2xl p-1.5 rounded-full border border-white/10">
-          <Link href="/" className="px-6 py-2 rounded-full bg-white/10 text-white font-semibold text-sm">Beranda</Link>
-          <Link href="/gallery" className="px-6 py-2 rounded-full hover:bg-white/5 text-gray-400 hover:text-white transition-all text-sm">Galeri</Link>
-          <Link href="/dashboard" className="px-6 py-2 rounded-full hover:bg-white/5 text-gray-400 hover:text-white transition-all text-sm">Dashboard</Link>
-          <Link href="/tutorial" className="ml-4 px-6 py-2 bg-gradient-to-r from-blue-600 to-cyan-500 hover:shadow-lg hover:shadow-blue-600/40 text-white rounded-full font-bold text-sm transition-all">
+        {/* BAGIAN KANAN: Menu Navigasi (Sesuai Desain Sebelumnya) */}
+        <div className="hidden md:flex items-center gap-1 bg-white/5 backdrop-blur-2xl p-1.5 rounded-full border border-white/10 shadow-2xl">
+          <Link href="/" className="px-6 py-2 rounded-full bg-white/10 text-white font-bold text-sm">Beranda</Link>
+          <Link href="/gallery" className="px-6 py-2 rounded-full hover:bg-white/5 text-gray-400 hover:text-white transition-all text-sm font-semibold">Galeri</Link>
+          <Link href="/dashboard" className="px-6 py-2 rounded-full hover:bg-white/5 text-gray-400 hover:text-white transition-all text-sm font-semibold">Dashboard</Link>
+          <Link href="/tutorial" className="ml-4 px-6 py-2 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white rounded-full font-bold text-sm shadow-lg shadow-blue-600/20 transition-all">
             Mulai Belajar
           </Link>
         </div>
