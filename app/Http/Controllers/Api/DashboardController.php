@@ -48,7 +48,7 @@ class DashboardController extends Controller
             "leaderboard" => [
                 [ "rank" => 1, "name" => "Rama Putra M.", "xp" => 4500, "avatar_emoji" => "👨" ],
                 [ "rank" => 2, "name" => "Abyan Bergas I.", "xp" => 4200, "avatar_emoji" => "👨‍🦱" ],
-                [ "rank" => 3, "name" => "Maulana Yudo Y.", "xp" => 1200, "avatar_emoji" => "👨" ]
+                [ "rank" => 3, "name" => "Maulana Yudo Y.", "xp" => 2500, "avatar_emoji" => "👨" ]
             ],
             "daily_challenges" => [
                 [ 
