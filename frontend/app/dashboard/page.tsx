@@ -251,7 +251,9 @@ export default function DashboardWireframe() {
 
                     </div>
                 </main>
+
             </div>
+
         </>
     );
 }
