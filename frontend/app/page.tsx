@@ -44,7 +44,7 @@ export default function HomePage() {
   if (isLoading) return <LoadingScreen />;
 
   return (
-    <div className="min-h-screen bg-[#00040a] text-white font-['Outfit'] overflow-x-hidden animate-in fade-in duration-1000">
+    <div className="min-h-screen bg-[#00040a] text-white font-sans overflow-x-hidden animate-in fade-in duration-1000">
       {/* 1. ULTRA NAVBAR */}
       {/* GLOBAL NAVBAR - DARK STYLE WITH CAPSULE LOGO */}
       <nav className="fixed top-0 w-full z-50 px-6 py-5 flex justify-between items-center transition-all">
@@ -83,9 +83,9 @@ export default function HomePage() {
             Eksplorasi Virtual 3D
           </div>
           <h1 className="text-6xl md:text-8xl font-black mb-8 leading-[1.1] tracking-tighter">
-            Menyelami Rahasia <br />
+            MENYELAMI RAHASIA <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-cyan-300 to-blue-500 text-glow">
-              Samudra Biru.
+              SAMUDRA BIRU.
             </span>
           </h1>
           <p className="text-gray-400 max-w-2xl mx-auto text-lg md:text-xl mb-12 leading-relaxed">
@@ -93,7 +93,7 @@ export default function HomePage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
             <button className="group relative px-10 py-5 bg-white text-black font-black rounded-2xl transition-colors duration-1000 hover:text-white overflow-hidden shadow-2xl">
-              <span className="relative z-10 uppercase transition-colors duration-1000 delay-300">Mulai Penyelaman</span>
+              <span className="relative z-10 transition-colors duration-1000 delay-300">Mulai Penyelaman</span>
               {/* Efek Gelombang Air (Water Wave) - Banyak Lapisan & Diperlambat */}
               <div className="absolute left-1/2 top-[150%] h-[400px] w-[400px] -translate-x-1/2 rounded-[38%] bg-blue-800/90 group-hover:top-[-140px] transition-all duration-[2000ms] ease-in-out animate-[spin_8s_linear_infinite] z-0"></div>
               <div className="absolute left-1/2 top-[150%] h-[400px] w-[400px] -translate-x-1/2 rounded-[42%] bg-blue-600 group-hover:top-[-150px] transition-all duration-[2500ms] ease-in-out animate-[spin_10s_linear_infinite_reverse] z-0 delay-75"></div>

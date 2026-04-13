@@ -34,7 +34,7 @@ export default function CommunityGallery() {
     });
 
     return (
-        <div className="min-h-screen flex flex-col bg-gradient-to-b from-blue-50 to-cyan-50 font-['Outfit']">
+        <div className="min-h-screen flex flex-col bg-gradient-to-b from-blue-50 to-cyan-50 font-sans">
 
             {/* GLOBAL NAVBAR - LIGHT STYLE DENGAN CAPSULE LOGO */}
             <nav className="fixed top-0 w-full z-50 px-6 py-5 flex justify-between items-center transition-all">
