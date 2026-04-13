@@ -88,9 +88,13 @@ export default function HomePage() {
             Rasakan keajaiban ekosistem Raja Ampat dalam visualisasi 3D yang nyata. Pelajari pentingnya konservasi laut melalui interaksi langsung.
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-            <button className="group relative px-10 py-5 bg-white text-black font-black rounded-2xl transition-all hover:bg-blue-600 hover:text-white overflow-hidden shadow-2xl">
-              <span className="relative z-10 uppercase">Mulai Penyelaman</span>
-              <div className="absolute inset-0 bg-blue-600 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+            <button className="group relative px-10 py-5 bg-white text-black font-black rounded-2xl transition-colors duration-1000 hover:text-white overflow-hidden shadow-2xl">
+              <span className="relative z-10 uppercase transition-colors duration-1000 delay-300">Mulai Penyelaman</span>
+              {/* Efek Gelombang Air (Water Wave) - Banyak Lapisan & Diperlambat */}
+              <div className="absolute left-1/2 top-[150%] h-[400px] w-[400px] -translate-x-1/2 rounded-[38%] bg-blue-800/90 group-hover:top-[-140px] transition-all duration-[2000ms] ease-in-out animate-[spin_8s_linear_infinite] z-0"></div>
+              <div className="absolute left-1/2 top-[150%] h-[400px] w-[400px] -translate-x-1/2 rounded-[42%] bg-blue-600 group-hover:top-[-150px] transition-all duration-[2500ms] ease-in-out animate-[spin_10s_linear_infinite_reverse] z-0 delay-75"></div>
+              <div className="absolute left-1/2 top-[150%] h-[400px] w-[400px] -translate-x-1/2 rounded-[45%] bg-cyan-500/70 group-hover:top-[-160px] transition-all duration-[3000ms] ease-in-out animate-[spin_12s_linear_infinite] z-0 delay-150"></div>
+              <div className="absolute left-1/2 top-[150%] h-[400px] w-[400px] -translate-x-1/2 rounded-[40%] bg-blue-300/40 group-hover:top-[-170px] transition-all duration-[3500ms] ease-in-out animate-[spin_14s_linear_infinite_reverse] z-0 delay-300"></div>
             </button>
             <button className="flex items-center gap-3 px-6 py-2 text-white font-bold hover:text-blue-400 transition-all">
               <span className="w-12 h-12 flex items-center justify-center rounded-full border border-white/20">▶</span>
