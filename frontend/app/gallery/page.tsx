@@ -3,6 +3,13 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 
 // 1. DATA PALSU (Mock Data) untuk simulasi pencarian
+const CATEGORIES = [
+    { value: 'all', label: 'Semua' },
+    { value: 'coral', label: 'Karang' },
+    { value: 'fish', label: 'Ikan' },
+    { value: 'environment', label: 'Lingkungan' },
+];
+
 const MOCK_GALLERY_DATA = [
     { id: 1, title: 'Keindahan Terumbu Karang', author: 'Rama Putra', category: 'coral' },
     { id: 2, title: 'Penyu Hijau Berenang', author: 'Abyan Bergas', category: 'fish' },
@@ -66,7 +73,7 @@ export default function CommunityGallery() {
                     </button>
                 </div>
 
-                {/* SEARCH BAR & FILTER (Diubah agar tersambung dengan State) */}
+                {/* SEARCH BAR & FILTER */}
                 <div className="flex flex-col md:flex-row gap-4 mb-10 bg-white p-4 rounded-2xl shadow-sm border border-blue-100">
                     <input
                         type="text"
@@ -75,16 +82,21 @@ export default function CommunityGallery() {
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="flex-grow p-4 bg-gray-50 border-2 border-transparent text-gray-900 placeholder-gray-500 rounded-xl focus:outline-none focus:border-blue-400 focus:bg-white transition-colors font-medium"
                     />
-                    <select
-                        value={selectedCategory}
-                        onChange={(e) => setSelectedCategory(e.target.value)}
-                        className="p-4 bg-gray-50 border-2 border-transparent text-gray-900 rounded-xl focus:outline-none focus:border-blue-400 focus:bg-white transition-colors cursor-pointer min-w-[200px] font-medium"
-                    >
-                        <option value="all">Semua Kategori</option>
-                        <option value="coral">Terumbu Karang</option>
-                        <option value="fish">Ikan & Biota Laut</option>
-                        <option value="environment">Lingkungan</option>
-                    </select>
+                    <div className="flex items-center gap-2">
+                        {CATEGORIES.map((cat) => (
+                            <button
+                                key={cat.value}
+                                onClick={() => setSelectedCategory(cat.value)}
+                                className={`px-4 py-2.5 rounded-full text-sm font-semibold transition-all duration-200 ${
+                                    selectedCategory === cat.value
+                                        ? 'bg-blue-600 text-white shadow-md'
+                                        : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                                }`}
+                            >
+                                {cat.label}
+                            </button>
+                        ))}
+                    </div>
                 </div>
 
                 {/* GRID GAMBAR (Me-render hasil saringan) */}
