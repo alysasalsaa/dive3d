@@ -19,8 +19,20 @@ function delay(ms: number) {
  * Ganti isi fungsi ini dengan fetch('/api/modules') saat backend siap.
  */
 export async function getModules(): Promise<ModuleData[]> {
-  await delay(FAKE_DELAY_MS);
-  return MOCK_MODULES;
+  const response = await fetch('http://127.0.0.1:8000/api/modules', { cache: 'no-store' });
+  const data = await response.json();
+  return data.map((mod: any) => ({
+    id: mod.slug,
+    title: mod.title,
+    longDescription: mod.long_description,
+    icon: mod.icon,
+    difficulty: mod.difficulty,
+    estimatedTime: mod.estimated_time,
+    gradientFrom: mod.gradient_from,
+    gradientTo: mod.gradient_to,
+    modelUrl: mod.model_url,
+    pois: []
+  }));
 }
 
 /**
@@ -28,6 +40,8 @@ export async function getModules(): Promise<ModuleData[]> {
  * Mengembalikan undefined jika modul tidak ditemukan.
  */
 export async function getModuleById(id: string): Promise<ModuleData | undefined> {
-  await delay(FAKE_DELAY_MS);
-  return MOCK_MODULES.find((m) => m.id === id);
+  const modules = await getModules();
+  return modules.find((m) => m.id === id);
 }
+
+
