@@ -98,6 +98,8 @@ export default function ModelViewer({
           enablePan={false}
           enableZoom={true}
           enableRotate={true}
+          minPolarAngle={0}
+          maxPolarAngle={Math.PI}
         />
       </Canvas>
     </div>
