@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { getModules } from '../../lib/api';
-import { getMockProgress } from '../../lib/mockData';
+import { getModules, getUserProgress } from '../../lib/api';
 import type { ModuleData } from '../../lib/mockData';
 import ModelViewer from '../../components/ModelViewer';
 
@@ -28,13 +27,26 @@ function ModuleSkeleton() {
 // ============================================================
 export default function AkademiPage() {
   const [modules, setModules] = useState<ModuleData[]>([]);
+  // TAMBAHAN BARU KITA: Siapkan memori untuk progress Supabase
+  const [progresses, setProgresses] = useState<Record<string, any>>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     getModules()
-      .then(setModules)
+      .then(async (modulesData) => {
+        setModules(modulesData);
+
+        // TAMBAHAN BARU KITA: Ambil progres API untuk semua modul
+        const kantongSakti: Record<string, any> = {};
+        for (const mod of modulesData) {
+          kantongSakti[mod.id] = await getUserProgress(mod.id);
+        }
+        setProgresses(kantongSakti);
+
+      })
       .finally(() => setLoading(false));
   }, []);
+
 
   return (
     <div className="min-h-screen bg-[#00040a] text-white font-sans">
@@ -173,7 +185,7 @@ export default function AkademiPage() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {modules.map((mod) => {
-                const progress = getMockProgress(mod.id);
+                const progress = progresses[mod.id] || { visitedPois: [], completed: false };
                 const poiCount = mod.pois.length;
                 const visitedCount = progress.visitedPois.length;
                 const progressPct =

@@ -44,4 +44,33 @@ export async function getModuleById(id: string): Promise<ModuleData | undefined>
   return modules.find((m) => m.id === id);
 }
 
+/**
+ * Mengambil progress user dari Supabase.
+ */
+export async function getUserProgress(moduleId: string) {
+  // Menonaktifkan cache bawaan Next.js agar progres selalu ter-update (realtime)
+  const response = await fetch(`http://127.0.0.1:8000/api/progress/${moduleId}`, {
+    cache: 'no-store'
+  });
+  return response.json();
+}
+
+/**
+ * Akan dipanggil Frontend tiap kali klik 3D dilakukan.
+ */
+export async function saveUserProgress(moduleId: string, visitedPois: string[], completed: boolean) {
+  const response = await fetch(`http://127.0.0.1:8000/api/progress`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    },
+    body: JSON.stringify({
+      moduleId,
+      visitedPois,
+      completed
+    }),
+  });
+  return response.json();
+}
 
