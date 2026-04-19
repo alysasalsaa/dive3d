@@ -1,11 +1,14 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 export default function DashboardWireframe() {
+    const pathname = usePathname();
     const [dashboardData, setDashboardData] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const [activeMenu, setActiveMenu] = useState(0);
 
     useEffect(() => {
         fetch('http://localhost:8000/api/dashboard')
@@ -69,13 +72,13 @@ export default function DashboardWireframe() {
                     {/* Menu Items */}
                     <ul className="flex-1 mt-4 space-y-3 px-3 overflow-x-hidden">
                         {[
-                            { icon: '📊', label: 'Dashboard Utama', active: true },
-                            { icon: '📚', label: 'Ruang Kelas', active: false },
-                            { icon: '👑', label: 'Leaderboard', active: false },
-                            { icon: '🎁', label: 'Klaim Hadiah', active: false },
-                            { icon: '⚙️', label: 'Pengaturan', active: false },
+                            { icon: '📊', label: 'Dashboard Utama' },
+                            { icon: '📚', label: 'Ruang Kelas' },
+                            { icon: '👑', label: 'Leaderboard' },
+                            { icon: '🎁', label: 'Klaim Hadiah' },
+                            { icon: '⚙️', label: 'Pengaturan' },
                         ].map((item, idx) => (
-                            <li key={idx} className={`flex items-center rounded-xl cursor-pointer transition-all duration-300 group ${item.active ? 'bg-blue-50 text-blue-700 font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-blue-600'} ${isSidebarOpen ? 'p-3 gap-3' : 'justify-center p-3 w-12 h-12 mx-auto'}`} title={!isSidebarOpen ? item.label : ""}>
+                            <li key={idx} onClick={() => setActiveMenu(idx)} className={`flex items-center rounded-xl cursor-pointer transition-all duration-300 group ${activeMenu === idx ? 'bg-blue-50 text-blue-700 font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-blue-600'} ${isSidebarOpen ? 'p-3 gap-3' : 'justify-center p-3 w-12 h-12 mx-auto'}`} title={!isSidebarOpen ? item.label : ""}>
                                 <div className={`flex items-center justify-center flex-shrink-0 transition-transform duration-500 ease-out ${isSidebarOpen ? 'w-6 h-6' : 'w-full h-full group-hover:scale-125 group-hover:rotate-12 group-active:scale-95'}`}>
                                     <span role="img" aria-label={item.label} className="text-xl">{item.icon}</span>
                                 </div>
@@ -104,12 +107,27 @@ export default function DashboardWireframe() {
 
                         {/* Bagian Kanan: Global Navigation Bar (Desain persis seperti Gallery) */}
                         <div className="hidden md:flex items-center gap-1 bg-white/40 backdrop-blur-2xl p-1.5 rounded-full border border-blue-100 shadow-xl">
-                            <Link href="/" className="px-6 py-2 rounded-full hover:bg-white/50 text-gray-600 hover:text-blue-600 transition-all text-sm font-semibold">Beranda</Link>
-                            <Link href="/gallery" className="px-6 py-2 rounded-full hover:bg-white/50 text-gray-600 hover:text-blue-600 transition-all text-sm font-semibold">Galeri</Link>
-                            <Link href="/dashboard" className="px-6 py-2 rounded-full bg-blue-600 text-white font-bold text-sm shadow-md">Dashboard</Link>
-                            <Link href="/tutorial" className="ml-4 px-6 py-2 bg-gradient-to-r from-blue-600 to-cyan-500 text-white rounded-full font-bold text-sm shadow-lg shadow-blue-600/20 transition-all">
-                                Mulai Belajar
-                            </Link>
+                          {[
+                            { href: '/', label: 'Beranda' },
+                            { href: '/gallery', label: 'Galeri' },
+                            { href: '/dashboard', label: 'Dashboard' },
+                            { href: '/akademi', label: 'Akademi' },
+                          ].map(({ href, label }) => {
+                            const isActive = pathname === href;
+                            return (
+                              <Link
+                                key={href}
+                                href={href}
+                                className={`px-6 py-2 rounded-full text-sm font-semibold transition-all ${
+                                  isActive
+                                    ? 'bg-blue-600 text-white font-bold shadow-md'
+                                    : 'hover:bg-white/50 text-gray-600 hover:text-blue-600'
+                                }`}
+                              >
+                                {label}
+                              </Link>
+                            );
+                          })}
                         </div>
                     </header>
 
