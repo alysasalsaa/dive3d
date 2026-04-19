@@ -64,7 +64,7 @@ export default function HomePage() {
           <Link href="/gallery" className="px-6 py-2 rounded-full hover:bg-white/5 text-gray-400 hover:text-white transition-all text-sm font-semibold">Galeri</Link>
           <Link href="/dashboard" className="px-6 py-2 rounded-full hover:bg-white/5 text-gray-400 hover:text-white transition-all text-sm font-semibold">Dashboard</Link>
           <Link href="/akademi" className="ml-4 px-6 py-2 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white rounded-full font-bold text-sm shadow-lg shadow-blue-600/20 transition-all">
-            Mulai Belajar
+            Akademi
           </Link>
         </div>
       </nav>
@@ -94,7 +94,7 @@ export default function HomePage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
             <Link
-              href="/akademi"
+              href="/panduan"
               className="group relative px-10 py-5 bg-white text-black font-black rounded-2xl transition-colors duration-1000 hover:text-white overflow-hidden shadow-2xl inline-block"
             >
               <span className="relative z-10 transition-colors duration-1000 delay-300">Mulai Penyelaman</span>
