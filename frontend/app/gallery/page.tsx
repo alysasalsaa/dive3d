@@ -1,6 +1,7 @@
 'use client';
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 // 1. DATA PALSU (Mock Data) untuk simulasi pencarian
 const CATEGORIES = [
@@ -22,6 +23,7 @@ const MOCK_GALLERY_DATA = [
 ];
 
 export default function CommunityGallery() {
+    const pathname = usePathname();
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     // 2. STATE UNTUK PENCARIAN & FILTER
@@ -53,12 +55,27 @@ export default function CommunityGallery() {
                 </div>
 
                 <div className="hidden md:flex items-center gap-1 bg-white/70 backdrop-blur-xl p-1.5 rounded-full border border-blue-100 shadow-sm">
-                    <Link href="/" className="px-6 py-2 rounded-full hover:bg-white/50 text-gray-600 hover:text-blue-600 transition-all text-sm font-semibold">Beranda</Link>
-                    <Link href="/gallery" className="px-6 py-2 rounded-full bg-blue-600 text-white font-bold text-sm shadow-md">Galeri</Link>
-                    <Link href="/dashboard" className="px-6 py-2 rounded-full hover:bg-white/50 text-gray-600 hover:text-blue-600 transition-all text-sm font-semibold">Dashboard</Link>
-                    <Link href="/tutorial" className="ml-4 px-6 py-2 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 text-white rounded-full font-bold text-sm shadow-lg shadow-blue-600/20 transition-all">
-                        Mulai Belajar
-                    </Link>
+                  {[
+                    { href: '/', label: 'Beranda' },
+                    { href: '/gallery', label: 'Galeri' },
+                    { href: '/dashboard', label: 'Dashboard' },
+                    { href: '/akademi', label: 'Akademi' },
+                  ].map(({ href, label }) => {
+                    const isActive = pathname === href;
+                    return (
+                      <Link
+                        key={href}
+                        href={href}
+                        className={`px-6 py-2 rounded-full text-sm font-semibold transition-all ${
+                          isActive
+                            ? 'bg-blue-600 text-white font-bold shadow-md'
+                            : 'hover:bg-white/50 text-gray-600 hover:text-blue-600'
+                        }`}
+                      >
+                        {label}
+                      </Link>
+                    );
+                  })}
                 </div>
             </nav>
 

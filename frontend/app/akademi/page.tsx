@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { getModules, getUserProgress } from '../../lib/api';
 import type { ModuleData } from '../../lib/mockData';
 import ModelViewer from '../../components/ModelViewer';
@@ -26,6 +27,7 @@ function ModuleSkeleton() {
 // HALAMAN AKADEMI KONSERVASI
 // ============================================================
 export default function AkademiPage() {
+  const pathname = usePathname();
   const [modules, setModules] = useState<ModuleData[]>([]);
   // TAMBAHAN BARU KITA: Siapkan memori untuk progress Supabase
   const [progresses, setProgresses] = useState<Record<string, any>>({});
@@ -62,30 +64,27 @@ export default function AkademiPage() {
         </div>
 
         <div className="hidden md:flex items-center gap-1 bg-white/5 backdrop-blur-2xl p-1.5 rounded-full border border-white/10 shadow-2xl">
-          <Link
-            href="/"
-            className="px-6 py-2 rounded-full hover:bg-white/5 text-gray-400 hover:text-white transition-all text-sm font-semibold"
-          >
-            Beranda
-          </Link>
-          <Link
-            href="/gallery"
-            className="px-6 py-2 rounded-full hover:bg-white/5 text-gray-400 hover:text-white transition-all text-sm font-semibold"
-          >
-            Galeri
-          </Link>
-          <Link
-            href="/dashboard"
-            className="px-6 py-2 rounded-full hover:bg-white/5 text-gray-400 hover:text-white transition-all text-sm font-semibold"
-          >
-            Dashboard
-          </Link>
-          <Link
-            href="/akademi"
-            className="ml-4 px-6 py-2 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white rounded-full font-bold text-sm shadow-lg shadow-blue-600/20 transition-all"
-          >
-            Akademi
-          </Link>
+          {[
+            { href: '/', label: 'Beranda' },
+            { href: '/gallery', label: 'Galeri' },
+            { href: '/dashboard', label: 'Dashboard' },
+            { href: '/akademi', label: 'Akademi' },
+          ].map(({ href, label }) => {
+            const isActive = pathname === href;
+            return (
+              <Link
+                key={href}
+                href={href}
+                className={`px-6 py-2 rounded-full text-sm font-semibold transition-all ${
+                  isActive
+                    ? 'bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-bold shadow-lg shadow-blue-600/20'
+                    : 'hover:bg-white/5 text-gray-400 hover:text-white'
+                }`}
+              >
+                {label}
+              </Link>
+            );
+          })}
         </div>
       </nav>
 
