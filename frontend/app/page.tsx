@@ -103,7 +103,7 @@ export default function HomePage() {
           <h1 className="text-6xl md:text-8xl font-black mb-8 leading-[1.1] tracking-tighter">
             MENYELAMI RAHASIA <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-cyan-300 to-blue-500 text-glow">
-              SAMUDRA BIRU.
+              SAMUDRA BIRU
             </span>
           </h1>
           <p className="text-gray-400 max-w-2xl mx-auto text-lg md:text-xl mb-12 leading-relaxed">
