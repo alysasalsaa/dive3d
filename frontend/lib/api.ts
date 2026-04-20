@@ -48,22 +48,27 @@ export async function getModuleById(id: string): Promise<ModuleData | undefined>
  * Mengambil progress user dari Supabase.
  */
 export async function getUserProgress(moduleId: string) {
-  // Menonaktifkan cache bawaan Next.js agar progres selalu ter-update (realtime)
+  // 1. Ambil token dari brankas Chrome
+  const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
+
   const response = await fetch(`http://127.0.0.1:8000/api/progress/${moduleId}`, {
+    headers: {
+      'Authorization': `Bearer ${token}` // 2. Serahkan KTP ke Satpam Sanctum
+    },
     cache: 'no-store'
   });
   return response.json();
 }
 
-/**
- * Akan dipanggil Frontend tiap kali klik 3D dilakukan.
- */
 export async function saveUserProgress(moduleId: string, visitedPois: string[], completed: boolean) {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
+
   const response = await fetch(`http://127.0.0.1:8000/api/progress`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
+      'Authorization': `Bearer ${token}` // Serahkan KTP ke Satpam Sanctum
     },
     body: JSON.stringify({
       moduleId,

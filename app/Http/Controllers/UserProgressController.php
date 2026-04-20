@@ -14,10 +14,10 @@ class UserProgressController extends Controller
         // 1. Lacak modul apa yang sedang dimainkan
         $module = Module::where('slug', $slug)->firstOrFail();
 
-        // 2. Ambil progres si user. (Karena sistem "Login" belum diajarkan, kita pakai user sakti 'user_id' = 1)
+        // 2. Ambil progres si user. 
         // firstOrCreate artinya: Kalau buka web perdana, otomatis buat progres 0%. Kalau buka kedua kali, load progres lama!
         $progress = UserProgress::firstOrCreate(
-            ['user_id' => null, 'module_id' => $module->id],
+            ['user_id' => auth()->id(), 'module_id' => $module->id],
             ['visited_pois' => [], 'completed' => false] // Titik 0% mula-mula
         );
 
@@ -43,7 +43,7 @@ class UserProgressController extends Controller
 
         // 2. Tancapkan ingatan si user ke Tabel Database kita di Supabase
         $progress = UserProgress::updateOrCreate(
-            ['user_id' => null, 'module_id' => $module->id],
+            ['user_id' => auth()->id(), 'module_id' => $module->id],
             [
                 'visited_pois' => $request->visitedPois,
                 'completed' => $request->completed
