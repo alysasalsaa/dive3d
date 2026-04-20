@@ -11,9 +11,9 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    
+
     try {
-      const response = await fetch('http://localhost:8000/api/login', {
+      const response = await fetch('http://127.0.0.1:8000/api/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -30,7 +30,7 @@ export default function LoginPage() {
 
       // Simpan token
       localStorage.setItem('auth_token', data.token);
-      
+
       alert("Login Berhasil!");
       window.location.href = '/dashboard';
     } catch (error: any) {

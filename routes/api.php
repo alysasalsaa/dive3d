@@ -9,7 +9,7 @@ use App\Http\Controllers\ModuleController;
 use App\Http\Controllers\UserProgressController;
 use App\Http\Controllers\Api\AuthController;
 
-// Auth Endpoints
+// Endpoint Autentikasi
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
@@ -26,10 +26,14 @@ Route::post('/upload', [ContentController::class, 'upload']);
 // Endpoint untuk Modul Pembelajaran
 Route::get('/modules', [ModuleController::class, 'index']);
 
-Route::get('/progress/{slug}', [UserProgressController::class, 'show']);
-Route::post('/progress', [UserProgressController::class, 'update']);
-
-// Protected Endpoints
+// Endpoint untuk Menyimpan dan Mengambil Data Progres
 Route::middleware('auth:sanctum')->group(function () {
+
+    // Rute Logout
     Route::post('/logout', [AuthController::class, 'logout']);
+
+    // Rute Progres (Pindahan dari publik agar punya ID User Asli)
+    Route::get('/progress/{slug}', [UserProgressController::class, 'show']);
+    Route::post('/progress', [UserProgressController::class, 'update']);
+
 });
