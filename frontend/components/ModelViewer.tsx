@@ -38,6 +38,9 @@ export default function ModelViewer({
   const handleResetView = () => {
     if (controlsRef.current) {
       controlsRef.current.reset();
+      controlsRef.current.target.set(0, 0, 0);
+      controlsRef.current.object.position.set(0, 0, 1.2);
+      controlsRef.current.update();
     }
   };
 
@@ -83,7 +86,7 @@ export default function ModelViewer({
         </div>
       )}
 
-      <Canvas shadows dpr={[1, 2]} camera={{ fov: 50, position: [0, 0, 5] }}>
+      <Canvas shadows dpr={[1, 2]} camera={{ fov: 40, position: [0, 0, 1.2] }}>
         <Suspense fallback={<Loader />}>
           <Stage environment="city" intensity={0.5}>
             <GLTFModel url={url} />
