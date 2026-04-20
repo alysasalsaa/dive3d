@@ -12,9 +12,9 @@ class ModuleController extends Controller
      */
     public function index()
     {
-        // Ambil semua data pada tabel modules...
-        $modules = Module::all();
-        // ...dan kembalikan bentuknya sebagai format JSON ke Frontend!
+        // Ambil semua data pada tabel modules, BESERTA data pois-nya!
+        $modules = Module::with('pois')->get();
+
         return response()->json($modules);
     }
 

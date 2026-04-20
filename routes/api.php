@@ -37,3 +37,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/progress', [UserProgressController::class, 'update']);
 
 });
+
+
