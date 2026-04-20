@@ -10,7 +10,7 @@ export default function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (password !== confirmPassword) {
@@ -20,13 +20,33 @@ export default function RegisterPage() {
 
     setIsLoading(true);
     
-    // Simulasikan delay untuk request API
-    setTimeout(() => {
+    try {
+      const response = await fetch('http://localhost:8000/api/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ name, email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Terjadi kesalahan saat mendaftar');
+      }
+
+      // Simpan token (bisa di localStorage atau cookies)
+      localStorage.setItem('auth_token', data.token);
+      
+      alert("Pendaftaran Berhasil!");
+      // Redirect ke dashboard atau halaman lain bisa dilakukan di sini misal dengan useRouter
+      window.location.href = '/dashboard';
+    } catch (error: any) {
+      alert(error.message);
+    } finally {
       setIsLoading(false);
-      console.log('Register Details:', { name, email, password });
-      alert("Simulasi Register Berhasil. Cek Console.");
-      // TODO: Hubungkan dengan Backend
-    }, 1500);
+    }
   };
 
   return (

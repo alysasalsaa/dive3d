@@ -8,17 +8,36 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
-    // Simulasikan delay untuk request API (bisa dihapus nanti setelah ada koneksi backend)
-    setTimeout(() => {
+    try {
+      const response = await fetch('http://localhost:8000/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Login gagal');
+      }
+
+      // Simpan token
+      localStorage.setItem('auth_token', data.token);
+      
+      alert("Login Berhasil!");
+      window.location.href = '/dashboard';
+    } catch (error: any) {
+      alert(error.message);
+    } finally {
       setIsLoading(false);
-      console.log('Login Details:', { email, password });
-      alert("Simulasi Login Berhasil. Cek Console.");
-      // TODO: Hubungkan dengan Backend (fetch/axios ke endpoint Laravel)
-    }, 1500);
+    }
   };
 
   return (
