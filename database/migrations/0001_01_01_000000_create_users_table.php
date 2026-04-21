@@ -38,6 +38,11 @@ return new class extends Migration
             $table->longText('payload');
             $table->integer('last_activity')->index();
         });
+
+        Schema::create('contents', function (Blueprint $table) {
+            $table->enum('status',['pending','approved','rejected'])
+            ->default('pending');
+        });
     }
 
     /**

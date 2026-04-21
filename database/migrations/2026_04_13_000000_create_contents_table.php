@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -17,6 +16,8 @@ return new class extends Migration
             $table->string('file_path');
             $table->string('status')->default('pending');
             $table->timestamps();
+            $table->index('created_at');
+            $table->index(['status', 'created_at']);
         });
     }
 
