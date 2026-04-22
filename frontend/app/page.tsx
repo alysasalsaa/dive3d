@@ -67,6 +67,7 @@ export default function HomePage() {
             { href: '/gallery', label: 'Galeri' },
             { href: '/dashboard', label: 'Dashboard' },
             { href: '/akademi', label: 'Akademi' },
+            { href: '/tutorial', label: 'Tutorial' },
             { href: '/login', label: 'Masuk' },
             { href: '/register', label: 'Daftar' },
           ].map(({ href, label }) => {
