@@ -69,6 +69,7 @@ export default function AkademiPage() {
             { href: '/gallery', label: 'Galeri' },
             { href: '/dashboard', label: 'Dashboard' },
             { href: '/akademi', label: 'Akademi' },
+            { href: '/tutorial', label: 'Tutorial' },
           ].map(({ href, label }) => {
             const isActive = pathname === href;
             return (
