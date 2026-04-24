@@ -37,10 +37,11 @@ const LoadingScreen = () => (
 export default function HomePage() {
   const pathname = usePathname();
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  // Simulasi pemuatan aset 3D selama 3 detik
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 3000);
+    setIsLoggedIn(!!localStorage.getItem('auth_token'));
     return () => clearTimeout(timer);
   }, []);
 
@@ -60,23 +61,21 @@ export default function HomePage() {
           <span className="text-lg font-black tracking-widest text-white pr-1">DIVEXPLORE</span>
         </div>
 
-        {/* BAGIAN KANAN: Menu Navigasi (Sesuai Desain Sebelumnya) */}
+        {/* BAGIAN TENGAH: Nav Utama */}
         <div className="hidden md:flex items-center gap-1 bg-white/5 backdrop-blur-2xl p-1.5 rounded-full border border-white/10 shadow-2xl">
           {[
             { href: '/', label: 'Beranda' },
             { href: '/gallery', label: 'Galeri' },
-            { href: '/dashboard', label: 'Dashboard' },
             { href: '/akademi', label: 'Akademi' },
             { href: '/tutorial', label: 'Tutorial' },
-            { href: '/login', label: 'Masuk' },
-            { href: '/register', label: 'Daftar' },
+            { href: '/dashboard', label: 'Dashboard' },
           ].map(({ href, label }) => {
             const isActive = pathname === href;
             return (
               <Link
                 key={href}
                 href={href}
-                className={`px-6 py-2 rounded-full text-sm font-semibold transition-all ${
+                className={`px-5 py-2 rounded-full text-sm font-semibold transition-all ${
                   isActive
                     ? 'bg-white/10 text-white font-bold'
                     : 'hover:bg-white/5 text-gray-400 hover:text-white'
@@ -86,6 +85,33 @@ export default function HomePage() {
               </Link>
             );
           })}
+        </div>
+
+        {/* BAGIAN KANAN: Tombol Auth */}
+        <div className="hidden md:flex items-center gap-2">
+          {isLoggedIn ? (
+            <Link
+              href="/dashboard"
+              className="px-5 py-2 rounded-full text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-cyan-500 hover:opacity-90 transition-all shadow-lg shadow-blue-500/20"
+            >
+              Dashboard
+            </Link>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                className="px-5 py-2 rounded-full text-sm font-semibold text-gray-300 hover:text-white border border-white/10 hover:border-white/30 transition-all backdrop-blur-xl bg-white/5"
+              >
+                Masuk
+              </Link>
+              <Link
+                href="/register"
+                className="px-5 py-2 rounded-full text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-cyan-500 hover:opacity-90 transition-all shadow-lg shadow-blue-500/20"
+              >
+                Daftar
+              </Link>
+            </>
+          )}
         </div>
       </nav>
 
