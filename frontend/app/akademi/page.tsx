@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { getModules, getUserProgress } from '../../lib/api';
 import type { ModuleData } from '../../lib/mockData';
 import ModelViewer from '../../components/ModelViewer';
+import { useTheme } from '../../lib/useTheme';
 
 // ============================================================
 // LOADING SKELETON
@@ -28,8 +29,8 @@ function ModuleSkeleton() {
 // ============================================================
 export default function AkademiPage() {
   const pathname = usePathname();
+  const { isDark, toggleTheme } = useTheme();
   const [modules, setModules] = useState<ModuleData[]>([]);
-  // TAMBAHAN BARU KITA: Siapkan memori untuk progress Supabase
   const [progresses, setProgresses] = useState<Record<string, any>>({});
   const [loading, setLoading] = useState(true);
 
@@ -50,36 +51,38 @@ export default function AkademiPage() {
   }, []);
 
 
+  const navLinks = [
+    { href: '/', label: 'Beranda' },
+    { href: '/gallery', label: 'Galeri' },
+    { href: '/akademi', label: 'Akademi' },
+    { href: '/tutorial', label: 'Tutorial' },
+    { href: '/dashboard', label: 'Dashboard' },
+  ];
+
   return (
-    <div className="min-h-screen bg-[#00040a] text-white font-sans">
+    <div className={`min-h-screen font-sans transition-colors duration-300 ${isDark ? 'bg-[#00040a] text-white' : 'bg-sky-50 text-gray-900'}`}>
       {/* NAVBAR */}
       <nav className="fixed top-0 w-full z-50 px-6 py-5 flex justify-between items-center">
-        <div className="flex items-center gap-3 bg-white/10 backdrop-blur-xl py-2 px-5 rounded-full border border-white/10 shadow-2xl">
+        <div className={`flex items-center gap-3 backdrop-blur-xl py-2 px-5 rounded-full border shadow-xl transition-colors ${isDark ? 'bg-white/10 border-white/10' : 'bg-white/80 border-blue-100 shadow-sm'}`}>
           <div className="w-9 h-9 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-full flex items-center justify-center shadow-lg shadow-blue-500/20">
             <span className="text-base">🌊</span>
           </div>
-          <span className="text-lg font-black tracking-widest text-white pr-1">
+          <span className={`text-lg font-black tracking-widest pr-1 ${isDark ? 'text-white' : 'text-blue-900'}`}>
             DIVEXPLORE
           </span>
         </div>
 
-        <div className="hidden md:flex items-center gap-1 bg-white/5 backdrop-blur-2xl p-1.5 rounded-full border border-white/10 shadow-2xl">
-          {[
-            { href: '/', label: 'Beranda' },
-            { href: '/gallery', label: 'Galeri' },
-            { href: '/dashboard', label: 'Dashboard' },
-            { href: '/akademi', label: 'Akademi' },
-            { href: '/tutorial', label: 'Tutorial' },
-          ].map(({ href, label }) => {
+        <div className={`hidden md:flex items-center gap-1 backdrop-blur-2xl p-1.5 rounded-full border transition-colors ${isDark ? 'bg-white/5 border-white/10 shadow-2xl' : 'bg-white/80 border-gray-200 shadow-sm'}`}>
+          {navLinks.map(({ href, label }) => {
             const isActive = pathname === href;
             return (
-              <Link
-                key={href}
-                href={href}
-                className={`px-6 py-2 rounded-full text-sm font-semibold transition-all ${
+              <Link key={href} href={href}
+                className={`px-5 py-2 rounded-full text-sm font-semibold transition-all ${
                   isActive
                     ? 'bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-bold shadow-lg shadow-blue-600/20'
-                    : 'hover:bg-white/5 text-gray-400 hover:text-white'
+                    : isDark
+                      ? 'hover:bg-white/5 text-gray-400 hover:text-white'
+                      : 'text-gray-600 hover:text-blue-700 hover:bg-blue-50'
                 }`}
               >
                 {label}
@@ -87,6 +90,14 @@ export default function AkademiPage() {
             );
           })}
         </div>
+
+        <button
+          onClick={toggleTheme}
+          title={isDark ? 'Mode Terang' : 'Mode Gelap'}
+          className={`w-10 h-10 rounded-full flex items-center justify-center transition-all text-base ${isDark ? 'bg-white/10 hover:bg-white/20 border border-white/10' : 'bg-white hover:bg-gray-100 border border-gray-200 shadow-sm'}`}
+        >
+          {isDark ? '☀️' : '🌙'}
+        </button>
       </nav>
 
       {/* HERO */}
@@ -98,15 +109,15 @@ export default function AkademiPage() {
         <div className="max-w-7xl mx-auto relative z-10">
           {/* Breadcrumb */}
           <div className="flex items-center gap-2 text-sm mb-8">
-            <Link href="/" className="text-gray-500 hover:text-white transition-colors">
+            <Link href="/" className={`transition-colors hover:text-cyan-400 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
               Beranda
             </Link>
-            <span className="text-gray-700">›</span>
+            <span className={isDark ? 'text-gray-700' : 'text-gray-400'}>›</span>
             <span className="text-cyan-400 font-bold">Akademi Konservasi</span>
           </div>
 
           <div className="max-w-3xl">
-            <div className="inline-block px-4 py-1.5 mb-6 rounded-full bg-cyan-500/15 border border-cyan-400/30 text-cyan-300 text-[11px] font-black tracking-[0.2em] uppercase">
+            <div className={`inline-block px-4 py-1.5 mb-6 rounded-full border text-[11px] font-black tracking-[0.2em] uppercase ${isDark ? 'bg-cyan-500/15 border-cyan-400/30 text-cyan-300' : 'bg-cyan-500/10 border-cyan-400/20 text-cyan-600'}`}>
               🎓 Modul Pembelajaran 3D
             </div>
             <h1 className="text-5xl md:text-7xl font-black mb-6 leading-[1.05] tracking-tight">
@@ -115,7 +126,7 @@ export default function AkademiPage() {
                 Konservasi.
               </span>
             </h1>
-            <p className="text-gray-400 text-lg md:text-xl max-w-2xl leading-relaxed">
+            <p className={`text-lg md:text-xl max-w-2xl leading-relaxed ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
               Pilih modul pembelajaran dan mulai jelajahi ekosistem laut Raja
               Ampat dalam lingkungan 3D interaktif.
             </p>
@@ -130,13 +141,13 @@ export default function AkademiPage() {
         <div className="max-w-7xl mx-auto">
           {/* Judul Section */}
           <div className="mb-6">
-            <div className="inline-block px-4 py-1.5 mb-3 rounded-full bg-cyan-500/15 border border-cyan-400/30 text-cyan-300 text-[11px] font-black tracking-[0.2em] uppercase">
+            <div className={`inline-block px-4 py-1.5 mb-3 rounded-full border text-[11px] font-black tracking-[0.2em] uppercase ${isDark ? 'bg-cyan-500/15 border-cyan-400/30 text-cyan-300' : 'bg-cyan-500/10 border-cyan-400/20 text-cyan-600'}`}>
               🪸 Spesimen 3D Interaktif
             </div>
-            <h2 className="text-3xl md:text-4xl font-black text-white mb-2">
+            <h2 className={`text-3xl md:text-4xl font-black mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
               Model Terumbu Karang
             </h2>
-            <p className="text-gray-400 text-sm max-w-xl">
+            <p className={`text-sm max-w-xl ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
               Putar dan perbesar model untuk mempelajari struktur terumbu karang
               secara langsung. Gunakan kursor atau sentuhan untuk berinteraksi.
             </p>
@@ -149,7 +160,7 @@ export default function AkademiPage() {
           />
 
           {/* Keterangan singkat di bawah model */}
-          <div className="mt-4 flex items-center gap-3 text-xs text-gray-600">
+          <div className={`mt-4 flex items-center gap-3 text-xs ${isDark ? 'text-gray-600' : 'text-gray-400'}`}>
             <span>🖱️ Klik + Tarik untuk memutar</span>
             <span className="w-px h-4 bg-white/10" />
             <span>🔍 Scroll untuk zoom</span>
@@ -164,12 +175,12 @@ export default function AkademiPage() {
         <div className="max-w-7xl mx-auto">
           {/* Stats bar */}
           <div className="flex items-center gap-6 mb-10 text-sm">
-            <div className="flex items-center gap-2 text-gray-500">
+            <div className={`flex items-center gap-2 ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>
               <span className="text-lg">📚</span>
               <span className="font-bold">{modules.length} Modul</span>
             </div>
-            <div className="h-4 w-px bg-white/10" />
-            <div className="flex items-center gap-2 text-gray-500">
+            <div className={`h-4 w-px ${isDark ? 'bg-white/10' : 'bg-gray-300'}`} />
+            <div className={`flex items-center gap-2 ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>
               <span className="text-lg">⏱️</span>
               <span className="font-bold">~68 menit total</span>
             </div>
@@ -197,7 +208,7 @@ export default function AkademiPage() {
                     href={`/akademi/${mod.id}`}
                     className="group relative block"
                   >
-                    <div className="relative rounded-[28px] overflow-hidden bg-[#000814] border border-white/5 hover:border-white/15 transition-all duration-500 hover:scale-[1.01] shadow-xl hover:shadow-2xl">
+                    <div className={`relative rounded-[28px] overflow-hidden border transition-all duration-500 hover:scale-[1.01] shadow-xl hover:shadow-2xl ${isDark ? 'bg-[#000814] border-white/5 hover:border-white/15' : 'bg-white border-gray-100 hover:border-blue-200 hover:shadow-blue-100'}`}>
                       {/* Card header with gradient */}
                       <div
                         className="h-44 relative overflow-hidden"
@@ -240,10 +251,10 @@ export default function AkademiPage() {
 
                       {/* Card body */}
                       <div className="p-7">
-                        <h3 className="text-xl font-black text-white mb-2 group-hover:text-cyan-300 transition-colors">
+                        <h3 className={`text-xl font-black mb-2 group-hover:text-cyan-400 transition-colors ${isDark ? 'text-white' : 'text-gray-900'}`}>
                           {mod.title}
                         </h3>
-                        <p className="text-gray-500 text-sm leading-relaxed mb-5">
+                        <p className={`text-sm leading-relaxed mb-5 ${isDark ? 'text-gray-500' : 'text-gray-600'}`}>
                           {mod.longDescription}
                         </p>
 
@@ -262,7 +273,7 @@ export default function AkademiPage() {
                               {Math.round(progressPct)}%
                             </span>
                           </div>
-                          <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
+                          <div className={`w-full h-1.5 rounded-full overflow-hidden ${isDark ? 'bg-white/10' : 'bg-gray-200'}`}>
                             <div
                               className={`h-full rounded-full transition-all duration-700 ${progress.completed
                                 ? 'bg-gradient-to-r from-emerald-500 to-emerald-400'
@@ -275,7 +286,7 @@ export default function AkademiPage() {
 
                         {/* POI count */}
                         <div className="flex items-center justify-between">
-                          <span className="text-gray-600 text-xs font-medium">
+                          <span className={`text-xs font-medium ${isDark ? 'text-gray-600' : 'text-gray-400'}`}>
                             {visitedCount} / {poiCount} titik dikunjungi
                           </span>
                           <span className="text-cyan-400 text-xs font-bold group-hover:translate-x-1 transition-transform">
@@ -293,8 +304,8 @@ export default function AkademiPage() {
       </section>
 
       {/* FOOTER */}
-      <footer className="py-20 border-t border-white/5 text-center px-6">
-        <p className="text-gray-600 text-[10px] tracking-[0.4em] font-bold uppercase">
+      <footer className={`py-20 border-t text-center px-6 ${isDark ? 'border-white/5' : 'border-gray-200'}`}>
+        <p className={`text-[10px] tracking-[0.4em] font-bold uppercase ${isDark ? 'text-gray-600' : 'text-gray-400'}`}>
           © 2026 TIM DIVEXPLORE-3D • TEKNOLOGI INFORMASI UNY
         </p>
       </footer>

@@ -3,9 +3,11 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useTheme } from '../../lib/useTheme';
 
 export default function TutorialPage() {
   const pathname = usePathname();
+  const { isDark, toggleTheme } = useTheme();
   const [activeTab, setActiveTab] = useState('Semua');
 
   const categories = ['Semua', 'Pemula', 'Navigasi 3D', 'Fitur Lanjut'];
@@ -57,36 +59,38 @@ export default function TutorialPage() {
     ? tutorials 
     : tutorials.filter(t => t.category === activeTab);
 
+  const navLinks = [
+    { href: '/', label: 'Beranda' },
+    { href: '/gallery', label: 'Galeri' },
+    { href: '/akademi', label: 'Akademi' },
+    { href: '/tutorial', label: 'Tutorial' },
+    { href: '/dashboard', label: 'Dashboard' },
+  ];
+
   return (
-    <div className="min-h-screen bg-[#00040a] text-white font-sans selection:bg-cyan-500/30">
+    <div className={`min-h-screen font-sans selection:bg-cyan-500/30 transition-colors duration-300 ${isDark ? 'bg-[#00040a] text-white' : 'bg-sky-50 text-gray-900'}`}>
       {/* NAVBAR */}
       <nav className="fixed top-0 w-full z-50 px-6 py-5 flex justify-between items-center">
-        <div className="flex items-center gap-3 bg-white/10 backdrop-blur-xl py-2 px-5 rounded-full border border-white/10 shadow-2xl">
+        <div className={`flex items-center gap-3 backdrop-blur-xl py-2 px-5 rounded-full border shadow-xl transition-colors ${isDark ? 'bg-white/10 border-white/10' : 'bg-white/80 border-blue-100 shadow-sm'}`}>
           <div className="w-9 h-9 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-full flex items-center justify-center shadow-lg shadow-blue-500/20">
             <span className="text-base">🌊</span>
           </div>
-          <span className="text-lg font-black tracking-widest text-white pr-1">
+          <span className={`text-lg font-black tracking-widest pr-1 ${isDark ? 'text-white' : 'text-blue-900'}`}>
             DIVEXPLORE
           </span>
         </div>
 
-        <div className="hidden md:flex items-center gap-1 bg-white/5 backdrop-blur-2xl p-1.5 rounded-full border border-white/10 shadow-2xl">
-          {[
-            { href: '/', label: 'Beranda' },
-            { href: '/gallery', label: 'Galeri' },
-            { href: '/dashboard', label: 'Dashboard' },
-            { href: '/akademi', label: 'Akademi' },
-            { href: '/tutorial', label: 'Tutorial' },
-          ].map(({ href, label }) => {
+        <div className={`hidden md:flex items-center gap-1 backdrop-blur-2xl p-1.5 rounded-full border transition-colors ${isDark ? 'bg-white/5 border-white/10 shadow-2xl' : 'bg-white/80 border-gray-200 shadow-sm'}`}>
+          {navLinks.map(({ href, label }) => {
             const isActive = pathname === href;
             return (
-              <Link
-                key={href}
-                href={href}
-                className={`px-6 py-2 rounded-full text-sm font-semibold transition-all ${
+              <Link key={href} href={href}
+                className={`px-5 py-2 rounded-full text-sm font-semibold transition-all ${
                   isActive
                     ? 'bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-bold shadow-lg shadow-blue-600/20'
-                    : 'hover:bg-white/5 text-gray-400 hover:text-white'
+                    : isDark
+                      ? 'hover:bg-white/5 text-gray-400 hover:text-white'
+                      : 'text-gray-600 hover:text-blue-700 hover:bg-blue-50'
                 }`}
               >
                 {label}
@@ -94,6 +98,14 @@ export default function TutorialPage() {
             );
           })}
         </div>
+
+        <button
+          onClick={toggleTheme}
+          title={isDark ? 'Mode Terang' : 'Mode Gelap'}
+          className={`w-10 h-10 rounded-full flex items-center justify-center transition-all text-base ${isDark ? 'bg-white/10 hover:bg-white/20 border border-white/10' : 'bg-white hover:bg-gray-100 border border-gray-200 shadow-sm'}`}
+        >
+          {isDark ? '☀️' : '🌙'}
+        </button>
       </nav>
 
       {/* HERO SECTION */}
@@ -105,15 +117,15 @@ export default function TutorialPage() {
         <div className="max-w-7xl mx-auto relative z-10">
           {/* Breadcrumb */}
           <div className="flex items-center gap-2 text-sm mb-8">
-            <Link href="/" className="text-gray-500 hover:text-white transition-colors">
+            <Link href="/" className={`transition-colors hover:text-cyan-400 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
               Beranda
             </Link>
-            <span className="text-gray-700">›</span>
+            <span className={isDark ? 'text-gray-700' : 'text-gray-400'}>›</span>
             <span className="text-cyan-400 font-bold">Pusat Tutorial</span>
           </div>
 
           <div className="max-w-3xl">
-            <div className="inline-block px-4 py-1.5 mb-6 rounded-full bg-blue-500/10 border border-blue-400/20 text-blue-300 text-[11px] font-black tracking-[0.2em] uppercase backdrop-blur-md">
+            <div className={`inline-block px-4 py-1.5 mb-6 rounded-full border text-[11px] font-black tracking-[0.2em] uppercase backdrop-blur-md ${isDark ? 'bg-blue-500/10 border-blue-400/20 text-blue-300' : 'bg-blue-500/10 border-blue-400/20 text-blue-600'}`}>
               💡 Pusat Bantuan & Panduan
             </div>
             <h1 className="text-5xl md:text-7xl font-black mb-6 leading-[1.1] tracking-tight">
@@ -122,7 +134,7 @@ export default function TutorialPage() {
                 Eksplorasi.
               </span>
             </h1>
-            <p className="text-gray-400 text-lg md:text-xl max-w-2xl leading-relaxed">
+            <p className={`text-lg md:text-xl max-w-2xl leading-relaxed ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
               Pelajari semua fitur Divexplore-3D, mulai dari navigasi dasar hingga cara mendapatkan lencana di modul akademi konservasi.
             </p>
           </div>
@@ -141,8 +153,12 @@ export default function TutorialPage() {
                 onClick={() => setActiveTab(cat)}
                 className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 ${
                   activeTab === cat
-                    ? 'bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.3)]'
-                    : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white border border-white/5'
+                    ? isDark
+                      ? 'bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.3)]'
+                      : 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
+                    : isDark
+                      ? 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white border border-white/5'
+                      : 'bg-white text-gray-500 hover:bg-gray-100 hover:text-gray-800 border border-gray-200'
                 }`}
               >
                 {cat}
@@ -153,9 +169,9 @@ export default function TutorialPage() {
           {/* Tutorial Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
             {filteredTutorials.map((tutorial) => (
-              <div 
+              <div
                 key={tutorial.id}
-                className="group relative rounded-[28px] bg-[#000814] border border-white/5 overflow-hidden hover:border-white/20 transition-all duration-500 hover:shadow-[0_0_40px_rgba(0,0,0,0.5)]"
+                className={`group relative rounded-[28px] overflow-hidden transition-all duration-500 border ${isDark ? 'bg-[#000814] border-white/5 hover:border-white/20 hover:shadow-[0_0_40px_rgba(0,0,0,0.5)]' : 'bg-white border-gray-100 hover:border-blue-200 hover:shadow-xl'}`}
               >
                 {/* Background Hover Glow */}
                 <div className={`absolute inset-0 opacity-0 group-hover:opacity-10 bg-gradient-to-br ${tutorial.color} transition-opacity duration-500 pointer-events-none`} />
@@ -167,7 +183,7 @@ export default function TutorialPage() {
                       {tutorial.icon}
                     </div>
                     <div className="flex flex-col items-end gap-2">
-                      <span className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] font-bold text-gray-300 uppercase tracking-wider backdrop-blur-sm">
+                      <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider backdrop-blur-sm border ${isDark ? 'bg-white/5 border-white/10 text-gray-300' : 'bg-gray-100 border-gray-200 text-gray-600'}`}>
                         {tutorial.category}
                       </span>
                       <span className="text-gray-500 text-xs font-bold flex items-center gap-1">
@@ -177,10 +193,10 @@ export default function TutorialPage() {
                   </div>
 
                   {/* Content */}
-                  <h3 className="text-2xl font-black text-white mb-3 group-hover:text-cyan-300 transition-colors duration-300">
+                  <h3 className={`text-2xl font-black mb-3 group-hover:text-cyan-400 transition-colors duration-300 ${isDark ? 'text-white' : 'text-gray-900'}`}>
                     {tutorial.title}
                   </h3>
-                  <p className="text-gray-400 text-sm leading-relaxed mb-8">
+                  <p className={`text-sm leading-relaxed mb-8 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                     {tutorial.description}
                   </p>
 
@@ -195,7 +211,7 @@ export default function TutorialPage() {
                       </span>
                     </div>
                     
-                    <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden backdrop-blur-sm">
+                    <div className={`h-2 w-full rounded-full overflow-hidden backdrop-blur-sm ${isDark ? 'bg-white/5' : 'bg-gray-100'}`}>
                       <div 
                         className={`h-full rounded-full relative overflow-hidden transition-all duration-1000 ease-out ${
                           tutorial.progress === 100 
@@ -211,11 +227,11 @@ export default function TutorialPage() {
                   </div>
                   
                   {/* Action Button */}
-                  <div className="mt-8 pt-6 border-t border-white/5 flex justify-between items-center">
-                    <span className="text-xs text-gray-500 font-medium">
+                  <div className={`mt-8 pt-6 border-t flex justify-between items-center ${isDark ? 'border-white/5' : 'border-gray-100'}`}>
+                    <span className={`text-xs font-medium ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
                       {tutorial.progress === 100 ? '✅ Selesai dipelajari' : 'Lanjutkan membaca'}
                     </span>
-                    <button className="w-10 h-10 rounded-full bg-white/5 hover:bg-white/15 flex items-center justify-center text-cyan-400 transition-colors">
+                    <button className={`w-10 h-10 rounded-full flex items-center justify-center text-cyan-400 transition-colors ${isDark ? 'bg-white/5 hover:bg-white/15' : 'bg-blue-50 hover:bg-blue-100'}`}>
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M5 12h14M12 5l7 7-7 7"/>
                       </svg>
@@ -227,7 +243,7 @@ export default function TutorialPage() {
           </div>
 
           {/* Video Tutorial CTA */}
-          <div className="mt-20 relative rounded-[32px] overflow-hidden bg-gradient-to-br from-blue-900/40 to-cyan-900/20 border border-cyan-500/20 p-10 md:p-16 flex flex-col md:flex-row items-center justify-between gap-10">
+          <div className={`mt-20 relative rounded-[32px] overflow-hidden border p-10 md:p-16 flex flex-col md:flex-row items-center justify-between gap-10 ${isDark ? 'bg-gradient-to-br from-blue-900/40 to-cyan-900/20 border-cyan-500/20' : 'bg-gradient-to-br from-blue-700 to-blue-900 border-blue-600/30'}`}>
             {/* Animated particles background */}
             <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, #06b6d4 1px, transparent 0)', backgroundSize: '32px 32px' }}></div>
             
@@ -239,8 +255,8 @@ export default function TutorialPage() {
                 </span>
                 Video Panduan Lengkap
               </div>
-              <h2 className="text-3xl md:text-4xl font-black mb-4 text-white">Lebih Suka Menonton?</h2>
-              <p className="text-gray-300 mb-8 leading-relaxed">
+              <h2 className={`text-3xl md:text-4xl font-black mb-4 ${isDark ? 'text-white' : 'text-gray-900'}`}>Lebih Suka Menonton?</h2>
+              <p className={`mb-8 leading-relaxed ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
                 Tonton seri video tutorial lengkap kami yang memandu Anda langkah demi langkah dalam menggunakan platform Divexplore-3D.
               </p>
               <button className="px-8 py-3.5 rounded-full bg-white text-black font-bold hover:scale-105 transition-transform flex items-center gap-2 shadow-[0_0_30px_rgba(255,255,255,0.2)]">
@@ -266,8 +282,8 @@ export default function TutorialPage() {
       </section>
 
       {/* FOOTER */}
-      <footer className="py-10 border-t border-white/5 text-center px-6 relative z-10">
-        <p className="text-gray-600 text-[10px] tracking-[0.4em] font-bold uppercase">
+      <footer className={`py-10 border-t text-center px-6 relative z-10 ${isDark ? 'border-white/5' : 'border-gray-200'}`}>
+        <p className={`text-[10px] tracking-[0.4em] font-bold uppercase ${isDark ? 'text-gray-600' : 'text-gray-400'}`}>
           © 2026 TIM DIVEXPLORE-3D • TEKNOLOGI INFORMASI UNY
         </p>
       </footer>

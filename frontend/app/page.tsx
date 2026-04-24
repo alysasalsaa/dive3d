@@ -2,13 +2,11 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useTheme } from '../lib/useTheme';
 
-
-// Komponen Loading Screen (WP 2.3.1)
 const LoadingScreen = () => (
   <div className="fixed inset-0 z-[100] bg-[#00040a] flex flex-col items-center justify-center">
     <div className="relative">
-      {/* Animasi Gelombang Berdenyut */}
       <div className="w-24 h-24 border-4 border-blue-500/20 rounded-full animate-ping absolute inset-0"></div>
       <div className="w-24 h-24 border-4 border-blue-500 rounded-full flex items-center justify-center bg-[#00040a] relative z-10">
         <span className="text-3xl animate-bounce">🌊</span>
@@ -23,7 +21,6 @@ const LoadingScreen = () => (
         "Laut adalah jantung bumi. Mari kita jaga detaknya tetap kuat."
       </p>
     </div>
-
     <style jsx>{`
       @keyframes loading {
         0% { width: 0%; transform: translateX(-100%); }
@@ -36,6 +33,7 @@ const LoadingScreen = () => (
 
 export default function HomePage() {
   const pathname = usePathname();
+  const { isDark, toggleTheme } = useTheme();
   const [isLoading, setIsLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
@@ -47,38 +45,40 @@ export default function HomePage() {
 
   if (isLoading) return <LoadingScreen />;
 
+  const navLinks = [
+    { href: '/', label: 'Beranda' },
+    { href: '/gallery', label: 'Galeri' },
+    { href: '/akademi', label: 'Akademi' },
+    { href: '/tutorial', label: 'Tutorial' },
+    { href: '/dashboard', label: 'Dashboard' },
+  ];
+
   return (
-    <div className="min-h-screen bg-[#00040a] text-white font-sans overflow-x-hidden animate-in fade-in duration-1000">
-      {/* 1. ULTRA NAVBAR */}
-      {/* GLOBAL NAVBAR - DARK STYLE WITH CAPSULE LOGO */}
+    <div className={`min-h-screen font-sans overflow-x-hidden animate-in fade-in duration-1000 transition-colors ${isDark ? 'bg-[#00040a] text-white' : 'bg-sky-50 text-gray-900'}`}>
+
+      {/* NAVBAR */}
       <nav className="fixed top-0 w-full z-50 px-6 py-5 flex justify-between items-center transition-all">
 
-        {/* BAGIAN KIRI: Logo & Judul dengan Kapsul Gelap */}
-        <div className="flex items-center gap-3 bg-white/10 backdrop-blur-xl py-2 px-5 rounded-full border border-white/10 shadow-2xl">
+        {/* Logo */}
+        <div className={`flex items-center gap-3 backdrop-blur-xl py-2 px-5 rounded-full border shadow-xl transition-colors ${isDark ? 'bg-white/10 border-white/10' : 'bg-white/80 border-blue-100 shadow-sm'}`}>
           <div className="w-9 h-9 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-full flex items-center justify-center shadow-lg shadow-blue-500/20">
             <span className="text-base">🌊</span>
           </div>
-          <span className="text-lg font-black tracking-widest text-white pr-1">DIVEXPLORE</span>
+          <span className={`text-lg font-black tracking-widest pr-1 ${isDark ? 'text-white' : 'text-blue-900'}`}>DIVEXPLORE</span>
         </div>
 
-        {/* BAGIAN TENGAH: Nav Utama */}
-        <div className="hidden md:flex items-center gap-1 bg-white/5 backdrop-blur-2xl p-1.5 rounded-full border border-white/10 shadow-2xl">
-          {[
-            { href: '/', label: 'Beranda' },
-            { href: '/gallery', label: 'Galeri' },
-            { href: '/akademi', label: 'Akademi' },
-            { href: '/tutorial', label: 'Tutorial' },
-            { href: '/dashboard', label: 'Dashboard' },
-          ].map(({ href, label }) => {
+        {/* Nav links */}
+        <div className={`hidden md:flex items-center gap-1 backdrop-blur-2xl p-1.5 rounded-full border shadow-2xl transition-colors ${isDark ? 'bg-white/5 border-white/10' : 'bg-white/80 border-gray-200 shadow-sm'}`}>
+          {navLinks.map(({ href, label }) => {
             const isActive = pathname === href;
             return (
-              <Link
-                key={href}
-                href={href}
+              <Link key={href} href={href}
                 className={`px-5 py-2 rounded-full text-sm font-semibold transition-all ${
                   isActive
-                    ? 'bg-white/10 text-white font-bold'
-                    : 'hover:bg-white/5 text-gray-400 hover:text-white'
+                    ? 'bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-bold shadow-lg shadow-blue-500/20'
+                    : isDark
+                      ? 'hover:bg-white/5 text-gray-400 hover:text-white'
+                      : 'text-gray-600 hover:text-blue-700 hover:bg-blue-50'
                 }`}
               >
                 {label}
@@ -87,60 +87,63 @@ export default function HomePage() {
           })}
         </div>
 
-        {/* BAGIAN KANAN: Tombol Auth */}
+        {/* Auth + Toggle */}
         <div className="hidden md:flex items-center gap-2">
           {isLoggedIn ? (
-            <Link
-              href="/dashboard"
+            <Link href="/dashboard"
               className="px-5 py-2 rounded-full text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-cyan-500 hover:opacity-90 transition-all shadow-lg shadow-blue-500/20"
             >
               Dashboard
             </Link>
           ) : (
             <>
-              <Link
-                href="/login"
-                className="px-5 py-2 rounded-full text-sm font-semibold text-gray-300 hover:text-white border border-white/10 hover:border-white/30 transition-all backdrop-blur-xl bg-white/5"
+              <Link href="/login"
+                className={`px-5 py-2 rounded-full text-sm font-semibold transition-all backdrop-blur-xl ${isDark ? 'text-gray-300 hover:text-white border border-white/10 hover:border-white/30 bg-white/5' : 'text-gray-700 hover:text-blue-700 border border-gray-200 hover:border-blue-300 bg-white'}`}
               >
                 Masuk
               </Link>
-              <Link
-                href="/register"
+              <Link href="/register"
                 className="px-5 py-2 rounded-full text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-cyan-500 hover:opacity-90 transition-all shadow-lg shadow-blue-500/20"
               >
                 Daftar
               </Link>
             </>
           )}
+          <button
+            onClick={toggleTheme}
+            title={isDark ? 'Mode Terang' : 'Mode Gelap'}
+            className={`w-10 h-10 rounded-full flex items-center justify-center transition-all text-base ${isDark ? 'bg-white/10 hover:bg-white/20 border border-white/10' : 'bg-white hover:bg-gray-100 border border-gray-200 shadow-sm'}`}
+          >
+            {isDark ? '☀️' : '🌙'}
+          </button>
         </div>
       </nav>
 
-      {/* 2. DYNAMIC HERO SECTION */}
+      {/* HERO SECTION */}
       <section className="relative h-screen flex items-center justify-center">
         <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-gradient-to-b from-blue-900/10 via-transparent to-[#00040a]"></div>
+          <div className={`absolute inset-0 bg-gradient-to-b ${isDark ? 'from-blue-900/10 via-transparent to-[#00040a]' : 'from-blue-200/30 via-transparent to-sky-50'}`}></div>
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-blue-500/20 blur-[120px] rounded-full"></div>
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="text-white/5 text-[15vw] font-black select-none uppercase tracking-tighter">RAJA AMPAT</div>
+            <div className={`text-[15vw] font-black select-none uppercase tracking-tighter ${isDark ? 'text-white/5' : 'text-blue-900/5'}`}>RAJA AMPAT</div>
           </div>
         </div>
 
         <div className="relative z-10 text-center max-w-5xl px-6">
-          <div className="inline-block px-5 py-2 mb-6 rounded-full bg-cyan-500/20 border border-cyan-400/60 text-cyan-100 text-xs font-black tracking-[0.25em] uppercase animate-pulse shadow-[0_0_25px_rgba(34,211,238,0.6)]">
+          <div className="inline-block px-5 py-2 mb-6 rounded-full bg-cyan-500/20 border border-cyan-400/60 text-cyan-600 text-xs font-black tracking-[0.25em] uppercase animate-pulse shadow-[0_0_25px_rgba(34,211,238,0.3)]">
             Eksplorasi Virtual 3D
           </div>
-          <h1 className="text-6xl md:text-8xl font-black mb-8 leading-[1.1] tracking-tighter">
+          <h1 className={`text-6xl md:text-8xl font-black mb-8 leading-[1.1] tracking-tighter ${isDark ? 'text-white' : 'text-gray-900'}`}>
             MENYELAMI RAHASIA <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-cyan-300 to-blue-500 text-glow">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-500">
               SAMUDRA BIRU
             </span>
           </h1>
-          <p className="text-gray-400 max-w-2xl mx-auto text-lg md:text-xl mb-12 leading-relaxed">
+          <p className={`max-w-2xl mx-auto text-lg md:text-xl mb-12 leading-relaxed ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
             Rasakan keajaiban ekosistem Raja Ampat dalam visualisasi 3D yang nyata. Pelajari pentingnya konservasi laut melalui interaksi langsung.
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-            <Link
-              href="/panduan"
+            <Link href="/panduan"
               className="group relative px-10 py-5 bg-white text-black font-black rounded-2xl transition-colors duration-1000 hover:text-white overflow-hidden shadow-2xl inline-block"
             >
               <span className="relative z-10 transition-colors duration-1000 delay-300">Mulai Penyelaman</span>
@@ -149,8 +152,8 @@ export default function HomePage() {
               <div className="absolute left-1/2 top-[150%] h-[400px] w-[400px] -translate-x-1/2 rounded-[45%] bg-cyan-500/70 group-hover:top-[-160px] transition-all duration-[3000ms] ease-in-out animate-[spin_12s_linear_infinite] z-0 delay-150"></div>
               <div className="absolute left-1/2 top-[150%] h-[400px] w-[400px] -translate-x-1/2 rounded-[40%] bg-blue-300/40 group-hover:top-[-170px] transition-all duration-[3500ms] ease-in-out animate-[spin_14s_linear_infinite_reverse] z-0 delay-300"></div>
             </Link>
-            <button className="flex items-center gap-3 px-6 py-2 text-white font-bold hover:text-blue-400 transition-all">
-              <span className="w-12 h-12 flex items-center justify-center rounded-full border border-white/20">▶</span>
+            <button className={`flex items-center gap-3 px-6 py-2 font-bold hover:text-blue-400 transition-all ${isDark ? 'text-white' : 'text-gray-700'}`}>
+              <span className={`w-12 h-12 flex items-center justify-center rounded-full border ${isDark ? 'border-white/20' : 'border-gray-300'}`}>▶</span>
               Lihat Trailer
             </button>
           </div>
@@ -158,8 +161,8 @@ export default function HomePage() {
       </section>
 
       {/* FOOTER */}
-      <footer className="py-20 border-t border-white/5 text-center px-6">
-        <p className="text-gray-600 text-[10px] tracking-[0.4em] font-bold uppercase">
+      <footer className={`py-20 border-t text-center px-6 ${isDark ? 'border-white/5' : 'border-gray-200'}`}>
+        <p className={`text-[10px] tracking-[0.4em] font-bold uppercase ${isDark ? 'text-gray-600' : 'text-gray-400'}`}>
           © 2026 TIM DIVEXPLORE-3D • TEKNOLOGI INFORMASI UNY
         </p>
       </footer>
