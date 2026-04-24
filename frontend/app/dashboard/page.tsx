@@ -2,9 +2,11 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useTheme } from '../../lib/useTheme';
 
-export default function DashboardWireframe() {
+export default function DashboardPage() {
     const pathname = usePathname();
+    const { isDark, toggleTheme } = useTheme();
     const [dashboardData, setDashboardData] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -14,317 +16,360 @@ export default function DashboardWireframe() {
         fetch('http://localhost:8000/api/dashboard')
             .then(res => res.json())
             .then(data => {
-                if (data.status === 'success') {
-                    setDashboardData(data.data);
-                }
+                if (data.status === 'success') setDashboardData(data.data);
                 setLoading(false);
             })
-            .catch(err => {
-                console.error("Error fetching dashboard:", err);
-                setLoading(false);
-            });
+            .catch(() => setLoading(false));
     }, []);
 
     if (loading) {
-        return <div className="flex h-screen items-center justify-center bg-gray-50 text-blue-600 font-bold text-xl animate-pulse">Memuat Dashboard...</div>;
+        return (
+            <div className={`flex h-screen items-center justify-center ${isDark ? 'bg-[#00040a]' : 'bg-sky-50'}`}>
+                <div className="text-center">
+                    <div className="w-16 h-16 border-4 border-blue-500/20 border-t-cyan-400 rounded-full animate-spin mx-auto mb-4" />
+                    <p className="text-cyan-400 font-bold tracking-widest text-sm uppercase">Memuat Dashboard...</p>
+                </div>
+            </div>
+        );
     }
 
-    if (!dashboardData) return(
-        <div className="flex h-screen items-center justify-center bg-gray-50 text-red-500 font-bold text-xl">Gagal memuat API</div>
+    if (!dashboardData) return (
+        <div className={`flex h-screen items-center justify-center ${isDark ? 'bg-[#00040a]' : 'bg-sky-50'}`}>
+            <div className="text-center">
+                <div className="text-4xl mb-4">🌊</div>
+                <p className="text-red-400 font-bold">Gagal terhubung ke server</p>
+                <p className="text-gray-500 text-sm mt-2">Pastikan backend sudah berjalan</p>
+            </div>
+        </div>
     );
 
+    const menuItems = [
+        { icon: '📊', label: 'Dashboard' },
+        { icon: '📚', label: 'Ruang Kelas' },
+        { icon: '👑', label: 'Leaderboard' },
+        { icon: '🎁', label: 'Klaim Hadiah' },
+        { icon: '⚙️', label: 'Pengaturan' },
+    ];
+
     return (
-        <>
-            <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+        <div className={`flex h-screen font-sans overflow-hidden transition-colors duration-300 ${isDark ? 'bg-[#00040a] text-white' : 'bg-sky-50 text-gray-900'}`}>
 
-            {/* Container Utama */}
-            <div className="flex h-screen bg-gray-50 font-['Outfit'] text-gray-800">
-
-                {/* NAVIGASI KONTROL: Sidebar */}
-                <aside className={`bg-white border-r border-gray-200 flex flex-col transition-all duration-500 ease-in-out relative ${isSidebarOpen ? 'w-64' : 'w-20'}`}>
-                    
-                    {/* Header Area */}
-                    <div className="h-24 flex items-center px-4 relative overflow-hidden border-b border-transparent">
-                        {/* Tombol Utama / Logo */}
-                        <div 
-                            className={`p-2 rounded-xl transition-all duration-500 ease-in-out flex-shrink-0 flex items-center justify-center cursor-pointer ${isSidebarOpen ? 'bg-blue-100 text-blue-900 w-11 h-11' : 'bg-gradient-to-tr from-blue-500 to-cyan-400 text-white w-12 h-12 hover:scale-110 hover:rotate-12 shadow-lg hover:shadow-cyan-400/50 mx-auto'}`} 
-                            onClick={() => !isSidebarOpen && setIsSidebarOpen(true)} 
-                            title={!isSidebarOpen ? "Expand Sidebar" : ""}
-                        >
-                            <span role="img" aria-label="rocket" className={`text-xl transition-transform duration-500 ${!isSidebarOpen ? 'animate-pulse' : ''}`}>🚀</span>
-                        </div>
-                        
-                        {/* Teks Logo */}
-                        <span className={`text-2xl font-bold text-blue-900 whitespace-nowrap ml-3 transition-all duration-500 ease-in-out ${isSidebarOpen ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8 pointer-events-none max-w-0'}`}>
-                            SeaQuest
-                        </span>
-                        
-                        {/* Tombol Minimize */}
-                        <button 
-                            onClick={() => setIsSidebarOpen(false)} 
-                            className={`absolute right-4 text-gray-400 hover:text-blue-600 focus:outline-none transition-all duration-500 ease-in-out hover:scale-125 ${isSidebarOpen ? 'opacity-100 rotate-0' : 'opacity-0 rotate-180 pointer-events-none'}`} 
-                            title="Minimize Sidebar"
-                        >
-                            <span role="img" aria-label="collapse" className="text-sm">◀️</span>
-                        </button>
-                    </div>
-
-                    {/* Menu Items */}
-                    <ul className="flex-1 mt-4 space-y-3 px-3 overflow-x-hidden">
-                        {[
-                            { icon: '📊', label: 'Dashboard Utama' },
-                            { icon: '📚', label: 'Ruang Kelas' },
-                            { icon: '👑', label: 'Leaderboard' },
-                            { icon: '🎁', label: 'Klaim Hadiah' },
-                            { icon: '⚙️', label: 'Pengaturan' },
-                        ].map((item, idx) => (
-                            <li key={idx} onClick={() => setActiveMenu(idx)} className={`flex items-center rounded-xl cursor-pointer transition-all duration-300 group ${activeMenu === idx ? 'bg-blue-50 text-blue-700 font-semibold' : 'text-gray-600 hover:bg-gray-50 hover:text-blue-600'} ${isSidebarOpen ? 'p-3 gap-3' : 'justify-center p-3 w-12 h-12 mx-auto'}`} title={!isSidebarOpen ? item.label : ""}>
-                                <div className={`flex items-center justify-center flex-shrink-0 transition-transform duration-500 ease-out ${isSidebarOpen ? 'w-6 h-6' : 'w-full h-full group-hover:scale-125 group-hover:rotate-12 group-active:scale-95'}`}>
-                                    <span role="img" aria-label={item.label} className="text-xl">{item.icon}</span>
-                                </div>
-                                <span className={`whitespace-nowrap transition-all duration-500 ease-in-out overflow-hidden ${isSidebarOpen ? 'opacity-100 max-w-[200px] translate-x-0' : 'opacity-0 max-w-0 -translate-x-4 pointer-events-none'}`}>
-                                    {item.label}
-                                </span>
-                            </li>
-                        ))}
-                    </ul>
-                </aside>
-
-                {/* Main Content Area */}
-                <main className="flex-1 flex flex-col overflow-y-auto">
-
-                    {/* NAVIGASI KONTROL: Header (BAGIAN INI YANG DIUBAH) */}
-                    <header className="bg-white/40 backdrop-blur-2xl px-6 py-5 border-b border-gray-200 flex justify-between items-center sticky top-0 z-10 transition-all">
-                        {/* Bagian Kiri: Profile Menu, Notifikasi, dan Judul dipindah ke kiri */}
-                        <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 bg-gradient-to-tr from-blue-400 to-cyan-400 rounded-full cursor-pointer shadow-sm border-2 border-white" title="Profile Menu"></div>
-                            <div className="relative cursor-pointer p-2 hover:bg-gray-100 rounded-full transition-colors" title="Notifikasi">
-                                <span role="img" aria-label="bell" className="text-xl">🔔</span>
-                                <div className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></div>
-                            </div>
-                            <div className="text-xl font-semibold text-gray-800 ml-2">Learning Page</div>
-                        </div>
-
-                        {/* Bagian Kanan: Global Navigation Bar (Desain persis seperti Gallery) */}
-                        <div className="hidden md:flex items-center gap-1 bg-white/40 backdrop-blur-2xl p-1.5 rounded-full border border-blue-100 shadow-xl">
-                          {[
-                            { href: '/', label: 'Beranda' },
-                            { href: '/gallery', label: 'Galeri' },
-                            { href: '/dashboard', label: 'Dashboard' },
-                            { href: '/akademi', label: 'Akademi' },
-                          ].map(({ href, label }) => {
-                            const isActive = pathname === href;
-                            return (
-                              <Link
-                                key={href}
-                                href={href}
-                                className={`px-6 py-2 rounded-full text-sm font-semibold transition-all ${
-                                  isActive
-                                    ? 'bg-blue-600 text-white font-bold shadow-md'
-                                    : 'hover:bg-white/50 text-gray-600 hover:text-blue-600'
-                                }`}
-                              >
-                                {label}
-                              </Link>
-                            );
-                          })}
-                        </div>
-                    </header>
-
-                    {/* Dashboard Content (SAMA PERSIS, TIDAK ADA YANG DIUBAH) */}
-                    <div className="p-8 max-w-7xl mx-auto w-full space-y-6">
-
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            {/* 1. KOMPONEN UTAMA: Profile */}
-                            <div className="md:col-span-2 bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center gap-6">
-                                <div className="w-24 h-24 bg-gradient-to-tr from-blue-400 to-cyan-400 rounded-full shadow-inner flex-shrink-0"></div>
-                                <div className="flex-1">
-                                    <div className="text-2xl font-bold text-gray-900">{dashboardData.user.name}</div>
-                                    <div className="text-blue-600 font-medium mt-1 flex items-center gap-1">
-                                        <span role="img" aria-label="stars">✨</span> Level {dashboardData.user.level} : {dashboardData.user.rank_name}
-                                    </div>
-                                    <div className="mt-4 bg-gray-100 rounded-full h-3 w-full overflow-hidden">
-                                        <div className="bg-blue-500 h-full rounded-full" style={{ width: `${(dashboardData.user.current_xp / dashboardData.user.next_level_xp) * 100}%` }}></div>
-                                    </div>
-                                    <div className="flex justify-between text-sm text-gray-500 mt-2 font-medium">
-                                        <span>{dashboardData.user.current_xp} XP Saat Ini</span>
-                                        <span>Dibutuhkan {dashboardData.user.next_level_xp} XP untuk Level Up</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* 1. KOMPONEN UTAMA: Badge (Lencana) */}
-                            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col justify-center">
-                                <div className="font-bold text-gray-800 mb-4 flex items-center gap-2">
-                                    <span role="img" aria-label="medal" className="text-xl">🏅</span> Koleksi Lencana
-                                </div>
-                                <div className="flex gap-4 justify-center">
-                                    {dashboardData.badges.map((badge: any) => (
-                                        <div key={badge.id} className={`w-14 h-14 rounded-full flex items-center justify-center text-2xl cursor-pointer transition-all ${badge.achieved ? 'bg-blue-50 border-2 border-blue-400 shadow-sm' : 'bg-gray-50 border-2 border-dashed border-gray-300'}`} title={`${badge.name}: ${badge.tooltip}`}>
-                                            <span role="img" aria-label={badge.name} className={badge.achieved ? 'opacity-100' : 'opacity-50 hover:opacity-100'}>{badge.icon}</span>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {/* 2. ELEMEN MONITORING: Status Progres Belajar */}
-                            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                                <div className="font-bold text-gray-800 mb-6 flex items-center gap-2">
-                                    <span role="img" aria-label="chart_up" className="text-xl">📈</span> Progres Belajar
-                                </div>
-
-                                <div className="space-y-5">
-                                    {dashboardData.learning_progress.map((progress: any) => {
-                                        const c = progress.color || "blue";
-                                        return (
-                                        <div key={progress.course_id}>
-                                            <div className="flex justify-between text-sm font-medium mb-2">
-                                                <span className="text-gray-700">{progress.title}</span>
-                                                <span className={c === 'emerald' ? 'text-emerald-500' : c === 'amber' ? 'text-amber-500' : 'text-blue-500'}>{progress.progress_percentage}%</span>
-                                            </div>
-                                            <div className="bg-gray-100 rounded-full h-2 w-full overflow-hidden">
-                                                <div className={c === 'emerald' ? 'bg-emerald-500 h-full rounded-full' : c === 'amber' ? 'bg-amber-500 h-full rounded-full' : 'bg-blue-500 h-full rounded-full'} style={{ width: `${progress.progress_percentage}%` }}></div>
-                                            </div>
-                                        </div>
-                                    )})}
-                                </div>
-                            </div>
-
-                            {/* 2. ELEMEN MONITORING: Ringkasan Skor Kuis */}
-                            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                                <div className="font-bold text-gray-800 mb-6 flex items-center gap-2">
-                                    <span role="img" aria-label="memo" className="text-xl">📝</span> Ringkasan Skor Kuis
-                                </div>
-                                <div className="space-y-4">
-                                    {dashboardData.recent_quizzes.map((quiz: any) => {
-                                        const c = quiz.color || 'blue';
-                                        const borderClass = c === 'emerald' ? 'border-emerald-100 bg-emerald-50/30' : c === 'amber' ? 'border-amber-100 bg-amber-50/30' : 'border-blue-100 bg-blue-50/30';
-                                        const textClass = c === 'emerald' ? 'text-emerald-600' : c === 'amber' ? 'text-amber-600' : 'text-blue-600';
-                                        
-                                        return (
-                                        <div key={quiz.quiz_id} className={`flex justify-between items-center p-3 rounded-lg border ${borderClass}`}>
-                                            <span className="text-sm font-medium text-gray-700">{quiz.title}</span>
-                                            <span className={`text-sm font-bold ${textClass}`}>{quiz.score} / 100</span>
-                                        </div>
-                                    )})}
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* 3. FITUR GAMIFIKASI: Leaderboard, Tantangan, Reward */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-                            {/* Gamifikasi: Leaderboard */}
-                            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                                <div className="font-bold text-gray-800 mb-5 flex items-center gap-2">
-                                    <span role="img" aria-label="crown" className="text-xl">👑</span> Leaderboard Top 3
-                                </div>
-                                <div className="space-y-4">
-                                    {dashboardData.leaderboard.map((user: any) => {
-                                        const rankColors: any = {
-                                            1: "bg-yellow-50/50 border-transparent",
-                                            2: "bg-gray-50 border-transparent",
-                                            3: "bg-orange-50/50 border-orange-100"
-                                        };
-                                        const textColors: any = {
-                                            1: "text-yellow-600",
-                                            2: "text-gray-600",
-                                            3: "text-orange-600"
-                                        };
-                                        const badgeColors: any = {
-                                            1: "bg-yellow-400",
-                                            2: "bg-gray-300",
-                                            3: "bg-orange-400"
-                                        };
-                                        return (
-                                        <div key={user.rank} className={`flex items-center gap-3 p-2 rounded-lg border ${rankColors[user.rank] || 'bg-white border-gray-100'}`}>
-                                            <div className={`w-8 h-8 rounded-full ${badgeColors[user.rank] || 'bg-blue-300'} text-white flex items-center justify-center font-bold text-sm shadow-sm`}>{user.rank}</div>
-                                            <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-xl">{user.avatar_emoji}</div>
-                                            <div className="flex-1">
-                                                <div className={`text-sm font-bold ${user.rank === 3 ? 'text-blue-700' : 'text-gray-800'}`}>{user.name}</div>
-                                                <div className={`text-xs font-medium ${textColors[user.rank] || 'text-gray-500'}`}>{user.xp} XP</div>
-                                            </div>
-                                        </div>
-                                    )})}
-                                </div>
-                            </div>
-
-                            {/* Gamifikasi: Tantangan Interaktif */}
-                            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                                <div className="font-bold text-gray-800 mb-5 flex items-center gap-2">
-                                    <span role="img" aria-label="crossed_swords" className="text-xl">⚔️</span> Tantangan Harian
-                                </div>
-                                <div className="space-y-4">
-                                    {dashboardData.daily_challenges.map((challenge: any) => (
-                                        <div key={challenge.id} className="p-4 rounded-xl border border-gray-100 bg-gray-50">
-                                            <div className="text-sm font-bold text-gray-800 mb-2">{challenge.title}</div>
-                                            <div className="bg-gray-200 rounded-full h-1.5 w-full overflow-hidden mb-2">
-                                                <div className={`${challenge.id % 2 === 0 ? 'bg-emerald-500' : 'bg-blue-500'} h-full rounded-full`} style={{ width: `${challenge.progress_percentage}%` }}></div>
-                                            </div>
-                                            <div className={`text-xs font-semibold flex items-center gap-1 ${challenge.id % 2 === 0 ? 'text-emerald-600' : 'text-blue-600'}`}>
-                                                <span role="img" aria-label="reward">{challenge.reward_icon}</span> {challenge.reward_text}
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Gamifikasi: Reward System */}
-                            <div className="bg-gradient-to-br from-blue-900 to-indigo-900 rounded-2xl p-6 shadow-md border border-blue-800 flex flex-col justify-center items-center text-center">
-                                <div className="font-bold text-yellow-400 mb-4 flex items-center gap-2 text-lg">
-                                    <span role="img" aria-label="gift" className="text-xl">🎁</span> Reward System
-                                </div>
-                                <div className="mb-6">
-                                    <div className="text-sm text-blue-200 font-medium mb-1">Total Gems Yang Anda Miliki:</div>
-                                    <div className="text-4xl font-extrabold text-white flex items-center justify-center gap-2">
-                                        <span role="img" aria-label="gem">💎</span> {dashboardData.user.gems}
-                                    </div>
-                                </div>
-                                <button className="w-full bg-gradient-to-r from-yellow-400 to-orange-400 hover:from-yellow-300 hover:to-orange-300 text-orange-950 font-bold py-3 px-4 rounded-xl transition-transform transform hover:-translate-y-1 shadow-lg">
-                                    Buka Toko / Tukar Reward
-                                </button>
-                                <div className="mt-4 text-xs text-blue-300/80 font-medium">
-                                    Ada 3 item e-book eksklusif yang bisa ditukar!
-                                </div>
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                    {/* FOOTER */}
-                    <footer className="bg-blue-950 text-blue-100 pt-16 pb-8 px-8 mt-auto border-t-4 border-cyan-500">
-                        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10">
-                            <div>
-                                <h4 className="text-2xl font-bold text-white mb-4">Divexplore-3D</h4>
-                                <p className="text-sm text-blue-200 leading-relaxed">Platform pembelajaran konservasi laut interaktif berbasis 3D. Menjelajahi keindahan ekosistem dan biota laut Raja Ampat langsung dari layarmu.</p>
-                            </div>
-                            <div>
-                                <h4 className="text-lg font-semibold text-white mb-4">Tautan Cepat</h4>
-                                <ul className="space-y-3 text-sm">
-                                    <li><Link href="/" className="hover:text-cyan-400 transition-colors flex items-center"><span className="mr-2">›</span> Beranda</Link></li>
-                                    <li><Link href="/dashboard" className="hover:text-cyan-400 transition-colors flex items-center"><span className="mr-2">›</span> Dashboard</Link></li>
-                                    <li><Link href="/gallery" className="hover:text-cyan-400 transition-colors flex items-center"><span className="mr-2">›</span> Galeri</Link></li>
-                                </ul>
-                            </div>
-                            <div>
-                                <h4 className="text-lg font-semibold text-white mb-4">Hubungi Kami</h4>
-                                <ul className="space-y-4 text-sm">
-                                    <li className="flex items-start"><span className="text-cyan-400 mr-3 text-lg">📍</span><span>Kampus UNY, Karangmalang,<br />Yogyakarta</span></li>
-                                    <li className="flex items-center"><span className="text-cyan-400 mr-3 text-lg">✉️</span><span>hello@divexplore3d.com</span></li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div className="max-w-7xl mx-auto border-t border-blue-800/50 mt-12 pt-8 text-center text-sm text-blue-400/80">
-                            &copy; {new Date().getFullYear()} Tim Divexplore-3D. Hak Cipta Dilindungi.
-                        </div>
-                    </footer>
-                </main>
-
+            {/* Ambient glow background */}
+            <div className="fixed inset-0 pointer-events-none z-0">
+                <div className="absolute top-0 left-1/4 w-[500px] h-[300px] bg-blue-500/10 blur-[120px] rounded-full" />
+                <div className="absolute bottom-1/4 right-0 w-[400px] h-[400px] bg-cyan-500/5 blur-[100px] rounded-full" />
             </div>
 
-        </>
+            {/* SIDEBAR */}
+            <aside className={`relative z-10 flex flex-col border-r backdrop-blur-2xl transition-all duration-500 ease-in-out flex-shrink-0 ${isSidebarOpen ? 'w-60' : 'w-[72px]'} ${isDark ? 'border-white/5 bg-white/[0.03]' : 'border-gray-200 bg-white shadow-sm'}`}>
+
+                {/* Logo */}
+                <div className={`h-20 flex items-center px-4 border-b ${isDark ? 'border-white/5' : 'border-gray-100'}`}>
+                    <div
+                        className={`w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20 flex-shrink-0 cursor-pointer`}
+                        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                    >
+                        <span className="text-lg">🌊</span>
+                    </div>
+                    <span className={`ml-3 text-base font-black tracking-widest whitespace-nowrap ${isDark ? "text-white" : "text-blue-900"} transition-all duration-500 ${isSidebarOpen ? 'opacity-100 max-w-[200px]' : 'opacity-0 max-w-0 overflow-hidden'}`}>
+                        DIVEXPLORE
+                    </span>
+                </div>
+
+                {/* Menu */}
+                <ul className="flex-1 py-4 px-2 space-y-1 overflow-x-hidden">
+                    {menuItems.map((item, idx) => (
+                        <li
+                            key={idx}
+                            onClick={() => setActiveMenu(idx)}
+                            title={!isSidebarOpen ? item.label : ''}
+                            className={`flex items-center rounded-xl cursor-pointer transition-all duration-200 group
+                                ${isSidebarOpen ? 'px-3 py-2.5 gap-3' : 'justify-center p-3'}
+                                ${activeMenu === idx
+                                    ? 'bg-gradient-to-r from-blue-600/30 to-cyan-500/20 border border-blue-500/30 text-cyan-400'
+                                    : isDark
+                                      ? 'text-gray-500 hover:text-white hover:bg-white/5 border border-transparent'
+                                      : 'text-gray-500 hover:text-blue-700 hover:bg-blue-50 border border-transparent'
+                                }`}
+                        >
+                            <span className="text-lg flex-shrink-0">{item.icon}</span>
+                            <span className={`text-sm font-semibold whitespace-nowrap transition-all duration-500 ${isSidebarOpen ? 'opacity-100 max-w-[200px]' : 'opacity-0 max-w-0 overflow-hidden pointer-events-none'}`}>
+                                {item.label}
+                            </span>
+                        </li>
+                    ))}
+                </ul>
+
+                {/* Logout */}
+                <div className={`p-2 border-t ${isDark ? 'border-white/5' : 'border-gray-100'}`}>
+                    <button
+                        onClick={() => { localStorage.removeItem('auth_token'); window.location.href = '/'; }}
+                        title={!isSidebarOpen ? 'Keluar' : ''}
+                        className={`w-full flex items-center rounded-xl text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200 border border-transparent
+                            ${isSidebarOpen ? 'px-3 py-2.5 gap-3' : 'justify-center p-3'}`}
+                    >
+                        <span className="text-lg flex-shrink-0">🚪</span>
+                        <span className={`text-sm font-semibold whitespace-nowrap transition-all duration-500 ${isSidebarOpen ? 'opacity-100 max-w-[200px]' : 'opacity-0 max-w-0 overflow-hidden pointer-events-none'}`}>
+                            Keluar
+                        </span>
+                    </button>
+                </div>
+            </aside>
+
+            {/* MAIN CONTENT */}
+            <main className="relative z-10 flex-1 flex flex-col overflow-y-auto">
+
+                {/* TOP HEADER */}
+                <header className={`sticky top-0 z-20 px-6 py-4 border-b backdrop-blur-2xl flex justify-between items-center ${isDark ? 'border-white/5 bg-[#00040a]/80' : 'border-gray-200 bg-sky-50/80'}`}>
+                    <div className="flex items-center gap-4">
+                        <div className="w-9 h-9 bg-gradient-to-br from-blue-400 to-cyan-400 rounded-full flex-shrink-0 shadow-lg shadow-blue-500/20" />
+                        <div>
+                            <p className={`font-bold text-sm leading-none ${isDark ? "text-white" : "text-gray-900"}`}>{dashboardData.user.name}</p>
+                            <p className="text-cyan-400 text-xs mt-0.5">Level {dashboardData.user.level} · {dashboardData.user.rank_name}</p>
+                        </div>
+                    </div>
+
+                    {/* Navbar */}
+                    <div className={`hidden md:flex items-center gap-1 backdrop-blur-2xl p-1.5 rounded-full border ${isDark ? "bg-white/5 border-white/10" : "bg-white/80 border-gray-200 shadow-sm"}`}>
+                        {[
+                            { href: '/', label: 'Beranda' },
+                            { href: '/gallery', label: 'Galeri' },
+                            { href: '/akademi', label: 'Akademi' },
+                            { href: '/tutorial', label: 'Tutorial' },
+                            { href: '/dashboard', label: 'Dashboard' },
+                        ].map(({ href, label }) => {
+                            const isActive = pathname === href;
+                            return (
+                                <Link key={href} href={href}
+                                    className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${isActive
+                                        ? 'bg-gradient-to-r from-blue-600 to-cyan-500 text-white shadow-lg shadow-blue-500/20'
+                                        : isDark ? 'text-gray-400 hover:text-white hover:bg-white/5' : 'text-gray-600 hover:text-blue-700 hover:bg-blue-50'}`}
+                                >
+                                    {label}
+                                </Link>
+                            );
+                        })}
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={toggleTheme}
+                            title={isDark ? 'Mode Terang' : 'Mode Gelap'}
+                            className={`w-9 h-9 rounded-full flex items-center justify-center transition-all text-sm ${isDark ? 'bg-white/10 hover:bg-white/20 border border-white/10' : 'bg-white hover:bg-gray-100 border border-gray-200 shadow-sm'}`}
+                        >
+                            {isDark ? '☀️' : '🌙'}
+                        </button>
+                        <div className={`relative cursor-pointer p-2 rounded-full transition-colors ${isDark ? 'hover:bg-white/5' : 'hover:bg-gray-100'}`}>
+                            <span className="text-xl">🔔</span>
+                            <div className="absolute top-1.5 right-1.5 w-2 h-2 bg-cyan-400 rounded-full" />
+                        </div>
+                    </div>
+                </header>
+
+                {/* DASHBOARD CONTENT */}
+                <div className="p-6 space-y-6 max-w-7xl mx-auto w-full">
+
+                    {/* Row 1: Profile + Badges */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+
+                        {/* Profile Card */}
+                        <div className={`md:col-span-2 backdrop-blur-xl rounded-2xl p-6 border ${isDark ? "bg-white/[0.04] border-white/10" : "bg-white border-gray-100 shadow-sm"} flex items-center gap-6 hover:border-blue-500/30 transition-colors`}>
+                            <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-full flex-shrink-0 shadow-xl shadow-blue-500/30 flex items-center justify-center text-3xl">
+                                🤿
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <h2 className={`text-xl font-black ${isDark ? 'text-white' : 'text-gray-900'}`}>{dashboardData.user.name}</h2>
+                                <p className="text-cyan-400 text-sm font-semibold mt-0.5">✨ Level {dashboardData.user.level} · {dashboardData.user.rank_name}</p>
+                                <div className={`mt-4 rounded-full h-2 overflow-hidden ${isDark ? 'bg-white/10' : 'bg-gray-100'}`}>
+                                    <div
+                                        className="bg-gradient-to-r from-blue-500 to-cyan-400 h-full rounded-full transition-all duration-700"
+                                        style={{ width: `${(dashboardData.user.current_xp / dashboardData.user.next_level_xp) * 100}%` }}
+                                    />
+                                </div>
+                                <div className="flex justify-between text-xs text-gray-500 mt-1.5 font-medium">
+                                    <span>{dashboardData.user.current_xp} XP</span>
+                                    <span>Target {dashboardData.user.next_level_xp} XP</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Badges */}
+                        <div className={`backdrop-blur-xl rounded-2xl p-6 border ${isDark ? "bg-white/[0.04] border-white/10" : "bg-white border-gray-100 shadow-sm"} hover:border-blue-500/30 transition-colors`}>
+                            <h3 className={`font-bold mb-4 flex items-center gap-2 text-sm ${isDark ? "text-white" : "text-gray-800"}`}>
+                                <span>🏅</span> Koleksi Lencana
+                            </h3>
+                            <div className="flex gap-3 flex-wrap justify-center">
+                                {dashboardData.badges.map((badge: any) => (
+                                    <div
+                                        key={badge.id}
+                                        title={`${badge.name}: ${badge.tooltip}`}
+                                        className={`w-14 h-14 rounded-2xl flex items-center justify-center text-2xl transition-all cursor-pointer
+                                            ${badge.achieved
+                                                ? 'bg-gradient-to-br from-blue-600/40 to-cyan-500/20 border border-cyan-400/40 shadow-lg shadow-cyan-500/10 hover:scale-110'
+                                                : 'bg-white/5 border border-white/10 opacity-40 grayscale'
+                                            }`}
+                                    >
+                                        {badge.icon}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Row 2: Progress + Quiz */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+                        {/* Progres Belajar */}
+                        <div className={`backdrop-blur-xl rounded-2xl p-6 border ${isDark ? "bg-white/[0.04] border-white/10" : "bg-white border-gray-100 shadow-sm"} hover:border-blue-500/30 transition-colors`}>
+                            <h3 className={`font-bold mb-5 flex items-center gap-2 text-sm ${isDark ? "text-white" : "text-gray-800"}`}>
+                                <span>📈</span> Progres Belajar
+                            </h3>
+                            <div className="space-y-5">
+                                {dashboardData.learning_progress.map((progress: any) => {
+                                    const colorMap: Record<string, string> = {
+                                        emerald: 'from-emerald-500 to-teal-400',
+                                        amber: 'from-amber-500 to-orange-400',
+                                        blue: 'from-blue-500 to-cyan-400',
+                                    };
+                                    const textMap: Record<string, string> = {
+                                        emerald: 'text-emerald-400',
+                                        amber: 'text-amber-400',
+                                        blue: 'text-cyan-400',
+                                    };
+                                    const c = progress.color || 'blue';
+                                    return (
+                                        <div key={progress.course_id}>
+                                            <div className="flex justify-between text-xs font-semibold mb-2">
+                                                <span className={isDark ? 'text-gray-300' : 'text-gray-700'}>{progress.title}</span>
+                                                <span className={textMap[c] || 'text-cyan-400'}>{progress.progress_percentage}%</span>
+                                            </div>
+                                            <div className={`rounded-full h-2 overflow-hidden ${isDark ? 'bg-white/10' : 'bg-gray-100'}`}>
+                                                <div
+                                                    className={`bg-gradient-to-r ${colorMap[c] || colorMap.blue} h-full rounded-full`}
+                                                    style={{ width: `${progress.progress_percentage}%` }}
+                                                />
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+
+                        {/* Ringkasan Kuis */}
+                        <div className={`backdrop-blur-xl rounded-2xl p-6 border ${isDark ? "bg-white/[0.04] border-white/10" : "bg-white border-gray-100 shadow-sm"} hover:border-blue-500/30 transition-colors`}>
+                            <h3 className={`font-bold mb-5 flex items-center gap-2 text-sm ${isDark ? "text-white" : "text-gray-800"}`}>
+                                <span>📝</span> Ringkasan Skor Kuis
+                            </h3>
+                            <div className="space-y-3">
+                                {dashboardData.recent_quizzes.map((quiz: any) => {
+                                    const c = quiz.color || 'blue';
+                                    const bgMap: Record<string, string> = {
+                                        emerald: 'bg-emerald-500/10 border-emerald-500/20',
+                                        amber: 'bg-amber-500/10 border-amber-500/20',
+                                        blue: 'bg-blue-500/10 border-blue-500/20',
+                                    };
+                                    const textMap: Record<string, string> = {
+                                        emerald: 'text-emerald-400',
+                                        amber: 'text-amber-400',
+                                        blue: 'text-cyan-400',
+                                    };
+                                    return (
+                                        <div key={quiz.quiz_id} className={`flex justify-between items-center p-3 rounded-xl border ${bgMap[c] || bgMap.blue}`}>
+                                            <span className={`text-sm font-medium ${isDark ? "text-gray-300" : "text-gray-700"}`}>{quiz.title}</span>
+                                            <span className={`text-sm font-black ${textMap[c] || 'text-cyan-400'}`}>{quiz.score} / 100</span>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Row 3: Leaderboard + Tantangan + Reward */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+
+                        {/* Leaderboard */}
+                        <div className={`backdrop-blur-xl rounded-2xl p-6 border ${isDark ? "bg-white/[0.04] border-white/10" : "bg-white border-gray-100 shadow-sm"} hover:border-yellow-500/20 transition-colors`}>
+                            <h3 className={`font-bold mb-5 flex items-center gap-2 text-sm ${isDark ? "text-white" : "text-gray-800"}`}>
+                                <span>👑</span> Leaderboard Top 3
+                            </h3>
+                            <div className="space-y-3">
+                                {dashboardData.leaderboard.map((user: any) => {
+                                    const rankStyle: Record<number, string> = {
+                                        1: 'border-yellow-500/30 bg-yellow-500/10',
+                                        2: 'border-gray-400/20 bg-gray-400/10',
+                                        3: 'border-orange-500/20 bg-orange-500/10',
+                                    };
+                                    const rankBadge: Record<number, string> = {
+                                        1: 'bg-gradient-to-br from-yellow-400 to-orange-400',
+                                        2: 'bg-gradient-to-br from-gray-300 to-gray-400',
+                                        3: 'bg-gradient-to-br from-orange-400 to-amber-500',
+                                    };
+                                    return (
+                                        <div key={user.rank} className={`flex items-center gap-3 p-2.5 rounded-xl border ${rankStyle[user.rank] || 'border-white/10 bg-white/5'}`}>
+                                            <div className={`w-7 h-7 rounded-full ${rankBadge[user.rank] || 'bg-blue-500'} text-white flex items-center justify-center font-black text-xs shadow-sm`}>{user.rank}</div>
+                                            <div className="w-9 h-9 bg-white/10 rounded-full flex items-center justify-center text-lg">{user.avatar_emoji}</div>
+                                            <div className="flex-1 min-w-0">
+                                                <p className={`text-sm font-bold truncate ${isDark ? "text-white" : "text-gray-900"}`}>{user.name}</p>
+                                                <p className="text-xs text-gray-400 font-medium">{user.xp} XP</p>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+
+                        {/* Tantangan Harian */}
+                        <div className={`backdrop-blur-xl rounded-2xl p-6 border ${isDark ? "bg-white/[0.04] border-white/10" : "bg-white border-gray-100 shadow-sm"} hover:border-blue-500/30 transition-colors`}>
+                            <h3 className={`font-bold mb-5 flex items-center gap-2 text-sm ${isDark ? "text-white" : "text-gray-800"}`}>
+                                <span>⚔️</span> Tantangan Harian
+                            </h3>
+                            <div className="space-y-4">
+                                {dashboardData.daily_challenges.map((challenge: any) => {
+                                    const isEven = challenge.id % 2 === 0;
+                                    return (
+                                        <div key={challenge.id} className={`p-4 rounded-xl border ${isDark ? "bg-white/5 border-white/10" : "bg-gray-50 border-gray-100"}`}>
+                                            <p className={`text-sm font-bold mb-2 ${isDark ? "text-white" : "text-gray-900"}`}>{challenge.title}</p>
+                                            <div className={`rounded-full h-1.5 overflow-hidden mb-2 ${isDark ? "bg-white/10" : "bg-gray-200"}`}>
+                                                <div
+                                                    className={`h-full rounded-full ${isEven ? 'bg-gradient-to-r from-emerald-500 to-teal-400' : 'bg-gradient-to-r from-blue-500 to-cyan-400'}`}
+                                                    style={{ width: `${challenge.progress_percentage}%` }}
+                                                />
+                                            </div>
+                                            <p className={`text-xs font-semibold flex items-center gap-1 ${isEven ? 'text-emerald-400' : 'text-cyan-400'}`}>
+                                                <span>{challenge.reward_icon}</span> {challenge.reward_text}
+                                            </p>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+
+                        {/* Reward System */}
+                        <div className="bg-gradient-to-br from-blue-700 to-blue-900 backdrop-blur-xl rounded-2xl p-6 border border-blue-500/30 flex flex-col justify-center items-center text-center hover:border-blue-400/50 transition-colors shadow-lg shadow-blue-900/20">
+                            <h3 className="font-bold text-yellow-400 mb-4 flex items-center gap-2 text-sm">
+                                <span>🎁</span> Reward System
+                            </h3>
+                            <p className="text-xs text-blue-200 mb-1">Total Gems Anda</p>
+                            <div className="text-5xl font-black text-white flex items-center gap-2 mb-6">
+                                <span>💎</span>
+                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-300">{dashboardData.user.gems}</span>
+                            </div>
+                            <button className="w-full bg-gradient-to-r from-yellow-400 to-orange-400 hover:opacity-90 text-orange-950 font-black py-3 px-4 rounded-xl transition-all hover:-translate-y-0.5 shadow-lg shadow-yellow-500/20 text-sm">
+                                Tukar Reward
+                            </button>
+                            <p className="mt-3 text-xs text-blue-300/70">3 item e-book eksklusif tersedia</p>
+                        </div>
+
+                    </div>
+                </div>
+
+                {/* FOOTER */}
+                <footer className={`mt-auto px-6 py-6 border-t text-center ${isDark ? "border-white/5" : "border-gray-200"}`}>
+                    <p className={`text-[10px] tracking-[0.4em] font-bold uppercase ${isDark ? "text-gray-600" : "text-gray-400"}`}>
+                        © 2026 Tim DiveXplore-3D · Teknologi Informasi UNY
+                    </p>
+                </footer>
+            </main>
+        </div>
     );
 }
