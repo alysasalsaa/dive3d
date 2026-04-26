@@ -170,6 +170,42 @@ export default function AkademiPage() {
         </div>
       </section>
 
+      {/* ============================================================ */}
+      {/* PREVIEW MODEL 3D IKAN BADUT (CLOWNFISH) */}
+      {/* ============================================================ */}
+      <section className="px-6 pb-16">
+        <div className="max-w-7xl mx-auto">
+          {/* Judul Section */}
+          <div className="mb-6">
+            <div className={`inline-block px-4 py-1.5 mb-3 rounded-full border text-[11px] font-black tracking-[0.2em] uppercase ${isDark ? 'bg-orange-500/15 border-orange-400/30 text-orange-400' : 'bg-orange-500/10 border-orange-400/20 text-orange-600'}`}>
+              🐟 Spesimen 3D Interaktif
+            </div>
+            <h2 className={`text-3xl md:text-4xl font-black mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+              Model Ikan Badut (Clownfish)
+            </h2>
+            <p className={`text-sm max-w-xl ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+              Putar dan perbesar model untuk mempelajari karakteristik Ikan Badut 
+              secara langsung. Gunakan kursor atau sentuhan untuk berinteraksi.
+            </p>
+          </div>
+
+          {/* Komponen ModelViewer — memanggil file GLB clownfish */}
+          <ModelViewer
+            url="/models/ClownFish3D/ClownFish3d.glb"
+            className="w-full h-[500px]"
+          />
+
+          {/* Keterangan singkat di bawah model */}
+          <div className={`mt-4 flex items-center gap-3 text-xs ${isDark ? 'text-gray-600' : 'text-gray-400'}`}>
+            <span>🖱️ Klik + Tarik untuk memutar</span>
+            <span className="w-px h-4 bg-white/10" />
+            <span>🔍 Scroll untuk zoom</span>
+            <span className="w-px h-4 bg-white/10" />
+            <span>📦 Koleksi Divexplore 3D</span>
+          </div>
+        </div>
+      </section>
+
       {/* MODULE GRID */}
       <section className="px-6 pb-32">
         <div className="max-w-7xl mx-auto">
