@@ -50,7 +50,19 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-950 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gray-950 p-4 relative">
+      <Link 
+        href="/" 
+        className="absolute top-6 left-6 md:top-8 md:left-8 flex items-center gap-2 text-gray-400 hover:text-white transition-colors group z-10"
+      >
+        <div className="w-8 h-8 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center group-hover:bg-gray-800 group-hover:border-gray-700 transition-all shadow-lg">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 group-hover:-translate-x-0.5 transition-transform" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
+          </svg>
+        </div>
+        <span className="text-sm font-medium">Kembali ke Beranda</span>
+      </Link>
+
       <div className="w-full max-w-md bg-gray-900 rounded-2xl shadow-xl overflow-hidden border border-gray-800">
         <div className="p-8">
           <div className="mb-8 text-center">
