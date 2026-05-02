@@ -130,6 +130,16 @@ export default function AkademiPage() {
               Pilih modul pembelajaran dan mulai jelajahi ekosistem laut Raja
               Ampat dalam lingkungan 3D interaktif.
             </p>
+
+            <div className="mt-8">
+              <Link 
+                href="/lms" 
+                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full font-bold text-white bg-gradient-to-r from-blue-600 to-cyan-500 hover:scale-105 transition-transform shadow-xl shadow-blue-500/25"
+              >
+                <span>Buka Halaman LMS</span>
+                <span className="text-xl">🚀</span>
+              </Link>
+            </div>
           </div>
         </div>
       </section>
