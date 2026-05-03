@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 
 type ViewState = 
@@ -22,10 +22,18 @@ type ModuleData = {
 };
 
 export default function LMSPage() {
-  const [view, setView] = useState<ViewState>('login');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [view, setView] = useState<ViewState | null>(null);
+
+  useEffect(() => {
+    const role = localStorage.getItem('user_role');
+    if (role === 'admin') {
+      setView('admin_dashboard');
+    } else if (role === 'user') {
+      setView('user_dashboard');
+    } else {
+      window.location.href = '/';
+    }
+  }, []);
 
   // ==========================================
   // DATABASE SIMULATION (Bisa diakses Admin & User)
@@ -61,35 +69,9 @@ export default function LMSPage() {
 
   // Reset semua state sementara saat logout
   const handleLogout = () => {
-    setView('login');
-    setEmail('');
-    setPassword('');
-    setError('');
-    
-    // Reset state user
-    setReadProgress(0);
-    setQuizAnswers({});
-    setScore(0);
-    setHasBadge(false);
-    setHasCertificate(false);
-    setSelectedModule(null);
-
-    // Reset state admin
-    setNewTitle('');
-    setNewDesc('');
-  };
-
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-
-    if (email === 'admin@lms.com' && password === 'admin123') {
-      setView('admin_dashboard');
-    } else if (email === 'user@lms.com' && password === 'user123') {
-      setView('user_dashboard');
-    } else {
-      setError('Email atau password salah! Gunakan admin@lms.com/admin123 atau user@lms.com/user123');
-    }
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('user_role');
+    window.location.href = '/';
   };
 
   // --- LOGIKA ADMIN ---
@@ -148,6 +130,8 @@ export default function LMSPage() {
     }, 2000);
   };
 
+  if (!view) return null;
+
   return (
     <div className="min-h-screen bg-[#00040a] text-white font-sans flex flex-col">
       {/* NAVBAR */}
@@ -176,56 +160,7 @@ export default function LMSPage() {
       <main className="flex-grow flex items-center justify-center p-6 relative">
         <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-blue-500/5 blur-[120px] rounded-full pointer-events-none" />
 
-        {/* ========================================= */}
-        {/* VIEW: LOGIN */}
-        {/* ========================================= */}
-        {view === 'login' && (
-          <div className="w-full max-w-md p-8 rounded-[28px] bg-white/5 border border-white/10 backdrop-blur-xl shadow-2xl relative z-10">
-            <div className="text-center mb-8">
-              <h1 className="text-3xl font-black mb-2 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">
-                Sistem Login
-              </h1>
-              <p className="text-sm text-gray-400">Silakan login untuk mengakses LMS</p>
-            </div>
 
-            {error && (
-              <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm font-medium text-center animate-pulse">
-                {error}
-              </div>
-            )}
-
-            <form onSubmit={handleLogin} className="space-y-5">
-              <div>
-                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Email</label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-5 py-3 rounded-xl bg-black/50 border border-white/10 text-white placeholder-gray-600 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-all"
-                  placeholder="admin@lms.com / user@lms.com"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Password</label>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-5 py-3 rounded-xl bg-black/50 border border-white/10 text-white placeholder-gray-600 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-all"
-                  placeholder="••••••••"
-                  required
-                />
-              </div>
-
-              <div className="pt-2">
-                <button type="submit" className="w-full py-3.5 rounded-xl font-bold text-white bg-gradient-to-r from-blue-600 to-cyan-500 hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-blue-500/25">
-                  Masuk ke Sistem
-                </button>
-              </div>
-            </form>
-          </div>
-        )}
 
         {/* ========================================= */}
         {/* VIEW: ADMIN DASHBOARD */}
