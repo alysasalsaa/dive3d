@@ -3,16 +3,27 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 
-type ViewState = 
-  | 'login' 
-  | 'admin_dashboard' 
+type ViewState =
+  | 'login'
+  | 'admin_dashboard'
   | 'admin_manage'
   | 'admin_edit_data'
-  | 'user_dashboard' 
-  | 'user_modules' 
-  | 'user_read_module' 
-  | 'user_quiz' 
+  | 'admin_quiz'
+  | 'user_dashboard'
+  | 'user_modules'
+  | 'user_read_module'
+  | 'user_quiz'
   | 'user_quiz_result';
+
+type QuizQuestion = {
+  id: number;
+  question: string;
+  option_a: string;
+  option_b: string;
+  option_c: string;
+  option_d: string;
+  correct_answer: string;
+};
 
 type ModuleData = {
   id: string;
@@ -79,12 +90,25 @@ export default function LMSPage() {
   const [newIcon, setNewIcon] = useState('📦');
   const [isAdminProcessing, setIsAdminProcessing] = useState(false);
 
+  // STATE ADMIN QUIZ
+  const [quizModuleSlug, setQuizModuleSlug] = useState('terumbu-karang');
+  const [quizQuestion, setQuizQuestion] = useState('');
+  const [quizOptionA, setQuizOptionA] = useState('');
+  const [quizOptionB, setQuizOptionB] = useState('');
+  const [quizOptionC, setQuizOptionC] = useState('');
+  const [quizOptionD, setQuizOptionD] = useState('');
+  const [quizCorrectAnswer, setQuizCorrectAnswer] = useState<'A'|'B'|'C'|'D'>('A');
+  const [existingQuestions, setExistingQuestions] = useState<QuizQuestion[]>([]);
+  const [quizAdminLoading, setQuizAdminLoading] = useState(false);
+
   // ==========================================
   // STATE USER
   // ==========================================
   const [selectedModule, setSelectedModule] = useState<ModuleData | null>(null);
   const [readProgress, setReadProgress] = useState(0);
   const [quizAnswers, setQuizAnswers] = useState<Record<number, string>>({});
+  const [quizQuestions, setQuizQuestions] = useState<QuizQuestion[]>([]);
+  const [quizUserLoading, setQuizUserLoading] = useState(false);
   const [score, setScore] = useState(0);
   const [hasBadge, setHasBadge] = useState(false);
   const [hasCertificate, setHasCertificate] = useState(false);
@@ -131,7 +155,60 @@ export default function LMSPage() {
     setNewTitle('');
     setNewDesc('');
     setNewIcon('📦');
-    setView('admin_edit_data');
+    if (category === 'Quiz') {
+      loadQuizQuestions('terumbu-karang');
+      setView('admin_quiz');
+    } else {
+      setView('admin_edit_data');
+    }
+  };
+
+  const loadQuizQuestions = async (slug: string) => {
+    setQuizAdminLoading(true);
+    const token = localStorage.getItem('auth_token');
+    try {
+      const res = await fetch(`http://localhost:8000/api/quiz/questions/${slug}`, {
+        headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' },
+      });
+      const data = await res.json();
+      setExistingQuestions(data.data ?? []);
+    } catch { setExistingQuestions([]); }
+    setQuizAdminLoading(false);
+  };
+
+  const handleAddQuestion = async () => {
+    if (!quizQuestion || !quizOptionA || !quizOptionB || !quizOptionC || !quizOptionD) return;
+    setQuizAdminLoading(true);
+    const token = localStorage.getItem('auth_token');
+    try {
+      await fetch('http://localhost:8000/api/quiz/questions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({
+          module_slug: quizModuleSlug,
+          question: quizQuestion,
+          option_a: quizOptionA,
+          option_b: quizOptionB,
+          option_c: quizOptionC,
+          option_d: quizOptionD,
+          correct_answer: quizCorrectAnswer,
+        }),
+      });
+      setQuizQuestion(''); setQuizOptionA(''); setQuizOptionB(''); setQuizOptionC(''); setQuizOptionD('');
+      setQuizCorrectAnswer('A');
+      await loadQuizQuestions(quizModuleSlug);
+    } catch { setQuizAdminLoading(false); }
+  };
+
+  const handleDeleteQuestion = async (id: number) => {
+    const token = localStorage.getItem('auth_token');
+    try {
+      await fetch(`http://localhost:8000/api/quiz/questions/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' },
+      });
+      await loadQuizQuestions(quizModuleSlug);
+    } catch {}
   };
 
   // --- LOGIKA USER ---
@@ -139,10 +216,27 @@ export default function LMSPage() {
     if (readProgress < 100) setReadProgress((prev) => Math.min(prev + 25, 100));
   };
 
+  const loadUserQuiz = async (slug: string) => {
+    setQuizUserLoading(true);
+    const token = localStorage.getItem('auth_token');
+    try {
+      const res = await fetch(`http://localhost:8000/api/quiz/questions/${slug}`, {
+        headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' },
+      });
+      const data = await res.json();
+      setQuizQuestions(data.data ?? []);
+    } catch { setQuizQuestions([]); }
+    setQuizUserLoading(false);
+  };
+
   const handleSubmitQuiz = async () => {
-    let calculatedScore = 0;
-    if (quizAnswers[1] === 'B') calculatedScore += 50;
-    if (quizAnswers[2] === 'C') calculatedScore += 50;
+    // Hitung skor dari soal yang diambil API
+    let correct = 0;
+    quizQuestions.forEach((q, i) => {
+      if (quizAnswers[i] === q.correct_answer) correct++;
+    });
+    const total = quizQuestions.length || 1;
+    const calculatedScore = Math.round((correct / total) * 100);
 
     setScore(calculatedScore);
     setIsProcessing(true);
@@ -531,6 +625,7 @@ export default function LMSPage() {
                   <button
                     onClick={() => {
                       setQuizAnswers({});
+                      if (selectedModule) loadUserQuiz(selectedModule.slug);
                       setView('user_quiz');
                     }}
                     className="px-8 py-4 rounded-xl font-bold text-white bg-gradient-to-r from-blue-600 to-cyan-500 hover:scale-[1.02] transition-all shadow-xl shadow-blue-500/25"
@@ -544,63 +639,157 @@ export default function LMSPage() {
         )}
 
         {/* ========================================= */}
-        {/* VIEW: QUIZ & QUIZ RESULT */}
+        {/* VIEW: ADMIN QUIZ MANAGER */}
+        {/* ========================================= */}
+        {view === 'admin_quiz' && (
+          <div className="w-full max-w-4xl p-8 rounded-[32px] bg-[#000814] border border-purple-500/30 shadow-2xl relative z-10 animate-in slide-in-from-bottom-8 duration-500">
+            <div className="flex items-center justify-between mb-8 border-b border-white/10 pb-6">
+              <div>
+                <div className="inline-block px-3 py-1 mb-3 rounded-full border border-purple-400/30 bg-purple-500/15 text-purple-300 text-[10px] font-black uppercase tracking-widest">Kelola Quiz</div>
+                <h1 className="text-3xl font-black text-white">Upload Soal Quiz</h1>
+              </div>
+              <button onClick={() => setView('admin_manage')} className="px-6 py-3 rounded-xl font-bold text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 border border-transparent hover:border-white/10 transition-all">← Kembali</button>
+            </div>
+
+            {/* Pilih Modul */}
+            <div className="mb-6">
+              <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Pilih Modul</label>
+              <select
+                value={quizModuleSlug}
+                onChange={(e) => { setQuizModuleSlug(e.target.value); loadQuizQuestions(e.target.value); }}
+                className="w-full px-5 py-3 rounded-xl bg-black/50 border border-white/10 text-white focus:outline-none focus:border-purple-400 transition-all"
+              >
+                {modules.map(m => <option key={m.slug} value={m.slug}>{m.title}</option>)}
+              </select>
+            </div>
+
+            {/* Form tambah soal */}
+            <div className="p-6 rounded-2xl bg-white/5 border border-white/10 mb-6 space-y-4">
+              <h3 className="text-white font-bold text-lg mb-2">✏️ Tambah Soal Baru</h3>
+
+              <div>
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Pertanyaan</label>
+                <textarea value={quizQuestion} onChange={e => setQuizQuestion(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl bg-black/50 border border-white/10 text-white placeholder-gray-600 focus:outline-none focus:border-purple-400 resize-none h-20 transition-all"
+                  placeholder="Tulis pertanyaan di sini..." />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {[
+                  { label: 'Opsi A', val: quizOptionA, set: setQuizOptionA },
+                  { label: 'Opsi B', val: quizOptionB, set: setQuizOptionB },
+                  { label: 'Opsi C', val: quizOptionC, set: setQuizOptionC },
+                  { label: 'Opsi D', val: quizOptionD, set: setQuizOptionD },
+                ].map(({ label, val, set }) => (
+                  <div key={label}>
+                    <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">{label}</label>
+                    <input type="text" value={val} onChange={e => set(e.target.value)}
+                      className="w-full px-4 py-3 rounded-xl bg-black/50 border border-white/10 text-white placeholder-gray-600 focus:outline-none focus:border-purple-400 transition-all"
+                      placeholder={`Isi ${label}...`} />
+                  </div>
+                ))}
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Jawaban Benar</label>
+                <div className="flex gap-3">
+                  {(['A','B','C','D'] as const).map(opt => (
+                    <button key={opt} onClick={() => setQuizCorrectAnswer(opt)}
+                      className={`w-12 h-12 rounded-xl font-black text-lg transition-all border ${quizCorrectAnswer === opt ? 'bg-emerald-500/20 border-emerald-400 text-emerald-300' : 'bg-black/50 border-white/10 text-gray-400 hover:border-white/30'}`}>
+                      {opt}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <button onClick={handleAddQuestion} disabled={quizAdminLoading || !quizQuestion || !quizOptionA || !quizOptionB || !quizOptionC || !quizOptionD}
+                className="w-full py-4 rounded-xl font-bold text-white bg-gradient-to-r from-purple-600 to-pink-500 hover:scale-[1.01] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100">
+                {quizAdminLoading ? 'Menyimpan...' : '+ Tambah Soal'}
+              </button>
+            </div>
+
+            {/* Daftar soal yang sudah ada */}
+            <div>
+              <h3 className="text-white font-bold mb-4">📋 Daftar Soal ({existingQuestions.length} soal)</h3>
+              {existingQuestions.length === 0
+                ? <p className="text-gray-500 text-sm text-center py-6">Belum ada soal untuk modul ini.</p>
+                : <div className="space-y-3">
+                    {existingQuestions.map((q, i) => (
+                      <div key={q.id} className="p-4 rounded-xl bg-white/5 border border-white/10 flex items-start justify-between gap-4">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-white font-medium mb-2">{i+1}. {q.question}</p>
+                          <div className="grid grid-cols-2 gap-1 text-xs text-gray-400">
+                            {(['a','b','c','d'] as const).map(k => (
+                              <span key={k} className={q.correct_answer === k.toUpperCase() ? 'text-emerald-400 font-bold' : ''}>
+                                {k.toUpperCase()}. {q[`option_${k}` as keyof QuizQuestion]}
+                                {q.correct_answer === k.toUpperCase() && ' ✓'}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                        <button onClick={() => handleDeleteQuestion(q.id)}
+                          className="shrink-0 px-3 py-2 rounded-lg text-red-400 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-xs font-bold transition-all">
+                          Hapus
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+              }
+            </div>
+          </div>
+        )}
+
+        {/* ========================================= */}
+        {/* VIEW: QUIZ USER (dari API) */}
         {/* ========================================= */}
         {view === 'user_quiz' && (
           <div className="w-full max-w-3xl p-8 rounded-[32px] bg-[#000814] border border-cyan-500/30 shadow-[0_0_50px_-12px_rgba(6,182,212,0.15)] relative z-10 animate-in slide-in-from-bottom-8 duration-500">
             <h1 className="text-3xl font-black text-white mb-2">Quiz: {selectedModule?.title}</h1>
             <p className="text-gray-400 mb-8">Pilih jawaban yang paling tepat berdasarkan materi yang telah dipelajari.</p>
 
-            <div className="space-y-8 mb-10">
-              <div className="p-6 rounded-2xl bg-white/5 border border-white/10">
-                <p className="text-lg font-medium text-white mb-4">1. Apa inti dari materi yang baru saja dibaca?</p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {['A. Hal yang tidak penting', 'B. Menjaga keseimbangan ekosistem', 'C. Merusak lingkungan', 'D. Tidak ada hubungannya'].map((opt) => (
-                    <label key={opt} className={`flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-all ${quizAnswers[1] === opt[0] ? 'bg-cyan-500/20 border-cyan-400' : 'bg-black/40 border-white/5 hover:border-white/20'}`}>
-                      <input 
-                        type="radio" 
-                        name="q1" 
-                        className="hidden"
-                        checked={quizAnswers[1] === opt[0]}
-                        onChange={() => setQuizAnswers(prev => ({ ...prev, 1: opt[0] }))}
-                      />
-                      <span className={quizAnswers[1] === opt[0] ? 'text-cyan-300 font-bold' : 'text-gray-300'}>{opt}</span>
-                    </label>
-                  ))}
-                </div>
+            {quizUserLoading ? (
+              <div className="py-16 flex flex-col items-center">
+                <div className="w-12 h-12 border-4 border-cyan-500/30 border-t-cyan-400 rounded-full animate-spin mb-4" />
+                <p className="text-cyan-400 text-sm">Memuat soal...</p>
               </div>
-              
-              <div className="p-6 rounded-2xl bg-white/5 border border-white/10">
-                <p className="text-lg font-medium text-white mb-4">2. Materi ini sangat penting untuk masa depan, setuju?</p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {['A. Tidak Setuju', 'B. Ragu-ragu', 'C. Sangat Setuju', 'D. Biasa saja'].map((opt) => (
-                    <label key={opt} className={`flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-all ${quizAnswers[2] === opt[0] ? 'bg-cyan-500/20 border-cyan-400' : 'bg-black/40 border-white/5 hover:border-white/20'}`}>
-                      <input 
-                        type="radio" 
-                        name="q2" 
-                        className="hidden"
-                        checked={quizAnswers[2] === opt[0]}
-                        onChange={() => setQuizAnswers(prev => ({ ...prev, 2: opt[0] }))}
-                      />
-                      <span className={quizAnswers[2] === opt[0] ? 'text-cyan-300 font-bold' : 'text-gray-300'}>{opt}</span>
-                    </label>
-                  ))}
-                </div>
+            ) : quizQuestions.length === 0 ? (
+              <div className="py-12 text-center">
+                <p className="text-4xl mb-4">📭</p>
+                <p className="text-gray-400">Soal quiz belum tersedia untuk modul ini.</p>
+                <p className="text-gray-500 text-sm mt-1">Hubungi admin untuk menambahkan soal.</p>
               </div>
-            </div>
+            ) : (
+              <div className="space-y-8 mb-10">
+                {quizQuestions.map((q, i) => (
+                  <div key={q.id} className="p-6 rounded-2xl bg-white/5 border border-white/10">
+                    <p className="text-lg font-medium text-white mb-4">{i+1}. {q.question}</p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {(['A','B','C','D'] as const).map(key => {
+                        const optKey = `option_${key.toLowerCase()}` as keyof QuizQuestion;
+                        const optText = q[optKey] as string;
+                        return (
+                          <label key={key} className={`flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-all ${quizAnswers[i] === key ? 'bg-cyan-500/20 border-cyan-400' : 'bg-black/40 border-white/5 hover:border-white/20'}`}>
+                            <input type="radio" name={`q${i}`} className="hidden"
+                              checked={quizAnswers[i] === key}
+                              onChange={() => setQuizAnswers(prev => ({ ...prev, [i]: key }))} />
+                            <span className={`text-sm ${quizAnswers[i] === key ? 'text-cyan-300 font-bold' : 'text-gray-300'}`}>{key}. {optText}</span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
 
             <div className="flex items-center justify-between pt-6 border-t border-white/10">
-              <button
-                onClick={() => setView('user_read_module')}
-                className="px-6 py-4 rounded-xl font-bold text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 transition-all border border-transparent hover:border-white/10 flex items-center gap-2"
-              >
-                <span>← Kembali ke Materi</span>
+              <button onClick={() => setView('user_read_module')}
+                className="px-6 py-4 rounded-xl font-bold text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 transition-all border border-transparent hover:border-white/10">
+                ← Kembali ke Materi
               </button>
-              <button
-                onClick={handleSubmitQuiz}
-                disabled={!quizAnswers[1] || !quizAnswers[2]}
-                className="px-8 py-4 rounded-xl font-bold text-white bg-gradient-to-r from-emerald-500 to-teal-400 hover:scale-105 transition-all shadow-xl shadow-emerald-500/25 disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed"
-              >
+              <button onClick={handleSubmitQuiz}
+                disabled={quizQuestions.length === 0 || quizQuestions.some((_, i) => !quizAnswers[i])}
+                className="px-8 py-4 rounded-xl font-bold text-white bg-gradient-to-r from-emerald-500 to-teal-400 hover:scale-105 transition-all shadow-xl shadow-emerald-500/25 disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed">
                 Submit Jawaban
               </button>
             </div>
