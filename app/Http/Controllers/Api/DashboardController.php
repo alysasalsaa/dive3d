@@ -4,78 +4,121 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Routing\Controller;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use App\Models\Badge;
+use App\Models\UserBadge;
+use App\Models\UserProgress;
+use App\Models\QuizResult;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
-    /**
-     * Get aggregate data for Dashboard.
-     * 
-     * @return JsonResponse
-     */
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        // -------------------------------------------------------------
-        // Ini adalah DUMMY DATA.
-        // Nanti bisa Anda ganti dengan query dari database menggunakan Model
-        // Contoh: $user = auth()->user(); $badges = Badge::where(...)->get();
-        // -------------------------------------------------------------
-        
+        $user = $request->user();
+
+        // --- Badges: semua badge + status earned user ---
+        $earnedIds = UserBadge::where('user_id', $user->id)->pluck('badge_id')->toArray();
+        $badges = Badge::all()->map(fn($b) => [
+            'id'       => $b->id,
+            'name'     => $b->name,
+            'icon'     => $b->icon,
+            'achieved' => in_array($b->id, $earnedIds),
+            'tooltip'  => $b->description,
+        ])->values();
+
+        // --- Learning progress: dari user_progress + module ---
+        $colors = ['emerald', 'blue', 'amber', 'blue'];
+        $progressRecords = UserProgress::with(['module.pois'])
+            ->where('user_id', $user->id)
+            ->get();
+
+        $learning_progress = $progressRecords->values()->map(function ($p, $index) use ($colors) {
+            // Jika completed via LMS → 100%, jika tidak → hitung dari POI
+            if ($p->completed) {
+                $percentage = 100;
+            } else {
+                $totalPois    = $p->module->pois->count();
+                $visitedCount = count($p->visited_pois ?? []);
+                $percentage   = $totalPois > 0 ? round(($visitedCount / $totalPois) * 100) : 0;
+            }
+
+            return [
+                'course_id'           => $p->module->id,
+                'title'               => $p->module->title,
+                'progress_percentage' => $percentage,
+                'color'               => $colors[$index % count($colors)],
+            ];
+        });
+
+        // --- Leaderboard: user diurutkan berdasarkan jumlah modul selesai ---
+        $leaderboard = DB::table('users')
+            ->leftJoin('user_progress', function ($join) {
+                $join->on('users.id', '=', 'user_progress.user_id')
+                     ->where('user_progress.completed', true);
+            })
+            ->select('users.id', 'users.name', DB::raw('COUNT(user_progress.id) as completed_count'))
+            ->groupBy('users.id', 'users.name')
+            ->orderByDesc('completed_count')
+            ->limit(3)
+            ->get()
+            ->values()
+            ->map(fn($u, $i) => [
+                'rank'         => $i + 1,
+                'name'         => $u->name,
+                'xp'           => $u->completed_count * 100,
+                'avatar_emoji' => '👤',
+            ]);
+
+        // --- User info (XP & gems masih dummy sampai sistem XP dibuat) ---
+        $completedCount = UserProgress::where('user_id', $user->id)
+            ->where('completed', true)->count();
+        $currentXp = $completedCount * 100;
+
         $data = [
-            "user" => [
-                "id" => 1,
-                "name" => "Maulana Yudo Yudistira",
-                "level" => 0,
-                "rank_name" => "Rookie",
-                "current_xp" => 2500,
-                "next_level_xp" => 5000,
-                "gems" => 500
+            'user' => [
+                'id'            => $user->id,
+                'name'          => $user->name,
+                'level'         => 0,
+                'rank_name'     => 'Rookie',
+                'current_xp'    => $currentXp,
+                'next_level_xp' => 500,
+                'gems'          => 0,
             ],
-            "badges" => [
-                [ "id" => 1, "name" => "Pembelajar Cepat", "icon" => "⚡", "achieved" => true, "tooltip" => "Selesaikan modul lebih cepat 50%" ],
-                [ "id" => 2, "name" => "Nilai Sempurna", "icon" => "🎯", "achieved" => true, "tooltip" => "Dapatkan 100 di kuis pertama" ],
-                [ "id" => 3, "name" => "Login Beruntun 7 Hari", "icon" => "🔥", "achieved" => false, "tooltip" => "Login 7 hari berturut-turut" ]
-            ],
-            "learning_progress" => [
-                [ "course_id" => 1, "title" => "Konservasi Terumbu Karang", "progress_percentage" => 45, "color" => "emerald" ],
-                [ "course_id" => 2, "title" => "Pengenalan Biota Laut Dasar", "progress_percentage" => 20, "color" => "blue" ],
-                [ "course_id" => 3, "title" => "Navigasi & Ekosistem Laut", "progress_percentage" => 10, "color" => "amber" ]
-            ],
-            "recent_quizzes" => [
-                [ "quiz_id" => 1, "title" => "Kuis: Anatomi Terumbu Karang", "score" => 85, "color" => "emerald" ],
-                [ "quiz_id" => 2, "title" => "Kuis: Fakta Ikan & Mamalia Laut", "score" => 90, "color" => "amber" ],
-                [ "quiz_id" => 3, "title" => "Ujian Sertifikasi Penyelam 3D", "score" => 75, "color" => "blue" ]
-            ],
-            "leaderboard" => [
-                [ "rank" => 1, "name" => "Rama Putra M.", "xp" => 4500, "avatar_emoji" => "👨" ],
-                [ "rank" => 2, "name" => "Abyan Bergas I.", "xp" => 4200, "avatar_emoji" => "👨‍🦱" ],
-                [ "rank" => 3, "name" => "Maulana Yudo Y.", "xp" => 2500, "avatar_emoji" => "👨" ]
-            ],
-            "daily_challenges" => [
-                [ 
-                    "id" => 1, 
-                    "title" => "Selesaikan 2 Materi Video", 
-                    "target" => 2, 
-                    "current" => 1, 
-                    "progress_percentage" => 50,
-                    "reward_text" => "+150 Gems & 1 Mystery Box",
-                    "reward_icon" => "💎"
+            'badges'           => $badges,
+            'learning_progress' => $learning_progress,
+
+            // Quiz: data real dari tabel quiz_results
+            'recent_quizzes' => QuizResult::where('user_id', $user->id)
+                ->latest()
+                ->limit(5)
+                ->get()
+                ->values()
+                ->map(fn($q) => [
+                    'quiz_id'  => $q->id,
+                    'title'    => $q->quiz_title,
+                    'score'    => $q->score,
+                    'max_score' => $q->max_score,
+                    'color'    => $q->score >= 80 ? 'emerald' : ($q->score >= 50 ? 'amber' : 'blue'),
+                ]),
+            'daily_challenges' => [
+                [
+                    'id'                 => 1,
+                    'title'              => 'Selesaikan 1 Modul Pembelajaran',
+                    'target'             => 1,
+                    'current'            => $completedCount > 0 ? 1 : 0,
+                    'progress_percentage' => $completedCount > 0 ? 100 : 0,
+                    'reward_text'        => '+100 XP',
+                    'reward_icon'        => '⭐',
                 ],
-                [ 
-                    "id" => 2, 
-                    "title" => "Dapatkan Skor Penuh di Kuis", 
-                    "target" => 1, 
-                    "current" => 0, 
-                    "progress_percentage" => 0,
-                    "reward_text" => "Lencana Emas Spesial",
-                    "reward_icon" => "🌟"
-                ]
-            ]
+            ],
+            'leaderboard' => $leaderboard,
         ];
 
         return response()->json([
-            "status" => "success",
-            "message" => "Data Dashboard Berhasil Diambil",
-            "data" => $data
+            'status'  => 'success',
+            'message' => 'Data Dashboard Berhasil Diambil',
+            'data'    => $data,
         ]);
     }
 }

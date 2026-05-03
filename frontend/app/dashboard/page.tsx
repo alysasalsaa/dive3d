@@ -13,10 +13,23 @@ export default function DashboardPage() {
     const [activeMenu, setActiveMenu] = useState(0);
 
     useEffect(() => {
-        fetch('http://localhost:8000/api/dashboard')
-            .then(res => res.json())
+        const token = localStorage.getItem('auth_token');
+        if (!token) {
+            window.location.href = '/login';
+            return;
+        }
+        fetch('http://localhost:8000/api/dashboard', {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'application/json',
+            },
+        })
+            .then(res => {
+                if (res.status === 401) { window.location.href = '/login'; return null; }
+                return res.json();
+            })
             .then(data => {
-                if (data.status === 'success') setDashboardData(data.data);
+                if (data && data.status === 'success') setDashboardData(data.data);
                 setLoading(false);
             })
             .catch(() => setLoading(false));
@@ -103,7 +116,7 @@ export default function DashboardPage() {
                 {/* Logout */}
                 <div className={`p-2 border-t ${isDark ? 'border-white/5' : 'border-gray-100'}`}>
                     <button
-                        onClick={() => { localStorage.removeItem('auth_token'); window.location.href = '/'; }}
+                        onClick={() => { localStorage.removeItem('auth_token'); localStorage.removeItem('user_role'); localStorage.removeItem('user_name'); localStorage.removeItem('user_email'); window.location.href = '/'; }}
                         title={!isSidebarOpen ? 'Keluar' : ''}
                         className={`w-full flex items-center rounded-xl text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200 border border-transparent
                             ${isSidebarOpen ? 'px-3 py-2.5 gap-3' : 'justify-center p-3'}`}
@@ -261,6 +274,9 @@ export default function DashboardPage() {
                                 <span>📝</span> Ringkasan Skor Kuis
                             </h3>
                             <div className="space-y-3">
+                                {dashboardData.recent_quizzes.length === 0 && (
+                                    <p className="text-sm text-gray-500 text-center py-4">Belum ada kuis yang dikerjakan.</p>
+                                )}
                                 {dashboardData.recent_quizzes.map((quiz: any) => {
                                     const c = quiz.color || 'blue';
                                     const bgMap: Record<string, string> = {
@@ -276,7 +292,7 @@ export default function DashboardPage() {
                                     return (
                                         <div key={quiz.quiz_id} className={`flex justify-between items-center p-3 rounded-xl border ${bgMap[c] || bgMap.blue}`}>
                                             <span className={`text-sm font-medium ${isDark ? "text-gray-300" : "text-gray-700"}`}>{quiz.title}</span>
-                                            <span className={`text-sm font-black ${textMap[c] || 'text-cyan-400'}`}>{quiz.score} / 100</span>
+                                            <span className={`text-sm font-black ${textMap[c] || 'text-cyan-400'}`}>{quiz.score} / {quiz.max_score ?? 100}</span>
                                         </div>
                                     );
                                 })}
