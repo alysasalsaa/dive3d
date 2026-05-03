@@ -29,12 +29,13 @@ export default function LoginPage() {
       }
 
       localStorage.setItem('auth_token', data.token);
-      localStorage.setItem('user_role', 'user');
+      localStorage.setItem('user_role', data.role ?? 'user');
       localStorage.setItem('user_name', data.user.name);
       localStorage.setItem('user_email', data.user.email);
 
       alert("Login Berhasil!");
-      window.location.href = '/dashboard';
+      // Admin langsung ke LMS, user biasa ke dashboard
+      window.location.href = data.role === 'admin' ? '/lms' : '/dashboard';
     } catch (error: any) {
       alert(error.message);
     } finally {

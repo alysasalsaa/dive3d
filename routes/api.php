@@ -10,6 +10,7 @@ use App\Http\Controllers\UserProgressController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\BadgeController;
 use App\Http\Controllers\QuizController;
+use App\Http\Controllers\QuizQuestionController;
 
 // Endpoint Autentikasi
 Route::post('/register', [AuthController::class, 'register']);
@@ -48,6 +49,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Rute Quiz
     Route::post('/quiz/submit', [QuizController::class, 'submit']);
+    Route::get('/quiz/questions/{moduleSlug}', [QuizQuestionController::class, 'index']);
+    Route::post('/quiz/questions', [QuizQuestionController::class, 'store']);
+    Route::delete('/quiz/questions/{id}', [QuizQuestionController::class, 'destroy']);
 
     // Rute Logout
     Route::post('/logout', [AuthController::class, 'logout']);
