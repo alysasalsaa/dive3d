@@ -16,6 +16,7 @@ type ViewState =
 
 type ModuleData = {
   id: string;
+  slug: string;
   title: string;
   desc: string;
   icon: string;
@@ -41,10 +42,32 @@ export default function LMSPage() {
   const [modules, setModules] = useState<ModuleData[]>([
     {
       id: 'm1',
+      slug: 'terumbu-karang',
       title: 'Ekosistem Terumbu Karang',
       desc: 'Mempelajari struktur dan fungsi ekosistem terumbu karang di lautan bebas.',
       icon: '🪸'
-    }
+    },
+    {
+      id: 'm2',
+      slug: 'keanekaragaman-laut',
+      title: 'Keanekaragaman Hayati Laut',
+      desc: 'Eksplorasi ragam spesies ikan, moluska, dan invertebrata yang menghuni perairan Raja Ampat.',
+      icon: '🐠'
+    },
+    {
+      id: 'm3',
+      slug: 'ancaman-lingkungan',
+      title: 'Ancaman Lingkungan Laut',
+      desc: 'Pahami dampak perubahan iklim, pemutihan karang, dan polusi terhadap ekosistem laut.',
+      icon: '⚠️'
+    },
+    {
+      id: 'm4',
+      slug: 'konservasi-aksi',
+      title: 'Aksi Konservasi Nyata',
+      desc: 'Temukan cara nyata untuk berkontribusi pada pelestarian laut.',
+      icon: '💚'
+    },
   ]);
 
   // ==========================================
@@ -71,6 +94,8 @@ export default function LMSPage() {
   const handleLogout = () => {
     localStorage.removeItem('auth_token');
     localStorage.removeItem('user_role');
+    localStorage.removeItem('user_name');
+    localStorage.removeItem('user_email');
     window.location.href = '/';
   };
 
@@ -114,14 +139,54 @@ export default function LMSPage() {
     if (readProgress < 100) setReadProgress((prev) => Math.min(prev + 25, 100));
   };
 
-  const handleSubmitQuiz = () => {
+  const handleSubmitQuiz = async () => {
     let calculatedScore = 0;
     if (quizAnswers[1] === 'B') calculatedScore += 50;
     if (quizAnswers[2] === 'C') calculatedScore += 50;
-    
+
     setScore(calculatedScore);
     setIsProcessing(true);
     setView('user_quiz_result');
+
+    // Simpan hasil quiz & update progress ke backend
+    const token = localStorage.getItem('auth_token');
+    if (token && selectedModule) {
+      try {
+        // 1. Simpan skor quiz
+        await fetch('http://localhost:8000/api/quiz/submit', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            quiz_title: `Kuis: ${selectedModule.title}`,
+            score: calculatedScore,
+            max_score: 100,
+          }),
+        });
+
+        // 2. Tandai modul sebagai selesai jika lulus (score >= 50)
+        if (calculatedScore >= 50) {
+          await fetch('http://localhost:8000/api/progress', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+              'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              moduleId: selectedModule.slug,
+              visitedPois: [],
+              completed: true,
+            }),
+          });
+        }
+      } catch {
+        // Gagal simpan tidak crash tampilan
+      }
+    }
 
     setTimeout(() => {
       setIsProcessing(false);

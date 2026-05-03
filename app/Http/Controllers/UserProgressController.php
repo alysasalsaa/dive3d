@@ -5,55 +5,50 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\UserProgress;
 use App\Models\Module;
+use App\Services\BadgeService;
 
 class UserProgressController extends Controller
 {
-    // TUGAS 1: Mengambil Data (Dipanggil Frontend saat User baru Buka Halaman)
     public function show($slug)
     {
-        // 1. Lacak modul apa yang sedang dimainkan
         $module = Module::where('slug', $slug)->firstOrFail();
 
-        // 2. Ambil progres si user. 
-        // firstOrCreate artinya: Kalau buka web perdana, otomatis buat progres 0%. Kalau buka kedua kali, load progres lama!
         $progress = UserProgress::firstOrCreate(
             ['user_id' => auth()->id(), 'module_id' => $module->id],
-            ['visited_pois' => [], 'completed' => false] // Titik 0% mula-mula
+            ['visited_pois' => [], 'completed' => false]
         );
 
-        // 3. Kembalikan bentuk datanya persis menggunakan gaya camelCase yang diwajibkan Frontend
         return response()->json([
-            'moduleId' => $module->slug,
+            'moduleId'    => $module->slug,
             'visitedPois' => $progress->visited_pois ?? [],
-            'completed' => $progress->completed
+            'completed'   => $progress->completed
         ]);
     }
 
-    // TUGAS 2: Menyimpan Data (Dipanggil Otomatis saat Frontend melapor user habis nge-Klik bagian terumbu)
-    public function update(Request $request)
+    public function update(Request $request, BadgeService $badgeService)
     {
-        // 1. Penjaga gerbang pengeklik (Harus ada data bentuk Array)
         $request->validate([
-            'moduleId' => 'required|string',
+            'moduleId'    => 'required|string',
             'visitedPois' => 'required|array',
-            'completed' => 'required|boolean'
+            'completed'   => 'required|boolean'
         ]);
 
         $module = Module::where('slug', $request->moduleId)->firstOrFail();
 
-        // 2. Tancapkan ingatan si user ke Tabel Database kita di Supabase
         $progress = UserProgress::updateOrCreate(
             ['user_id' => auth()->id(), 'module_id' => $module->id],
             [
                 'visited_pois' => $request->visitedPois,
-                'completed' => $request->completed
+                'completed'    => $request->completed
             ]
         );
 
+        $newBadges = $badgeService->checkAndAward(auth()->id());
+
         return response()->json([
-            'message' => 'Progres navigasi berhasil disimpan permanently ke Supabase!',
-            'data' => $progress
+            'message'    => 'Progres berhasil disimpan.',
+            'data'       => $progress,
+            'new_badges' => $newBadges,
         ]);
     }
 }
-

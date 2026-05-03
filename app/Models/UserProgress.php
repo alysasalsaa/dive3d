@@ -15,4 +15,9 @@ class UserProgress extends Model
         'visited_pois' => 'array',
         'completed' => 'boolean',
     ];
+
+    public function module()
+    {
+        return $this->belongsTo(Module::class);
+    }
 }

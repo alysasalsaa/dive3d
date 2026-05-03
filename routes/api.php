@@ -8,14 +8,13 @@ use App\Http\Controllers\ContentController;
 use App\Http\Controllers\ModuleController;
 use App\Http\Controllers\UserProgressController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\BadgeController;
+use App\Http\Controllers\QuizController;
 
 // Endpoint Autentikasi
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
-// Endpoint Agregat untuk Dashboard
-// Bisa dites di http://localhost:8000/api/dashboard
-Route::get('/dashboard', [DashboardController::class, 'index']);
 
 // Endpoint untuk Gallery
 Route::get('/gallery', [GalleryController::class, 'index']);
@@ -39,6 +38,16 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/approve/{id}', [ContentController::class, 'approve']);
         Route::post('/reject/{id}', [ContentController::class, 'reject']);
     });
+
+    // Dashboard (butuh auth agar dapat nama user asli)
+    Route::get('/dashboard', [DashboardController::class, 'index']);
+
+    // Rute Badge
+    Route::get('/badges', [BadgeController::class, 'index']);
+    Route::get('/badges/my', [BadgeController::class, 'my']);
+
+    // Rute Quiz
+    Route::post('/quiz/submit', [QuizController::class, 'submit']);
 
     // Rute Logout
     Route::post('/logout', [AuthController::class, 'logout']);

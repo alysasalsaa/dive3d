@@ -28,8 +28,10 @@ export default function LoginPage() {
         throw new Error(data.message || 'Login gagal');
       }
 
-      // Simpan token
       localStorage.setItem('auth_token', data.token);
+      localStorage.setItem('user_role', 'user');
+      localStorage.setItem('user_name', data.user.name);
+      localStorage.setItem('user_email', data.user.email);
 
       alert("Login Berhasil!");
       window.location.href = '/dashboard';
