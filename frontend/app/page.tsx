@@ -36,10 +36,68 @@ export default function HomePage() {
   const { isDark, toggleTheme } = useTheme();
   const [isLoading, setIsLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userRole, setUserRole] = useState<string | null>(null);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [isLoginProcessing, setIsLoginProcessing] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setIsLoginProcessing(true);
+
+    try {
+      const response = await fetch('http://127.0.0.1:8000/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Email atau password salah!');
+      }
+
+      // Simpan token
+      localStorage.setItem('auth_token', data.token);
+
+      // Coba ambil role dari response, jika tidak ada, gunakan 'user'
+      // Untuk testing, jika email admin, paksa jadi admin
+      let role = data.user?.role || 'user';
+      if (email === 'admin@lms.com') {
+        role = 'admin';
+      }
+
+      localStorage.setItem('user_role', role);
+      setIsLoggedIn(true);
+      setUserRole(role);
+      setShowLoginModal(false);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setIsLoginProcessing(false);
+    }
+  };
+
+  const handleProtectedNav = (e: React.MouseEvent, href: string) => {
+    const protectedRoutes = ['/gallery', '/akademi', '/tutorial', '/dashboard'];
+    if (!isLoggedIn && protectedRoutes.includes(href)) {
+      e.preventDefault();
+      setError(`Silakan Login atau Daftar terlebih dahulu untuk mengakses menu ${href.replace('/', '')}.`);
+      setShowLoginModal(true);
+    }
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 3000);
     setIsLoggedIn(!!localStorage.getItem('auth_token'));
+    setUserRole(localStorage.getItem('user_role'));
     return () => clearTimeout(timer);
   }, []);
 
@@ -73,6 +131,7 @@ export default function HomePage() {
             const isActive = pathname === href;
             return (
               <Link key={href} href={href}
+                onClick={(e) => handleProtectedNav(e, href)}
                 className={`px-5 py-2 rounded-full text-sm font-semibold transition-all ${
                   isActive
                     ? 'bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-bold shadow-lg shadow-blue-500/20'
@@ -90,18 +149,30 @@ export default function HomePage() {
         {/* Auth + Toggle */}
         <div className="hidden md:flex items-center gap-2">
           {isLoggedIn ? (
-            <Link href="/dashboard"
-              className="px-5 py-2 rounded-full text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-cyan-500 hover:opacity-90 transition-all shadow-lg shadow-blue-500/20"
-            >
-              Dashboard
-            </Link>
+            <div className="flex items-center gap-4 px-2">
+              <span className={`text-sm font-bold ${isDark ? 'text-white' : 'text-blue-900'}`}>
+                Halo, {userRole === 'admin' ? 'Admin' : 'User'}!
+              </span>
+              <button 
+                onClick={() => {
+                  localStorage.removeItem('auth_token');
+                  localStorage.removeItem('user_role');
+                  setIsLoggedIn(false);
+                  setUserRole(null);
+                }}
+                className={`text-xs font-semibold px-3 py-1.5 rounded-full border transition-all ${isDark ? 'bg-red-500/10 text-red-400 border-red-500/20 hover:bg-red-500/20' : 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100'}`}
+              >
+                Logout
+              </button>
+            </div>
           ) : (
             <>
-              <Link href="/login"
+              <button
+                onClick={() => setShowLoginModal(true)}
                 className={`px-5 py-2 rounded-full text-sm font-semibold transition-all backdrop-blur-xl ${isDark ? 'text-gray-300 hover:text-white border border-white/10 hover:border-white/30 bg-white/5' : 'text-gray-700 hover:text-blue-700 border border-gray-200 hover:border-blue-300 bg-white'}`}
               >
                 Masuk
-              </Link>
+              </button>
               <Link href="/register"
                 className="px-5 py-2 rounded-full text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-cyan-500 hover:opacity-90 transition-all shadow-lg shadow-blue-500/20"
               >
@@ -166,6 +237,67 @@ export default function HomePage() {
           © 2026 TIM DIVEXPLORE-3D • TEKNOLOGI INFORMASI UNY
         </p>
       </footer>
+      {/* LOGIN MODAL */}
+      {showLoginModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowLoginModal(false)}></div>
+          <div className="w-full max-w-md p-8 rounded-[28px] bg-[#00040a] border border-white/10 shadow-2xl relative z-10 animate-in zoom-in-95 duration-300">
+            <button 
+              onClick={() => setShowLoginModal(false)}
+              className="absolute top-6 right-6 text-gray-500 hover:text-white transition-colors"
+            >
+              ✕
+            </button>
+            <div className="text-center mb-8 mt-2">
+              <h1 className="text-3xl font-black mb-2 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">
+                Sistem Login
+              </h1>
+              <p className="text-sm text-gray-400">Silakan login untuk mengakses Sistem</p>
+            </div>
+
+            {error && (
+              <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm font-medium text-center animate-pulse">
+                {error}
+              </div>
+            )}
+
+            <form onSubmit={handleLogin} className="space-y-5">
+              <div>
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Email</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full px-5 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-600 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-all"
+                  placeholder="admin@lms.com / user@lms.com"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Password</label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full px-5 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-600 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-all"
+                  placeholder="••••••••"
+                  required
+                />
+              </div>
+
+              <div className="pt-2">
+                <button 
+                  type="submit" 
+                  disabled={isLoginProcessing}
+                  className="w-full py-3.5 rounded-xl font-bold text-white bg-gradient-to-r from-blue-600 to-cyan-500 hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-blue-500/25 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:scale-100"
+                >
+                  {isLoginProcessing ? 'Memproses...' : 'Masuk ke Sistem'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
