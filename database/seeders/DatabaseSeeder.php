@@ -30,5 +30,9 @@ class DatabaseSeeder extends Seeder
             BadgeSeeder::class,
             QuizQuestionSeeder::class,
         ]);
+        $this->call(ContentsTableSeeder::class);
+        $this->call(UserProgressTableSeeder::class);
+        $this->call(QuizResultsTableSeeder::class);
+        $this->call(UserBadgesTableSeeder::class);
     }
 }
