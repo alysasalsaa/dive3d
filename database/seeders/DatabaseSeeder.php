@@ -17,27 +17,27 @@ class DatabaseSeeder extends Seeder
         User::firstOrCreate(
             ['email' => 'admin@email.com'],
             [
-                'name'     => 'Admin',
+                'name' => 'Admin',
                 'password' => Hash::make('admin123'),
-                'role'     => 'admin',
+                'role' => 'admin',
             ]
         );
 
         User::firstOrCreate(
             ['email' => 'abyan@email.com'],
             [
-                'name'     => 'Abyan',
+                'name' => 'Abyan',
                 'password' => Hash::make('password'),
-                'role'     => 'user',
+                'role' => 'user',
             ]
         );
 
         User::firstOrCreate(
             ['email' => 'rafi@email.com'],
             [
-                'name'     => 'Rafi',
+                'name' => 'Rafi',
                 'password' => Hash::make('password'),
-                'role'     => 'user',
+                'role' => 'user',
             ]
         );
 
@@ -46,13 +46,13 @@ class DatabaseSeeder extends Seeder
             ModuleSeeder::class,
             PointOfInterestSeeder::class,
             BadgeSeeder::class,
-            QuizQuestionSeeder::class,
+            QuizDataSeeder::class,
         ]);
+
+        // --- Backup Data Transaksional ---
         $this->call(ContentsTableSeeder::class);
         $this->call(UserProgressTableSeeder::class);
         $this->call(QuizResultsTableSeeder::class);
         $this->call(UserBadgesTableSeeder::class);
-        $this->call(QuizQuestionsTableSeeder::class);
-        $this->call(BadgesTableSeeder::class);
     }
 }
