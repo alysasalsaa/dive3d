@@ -92,10 +92,10 @@ export default function AkademiPage() {
 
         <button
           onClick={toggleTheme}
-          title={isDark ? 'Mode Terang' : 'Mode Gelap'}
+          title={isDark ? 'Mode Gelap' : 'Mode Terang'}
           className={`w-10 h-10 rounded-full flex items-center justify-center transition-all text-base ${isDark ? 'bg-white/10 hover:bg-white/20 border border-white/10' : 'bg-white hover:bg-gray-100 border border-gray-200 shadow-sm'}`}
         >
-          {isDark ? '☀️' : '🌙'}
+          {isDark ? '🌙' : '☀️'}
         </button>
       </nav>
 
