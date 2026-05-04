@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\BadgeController;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\QuizQuestionController;
+use App\Http\Controllers\CertificateController;
 
 // Endpoint Autentikasi
 Route::post('/register', [AuthController::class, 'register']);
@@ -55,9 +56,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/quiz/questions', [QuizQuestionController::class, 'store']);
     Route::delete('/quiz/questions/{id}', [QuizQuestionController::class, 'destroy']);
 
+    // Rute Sertifikat
+    Route::get('/certificates', [CertificateController::class, 'index']);
+    Route::post('/certificates/generate', [CertificateController::class, 'generate']);
+
     // Rute Logout
     Route::post('/logout', [AuthController::class, 'logout']);
 });
+
+// Verifikasi sertifikat (publik)
+Route::get('/certificates/verify/{certificateNumber}', [CertificateController::class, 'verify']);
 
 // Showcase
 Route::get('/showcase', [ContentController::class, 'showcase']);

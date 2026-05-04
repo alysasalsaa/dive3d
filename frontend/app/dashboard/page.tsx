@@ -167,10 +167,10 @@ export default function DashboardPage() {
                     <div className="flex items-center gap-2">
                         <button
                             onClick={toggleTheme}
-                            title={isDark ? 'Mode Terang' : 'Mode Gelap'}
+                            title={isDark ? 'Mode Gelap' : 'Mode Terang'}
                             className={`w-9 h-9 rounded-full flex items-center justify-center transition-all text-sm ${isDark ? 'bg-white/10 hover:bg-white/20 border border-white/10' : 'bg-white hover:bg-gray-100 border border-gray-200 shadow-sm'}`}
                         >
-                            {isDark ? '☀️' : '🌙'}
+                            {isDark ? '🌙' : '☀️'}
                         </button>
                         <div className={`relative cursor-pointer p-2 rounded-full transition-colors ${isDark ? 'hover:bg-white/5' : 'hover:bg-gray-100'}`}>
                             <span className="text-xl">🔔</span>

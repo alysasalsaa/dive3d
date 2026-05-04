@@ -40,6 +40,7 @@ export default function HomePage() {
   const [userRole, setUserRole] = useState<string | null>(null);
   const [userName, setUserName] = useState<string | null>(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showTrailer, setShowTrailer] = useState(false);
   const [isLoginProcessing, setIsLoginProcessing] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -187,54 +188,119 @@ export default function HomePage() {
           )}
           <button
             onClick={toggleTheme}
-            title={isDark ? 'Mode Terang' : 'Mode Gelap'}
+            title={isDark ? 'Mode Gelap' : 'Mode Terang'}
             className={`w-10 h-10 rounded-full flex items-center justify-center transition-all text-base ${isDark ? 'bg-white/10 hover:bg-white/20 border border-white/10' : 'bg-white hover:bg-gray-100 border border-gray-200 shadow-sm'}`}
           >
-            {isDark ? '☀️' : '🌙'}
+            {isDark ? '🌙' : '☀️'}
           </button>
         </div>
       </nav>
 
       {/* HERO SECTION */}
-      <section className="relative h-screen flex items-center justify-center">
+      <section className="relative min-h-[90vh] flex items-center overflow-hidden">
+
+        {/* Background Image - Full Width */}
         <div className="absolute inset-0 z-0">
-          <div className={`absolute inset-0 bg-gradient-to-b ${isDark ? 'from-blue-900/10 via-transparent to-[#00040a]' : 'from-blue-200/30 via-transparent to-sky-50'}`}></div>
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-blue-500/20 blur-[120px] rounded-full"></div>
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className={`text-[15vw] font-black select-none uppercase tracking-tighter ${isDark ? 'text-white/5' : 'text-blue-900/5'}`}>RAJA AMPAT</div>
-          </div>
+          <img src="/images/hero-bg.jpg" alt="Raja Ampat" className="w-full h-full object-cover object-center" />
+          {/* Gradient Overlay */}
+          <div className={`absolute inset-0 transition-colors duration-1000 ${isDark ? 'bg-gradient-to-r from-[#00040a] via-[#00040a]/80 to-transparent' : 'bg-gradient-to-r from-[#eef8ff] via-[#eef8ff]/90 to-transparent'}`}></div>
         </div>
 
-        <div className="relative z-10 text-center max-w-5xl px-6">
-          <div className="inline-block px-5 py-2 mb-6 rounded-full bg-cyan-500/20 border border-cyan-400/60 text-cyan-600 text-xs font-black tracking-[0.25em] uppercase animate-pulse shadow-[0_0_25px_rgba(34,211,238,0.3)]">
-            Eksplorasi Virtual 3D
+        {/* Konten */}
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-8 pt-32 pb-16 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+          
+          {/* LEFT: Teks */}
+          <div className="pr-0 md:pr-10">
+            <p className={`text-base md:text-lg mb-1 font-bold transition-colors ${isDark ? 'text-gray-300' : 'text-[#041e42]'}`}>Selamat Datang di</p>
+            <h1 className={`text-6xl md:text-[5.5rem] font-black mb-4 leading-none tracking-tight transition-colors ${isDark ? 'text-white' : 'text-[#041e42]'}`}>
+              DIVEXPLORE
+            </h1>
+            <p className={`font-bold text-lg md:text-xl mb-6 leading-snug transition-colors ${isDark ? 'text-cyan-400' : 'text-[#0056b3]'}`}>
+              Jelajahi Keindahan Raja Ampat,<br />Lestarikan Laut untuk Masa Depan.
+            </p>
+            <p className={`text-sm md:text-base mb-10 leading-relaxed max-w-xl transition-colors ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+              Platform wisata bahari dan pembelajaran interaktif yang mengajakmu mengenal, mencintai, dan menjaga ekosistem laut Raja Ampat melalui pengalaman 3D dan konten edukatif.
+            </p>
+
+            <div className="flex flex-wrap gap-4 mb-8">
+              <Link
+                href="/panduan"
+                className="flex items-center gap-3 px-6 py-3.5 bg-[#0044aa] hover:bg-[#003388] text-white text-sm font-bold rounded-full transition-all shadow-lg"
+              >
+                <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center text-[#0044aa]">
+                  <span className="text-[12px] transform -rotate-45">➤</span>
+                </div>
+                Mulai Jelajah
+                <span className="text-lg leading-none ml-1">→</span>
+              </Link>
+            </div>
+
+            <div className={`inline-flex items-center gap-3 px-5 py-2.5 rounded-full text-sm font-semibold mb-12 transition-colors ${isDark ? 'bg-blue-900/40 text-blue-300' : 'bg-[#dff1ff] text-[#0066cc]'}`}>
+              <span className="text-lg">🌿</span> Bersama kita jaga laut, kehidupan, dan masa depan.
+            </div>
           </div>
-          <h1 className={`text-6xl md:text-8xl font-black mb-8 leading-[1.1] tracking-tighter ${isDark ? 'text-white' : 'text-gray-900'}`}>
-            MENYELAMI RAHASIA <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-500">
-              SAMUDRA BIRU
-            </span>
-          </h1>
-          <p className={`max-w-2xl mx-auto text-lg md:text-xl mb-12 leading-relaxed ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-            Rasakan keajaiban ekosistem Raja Ampat dalam visualisasi 3D yang nyata. Pelajari pentingnya konservasi laut melalui interaksi langsung.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-            <Link href="/panduan"
-              className="group relative px-10 py-5 bg-white text-black font-black rounded-2xl transition-colors duration-1000 hover:text-white overflow-hidden shadow-2xl inline-block"
-            >
-              <span className="relative z-10 transition-colors duration-1000 delay-300">Mulai Penyelaman</span>
-              <div className="absolute left-1/2 top-[150%] h-[400px] w-[400px] -translate-x-1/2 rounded-[38%] bg-blue-800/90 group-hover:top-[-140px] transition-all duration-[2000ms] ease-in-out animate-[spin_8s_linear_infinite] z-0"></div>
-              <div className="absolute left-1/2 top-[150%] h-[400px] w-[400px] -translate-x-1/2 rounded-[42%] bg-blue-600 group-hover:top-[-150px] transition-all duration-[2500ms] ease-in-out animate-[spin_10s_linear_infinite_reverse] z-0 delay-75"></div>
-              <div className="absolute left-1/2 top-[150%] h-[400px] w-[400px] -translate-x-1/2 rounded-[45%] bg-cyan-500/70 group-hover:top-[-160px] transition-all duration-[3000ms] ease-in-out animate-[spin_12s_linear_infinite] z-0 delay-150"></div>
-              <div className="absolute left-1/2 top-[150%] h-[400px] w-[400px] -translate-x-1/2 rounded-[40%] bg-blue-300/40 group-hover:top-[-170px] transition-all duration-[3500ms] ease-in-out animate-[spin_14s_linear_infinite_reverse] z-0 delay-300"></div>
-            </Link>
-            <button className={`flex items-center gap-3 px-6 py-2 font-bold hover:text-blue-400 transition-all ${isDark ? 'text-white' : 'text-gray-700'}`}>
-              <span className={`w-12 h-12 flex items-center justify-center rounded-full border ${isDark ? 'border-white/20' : 'border-gray-300'}`}>▶</span>
-              Lihat Trailer
-            </button>
+
+          {/* RIGHT: Video card */}
+          <div className={`rounded-2xl overflow-hidden border w-full max-w-xl lg:ml-auto p-2 backdrop-blur-md transition-colors shadow-2xl ${isDark ? 'bg-[#000814]/60 border-cyan-900/50' : 'bg-[#003366]/10 border-white/40'}`}>
+            <div className={`rounded-xl overflow-hidden ${isDark ? 'bg-[#00102a]' : 'bg-[#002244]'}`}>
+              <div className="px-4 py-3 flex items-center gap-2 border-b border-white/10">
+                <span className="text-base">🎬</span>
+                <p className="text-sm font-semibold text-white">Trailer DIVEXPLORE</p>
+              </div>
+
+              <div className="relative aspect-[16/10] flex items-center justify-center bg-black/40 overflow-hidden">
+                <img src="/images/hero-bg.jpg" alt="Trailer" className="absolute inset-0 w-full h-full object-cover opacity-70" />
+                
+                <button
+                  onClick={() => setShowTrailer(true)}
+                  className="relative z-10 w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-2xl transition-all hover:scale-105 active:scale-95 group"
+                >
+                  <div className="w-16 h-16 rounded-full flex items-center justify-center bg-white transition-colors">
+                    <span className="text-[#0044aa] text-3xl ml-1">▶</span>
+                  </div>
+                </button>
+
+                <div className="absolute bottom-0 left-0 right-0 z-10">
+                  <div className="h-1 bg-white/20">
+                    <div className="h-full w-1/3 bg-blue-500"></div>
+                  </div>
+                  <div className="px-4 py-3 flex items-center gap-2 bg-black/60 backdrop-blur-md">
+                    <span className="text-white text-xs font-medium">00:00 / 01:10</span>
+                    <div className="ml-auto flex items-center gap-4">
+                      <button className="text-white hover:text-blue-300 text-lg transition-colors">🔊</button>
+                      <button className="text-white hover:text-blue-300 text-lg transition-colors">⛶</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
+
+      {/* TRAILER MODAL */}
+      {showTrailer && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setShowTrailer(false)}></div>
+          <div className="relative z-10 w-full max-w-4xl bg-black rounded-2xl overflow-hidden shadow-2xl">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
+              <p className="text-white text-sm font-semibold">🎬 Trailer DIVEXPLORE</p>
+              <button onClick={() => setShowTrailer(false)} className="text-gray-400 hover:text-white transition-colors">✕</button>
+            </div>
+            <div className="aspect-video bg-gray-900 flex items-center justify-center text-gray-500 text-sm">
+              <video 
+                src="/videos/trailer.mp4" 
+                controls 
+                autoPlay
+                className="w-full h-full object-cover"
+                poster="/images/hero-bg.jpg"
+              >
+                Browser Anda tidak mendukung tag video HTML5.
+              </video>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* FOOTER */}
       <footer className={`py-20 border-t text-center px-6 ${isDark ? 'border-white/5' : 'border-gray-200'}`}>
