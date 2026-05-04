@@ -188,10 +188,10 @@ export default function HomePage() {
           )}
           <button
             onClick={toggleTheme}
-            title={isDark ? 'Mode Terang' : 'Mode Gelap'}
+            title={isDark ? 'Mode Gelap' : 'Mode Terang'}
             className={`w-10 h-10 rounded-full flex items-center justify-center transition-all text-base ${isDark ? 'bg-white/10 hover:bg-white/20 border border-white/10' : 'bg-white hover:bg-gray-100 border border-gray-200 shadow-sm'}`}
           >
-            {isDark ? '☀️' : '🌙'}
+            {isDark ? '🌙' : '☀️'}
           </button>
         </div>
       </nav>
@@ -208,7 +208,7 @@ export default function HomePage() {
 
         {/* Konten */}
         <div className="relative z-10 w-full max-w-7xl mx-auto px-8 pt-32 pb-16 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
-
+          
           {/* LEFT: Teks */}
           <div className="pr-0 md:pr-10">
             <p className={`text-base md:text-lg mb-1 font-bold transition-colors ${isDark ? 'text-gray-300' : 'text-[#041e42]'}`}>Selamat Datang di</p>
@@ -218,11 +218,11 @@ export default function HomePage() {
             <p className={`font-bold text-lg md:text-xl mb-6 leading-snug transition-colors ${isDark ? 'text-cyan-400' : 'text-[#0056b3]'}`}>
               Jelajahi Keindahan Raja Ampat,<br />Lestarikan Laut untuk Masa Depan.
             </p>
-            <p className={`text-sm md:text-base mb-10 leading-relaxed max-w-lg transition-colors ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+            <p className={`text-sm md:text-base mb-10 leading-relaxed max-w-xl transition-colors ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
               Platform wisata bahari dan pembelajaran interaktif yang mengajakmu mengenal, mencintai, dan menjaga ekosistem laut Raja Ampat melalui pengalaman 3D dan konten edukatif.
             </p>
 
-            <div className="flex flex-wrap gap-4 mb-10">
+            <div className="flex flex-wrap gap-4 mb-8">
               <Link
                 href="/panduan"
                 className="group flex items-center gap-4 px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white text-base font-black rounded-full transition-all duration-300 shadow-[0_0_40px_-10px_rgba(0,168,255,0.5)] hover:shadow-[0_0_60px_-15px_rgba(0,168,255,0.7)] hover:-translate-y-1"
@@ -235,7 +235,7 @@ export default function HomePage() {
               </Link>
             </div>
 
-            <div className={`inline-flex items-center gap-3 px-5 py-2.5 rounded-full text-sm font-semibold transition-colors ${isDark ? 'bg-blue-900/40 text-blue-300' : 'bg-[#dff1ff] text-[#0066cc]'}`}>
+            <div className={`inline-flex items-center gap-3 px-5 py-2.5 rounded-full text-sm font-semibold mb-12 transition-colors ${isDark ? 'bg-blue-900/40 text-blue-300' : 'bg-[#dff1ff] text-[#0066cc]'}`}>
               <span className="text-lg">🌿</span> Bersama kita jaga laut, kehidupan, dan masa depan.
             </div>
           </div>
@@ -282,14 +282,21 @@ export default function HomePage() {
       {showTrailer && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setShowTrailer(false)}></div>
-          <div className="relative z-10 w-full max-w-3xl bg-black rounded-2xl overflow-hidden shadow-2xl">
+          <div className="relative z-10 w-full max-w-4xl bg-black rounded-2xl overflow-hidden shadow-2xl">
             <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
               <p className="text-white text-sm font-semibold">🎬 Trailer DIVEXPLORE</p>
               <button onClick={() => setShowTrailer(false)} className="text-gray-400 hover:text-white transition-colors">✕</button>
             </div>
             <div className="aspect-video bg-gray-900 flex items-center justify-center text-gray-500 text-sm">
-              {/* Ganti dengan <video src="/videos/trailer.mp4" controls autoPlay /> */}
-              <p>Video trailer belum tersedia</p>
+              <video 
+                src="/videos/trailer.mp4" 
+                controls 
+                autoPlay
+                className="w-full h-full object-cover"
+                poster="/images/hero-bg.jpg"
+              >
+                Browser Anda tidak mendukung tag video HTML5.
+              </video>
             </div>
           </div>
         </div>
