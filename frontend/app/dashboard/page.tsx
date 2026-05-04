@@ -64,6 +64,17 @@ export default function DashboardPage() {
         { icon: '⚙️', label: 'Pengaturan' },
     ];
 
+    const userName = dashboardData.user?.name || 'Pengguna';
+    const xp = dashboardData.user?.current_xp || 0;
+    const targetXp = dashboardData.user?.next_level_xp || 500;
+    const level = dashboardData.user?.level || 0;
+    const rankName = dashboardData.user?.rank_name || 'Rookie';
+
+    const completedQuizzesCount = dashboardData.recent_quizzes?.filter((q: any) => q.score === 100).length || 0;
+    const totalModules = 4;
+    const totalVideos = 4;
+    const totalKuis = 4;
+
     return (
         <div className={`flex h-screen font-sans overflow-hidden transition-colors duration-300 ${isDark ? 'bg-[#00040a] text-white' : 'bg-sky-50 text-gray-900'}`}>
 
@@ -137,8 +148,8 @@ export default function DashboardPage() {
                     <div className="flex items-center gap-4">
                         <div className="w-9 h-9 bg-gradient-to-br from-blue-400 to-cyan-400 rounded-full flex-shrink-0 shadow-lg shadow-blue-500/20" />
                         <div>
-                            <p className={`font-bold text-sm leading-none ${isDark ? "text-white" : "text-gray-900"}`}>{dashboardData.user.name}</p>
-                            <p className="text-cyan-400 text-xs mt-0.5">Level {dashboardData.user.level} · {dashboardData.user.rank_name}</p>
+                            <p className={`font-bold text-sm leading-none ${isDark ? "text-white" : "text-gray-900"}`}>{userName}</p>
+                            <p className="text-cyan-400 text-xs mt-0.5">Level {level} · {rankName}</p>
                         </div>
                     </div>
 
@@ -181,204 +192,224 @@ export default function DashboardPage() {
 
                 {/* DASHBOARD CONTENT */}
                 <div className="p-6 space-y-6 max-w-7xl mx-auto w-full">
-
-                    {/* Row 1: Profile + Badges */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-
-                        {/* Profile Card */}
-                        <div className={`md:col-span-2 backdrop-blur-xl rounded-2xl p-6 border ${isDark ? "bg-white/[0.04] border-white/10" : "bg-white border-gray-100 shadow-sm"} flex items-center gap-6 hover:border-blue-500/30 transition-colors`}>
-                            <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-full flex-shrink-0 shadow-xl shadow-blue-500/30 flex items-center justify-center text-3xl">
+                    {/* Profile & XP Row */}
+                    <div className={`flex flex-col md:flex-row justify-between items-center rounded-2xl p-6 border ${isDark ? 'bg-[#0B1221] border-white/5' : 'bg-white border-gray-200 shadow-sm'}`}>
+                        <div className="flex items-center gap-5">
+                            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-400 to-cyan-400 flex items-center justify-center text-3xl shadow-lg shadow-cyan-500/20">
                                 🤿
                             </div>
-                            <div className="flex-1 min-w-0">
-                                <h2 className={`text-xl font-black ${isDark ? 'text-white' : 'text-gray-900'}`}>{dashboardData.user.name}</h2>
-                                <p className="text-cyan-400 text-sm font-semibold mt-0.5">✨ Level {dashboardData.user.level} · {dashboardData.user.rank_name}</p>
-                                <div className={`mt-4 rounded-full h-2 overflow-hidden ${isDark ? 'bg-white/10' : 'bg-gray-100'}`}>
-                                    <div
-                                        className="bg-gradient-to-r from-blue-500 to-cyan-400 h-full rounded-full transition-all duration-700"
-                                        style={{ width: `${(dashboardData.user.current_xp / dashboardData.user.next_level_xp) * 100}%` }}
-                                    />
-                                </div>
-                                <div className="flex justify-between text-xs text-gray-500 mt-1.5 font-medium">
-                                    <span>{dashboardData.user.current_xp} XP</span>
-                                    <span>Target {dashboardData.user.next_level_xp} XP</span>
+                            <div>
+                                <p className="text-gray-400 text-sm">Selamat datang kembali,</p>
+                                <h2 className="text-2xl font-bold">{userName}</h2>
+                                <div className="inline-flex items-center gap-1 mt-1 px-2.5 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-semibold">
+                                    ⭐ Level {level} · {rankName}
                                 </div>
                             </div>
                         </div>
 
-                        {/* Badges */}
-                        <Link href="/dashboard/badges" className={`block backdrop-blur-xl rounded-2xl p-6 border ${isDark ? "bg-white/[0.04] border-white/10" : "bg-white border-gray-100 shadow-sm"} hover:border-blue-500/30 hover:-translate-y-1 transition-all cursor-pointer group`}>
-                            <div className="flex justify-between items-center mb-4">
-                                <h3 className={`font-bold flex items-center gap-2 text-sm ${isDark ? "text-white" : "text-gray-800"}`}>
-                                    <span>🏅</span> Koleksi Lencana
-                                </h3>
-                                <span className={`text-xs opacity-0 group-hover:opacity-100 transition-opacity font-bold ${isDark ? "text-cyan-400" : "text-blue-600"}`}>Detail Lencana ➔</span>
+                        <div className={`mt-6 md:mt-0 w-full md:w-80 rounded-xl p-4 border ${isDark ? 'bg-[#0F172A]/50 border-white/5' : 'bg-gray-50 border-gray-100'}`}>
+                            <div className="flex items-center gap-2 mb-3">
+                                <span className="text-yellow-400">⭐</span>
+                                <span className="text-sm font-semibold text-gray-300">Total XP</span>
                             </div>
-                            <div className="flex gap-3 flex-wrap justify-center">
-                                {dashboardData.badges.map((badge: any) => (
-                                    <div
-                                        key={badge.id}
-                                        title={`${badge.name}: ${badge.tooltip}`}
-                                        className={`w-14 h-14 rounded-2xl flex items-center justify-center text-2xl transition-all cursor-pointer
-                                            ${badge.achieved
-                                                ? 'bg-gradient-to-br from-blue-600/40 to-cyan-500/20 border border-cyan-400/40 shadow-lg shadow-cyan-500/10 hover:scale-110'
-                                                : 'bg-white/5 border border-white/10 opacity-40 grayscale'
-                                            }`}
-                                    >
-                                        {badge.icon}
+                            <div className="flex justify-between items-end mb-1">
+                                <span className="text-lg font-bold">{xp} XP</span>
+                                <span className="text-xs text-gray-500">Target {targetXp} XP</span>
+                            </div>
+                            <div className={`h-1.5 rounded-full w-full ${isDark ? 'bg-gray-800' : 'bg-gray-200'}`}>
+                                <div className="h-full rounded-full bg-cyan-400 transition-all" style={{ width: `${Math.min((xp/(targetXp||1))*100, 100)}%` }} />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Grid 3 Cols (Row 1) */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {/* Akademik */}
+                        <div className={`rounded-2xl p-6 border flex flex-col justify-between ${isDark ? 'bg-[#0B1221] border-white/5' : 'bg-white border-gray-200 shadow-sm'}`}>
+                            <div className="flex items-start gap-3 mb-6">
+                                <div className="text-xl text-gray-400">📖</div>
+                                <div>
+                                    <h3 className="font-semibold text-sm">Ringkasan Progres Akademik</h3>
+                                    <p className="text-xs text-gray-500 mt-0.5">Modul yang diselesaikan</p>
+                                </div>
+                            </div>
+                            <div>
+                                <div className="flex justify-between items-end mb-2">
+                                    <span className="text-3xl font-bold text-cyan-400">{Math.round((completedQuizzesCount / totalModules) * 100)}%</span>
+                                    <span className="text-xs text-gray-500 font-medium">{completedQuizzesCount} / {totalModules} Modul</span>
+                                </div>
+                                <div className={`h-1.5 rounded-full w-full mb-4 ${isDark ? 'bg-gray-800' : 'bg-gray-200'}`}>
+                                    <div className="h-full rounded-full bg-cyan-400" style={{ width: `${(completedQuizzesCount / totalModules) * 100}%` }} />
+                                </div>
+                                <Link href="/akademi" className="text-xs text-cyan-400 hover:text-cyan-300 font-medium flex items-center gap-1">
+                                    Lihat Detail ➔
+                                </Link>
+                            </div>
+                        </div>
+
+                        {/* Tutorial */}
+                        <div className={`rounded-2xl p-6 border flex flex-col justify-between ${isDark ? 'bg-[#0B1221] border-white/5' : 'bg-white border-gray-200 shadow-sm'}`}>
+                            <div className="flex items-start gap-3 mb-6">
+                                <div className="text-xl text-blue-400">▶️</div>
+                                <div>
+                                    <h3 className="font-semibold text-sm">Ringkasan Progres Tutorial</h3>
+                                    <p className="text-xs text-gray-500 mt-0.5">Video yang ditonton</p>
+                                </div>
+                            </div>
+                            <div>
+                                <div className="flex justify-between items-end mb-2">
+                                    <span className="text-3xl font-bold text-cyan-400">{Math.round((completedQuizzesCount / totalVideos) * 100)}%</span>
+                                    <span className="text-xs text-gray-500 font-medium">{completedQuizzesCount} / {totalVideos} Video</span>
+                                </div>
+                                <div className={`h-1.5 rounded-full w-full mb-4 ${isDark ? 'bg-gray-800' : 'bg-gray-200'}`}>
+                                    <div className="h-full rounded-full bg-cyan-400" style={{ width: `${(completedQuizzesCount / totalVideos) * 100}%` }} />
+                                </div>
+                                <Link href="/tutorial" className="text-xs text-cyan-400 hover:text-cyan-300 font-medium flex items-center gap-1">
+                                    Lihat Detail ➔
+                                </Link>
+                            </div>
+                        </div>
+
+                        {/* Status Kuis */}
+                        <div className={`relative overflow-hidden rounded-2xl p-6 border flex flex-col justify-between ${isDark ? 'bg-[#0B1221] border-white/5' : 'bg-white border-gray-200 shadow-sm'}`}>
+                            <div className="flex items-start gap-3 mb-6 relative z-10">
+                                <div className="text-xl text-gray-400">📝</div>
+                                <div>
+                                    <h3 className="font-semibold text-sm">Status Kuis</h3>
+                                    <p className="text-xs text-gray-500 mt-0.5">Kuis yang dikerjakan</p>
+                                </div>
+                            </div>
+                            <div className="relative z-10">
+                                <div className="mb-4">
+                                    <span className="text-3xl font-bold text-white">{completedQuizzesCount}</span>
+                                    <p className="text-xs text-gray-500 mt-1">{completedQuizzesCount === 0 ? 'Belum ada kuis yang diselesaikan' : 'Kuis terselesaikan'}</p>
+                                </div>
+                                <Link href="/lms" className="text-xs text-cyan-400 hover:text-cyan-300 font-medium flex items-center gap-1">
+                                    Lihat Kuis ➔
+                                </Link>
+                            </div>
+                            {/* Background Icon */}
+                            <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-10">
+                                <span className="text-9xl">📋</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Grid 3 Cols (Row 2) */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {/* Status Verifikasi */}
+                        <div className={`rounded-2xl p-6 border flex flex-col ${isDark ? 'bg-[#0B1221] border-white/5' : 'bg-white border-gray-200 shadow-sm'}`}>
+                            <div className="flex items-start gap-3 mb-8">
+                                <div className="text-xl text-green-400">✅</div>
+                                <div>
+                                    <h3 className="font-semibold text-sm">Status Verifikasi Konten</h3>
+                                    <p className="text-xs text-gray-500 mt-0.5">Upload & verifikasi Konten</p>
+                                </div>
+                            </div>
+                            <div className="flex justify-around mb-8">
+                                <div className="text-center border-r border-white/10 w-1/2">
+                                    <p className="text-3xl font-bold text-cyan-400 mb-1">0</p>
+                                    <p className="text-xs text-gray-500">Diajukan</p>
+                                </div>
+                                <div className="text-center w-1/2">
+                                    <p className="text-3xl font-bold text-cyan-400 mb-1">0</p>
+                                    <p className="text-xs text-gray-500">Disetujui</p>
+                                </div>
+                            </div>
+                            <Link href="/dashboard" className="text-xs text-cyan-400 hover:text-cyan-300 font-medium flex items-center gap-1 mt-auto">
+                                Kelola Konten ➔
+                            </Link>
+                        </div>
+
+                        {/* Koleksi Lencana */}
+                        <div className={`rounded-2xl p-6 border flex flex-col ${isDark ? 'bg-[#0B1221] border-white/5' : 'bg-white border-gray-200 shadow-sm'}`}>
+                            <div className="flex items-start gap-3 mb-6">
+                                <div className="text-xl text-orange-400">🏅</div>
+                                <div>
+                                    <h3 className="font-semibold text-sm">Koleksi Lencana</h3>
+                                    <p className="text-xs text-gray-500 mt-0.5">Lencana yang diperoleh</p>
+                                </div>
+                            </div>
+                            <div className="flex justify-center gap-3 mb-6">
+                                {/* Badges placeholder */}
+                                {['🪸','🔍','🌊','🏆','⭐'].map((icon, i) => (
+                                    <div key={i} className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-lg opacity-40 grayscale">
+                                        {icon}
                                     </div>
                                 ))}
                             </div>
+                            <div className="mb-4">
+                                <span className="text-2xl font-bold text-cyan-400">0</span>
+                                <span className="text-lg font-bold text-gray-600"> / 10</span>
+                                <p className="text-xs text-gray-500 mt-1">Lencana Terkumpul</p>
+                            </div>
+                            <Link href="/dashboard/badges" className="text-xs text-cyan-400 hover:text-cyan-300 font-medium flex items-center gap-1 mt-auto">
+                                Lihat Semua Lencana ➔
+                            </Link>
+                        </div>
+
+                        {/* Claim Sertifikat */}
+                        <div className={`rounded-2xl p-6 border ${isDark ? 'bg-[#0B1221] border-yellow-500/30' : 'bg-yellow-50 border-yellow-300 shadow-sm'}`}>
+                            <div className="flex items-start gap-3 mb-5">
+                                <div className="text-xl text-yellow-400">📜</div>
+                                <div>
+                                    <h3 className="font-semibold text-sm">Claim Sertifikat</h3>
+                                    <p className="text-xs text-gray-500 mt-0.5">Klaim sertifikat setelah memenuhi syarat.</p>
+                                </div>
+                            </div>
+                            
+                            <div className={`rounded-xl p-4 border ${isDark ? 'bg-[#0F172A]/50 border-white/5' : 'bg-white border-gray-200'}`}>
+                                <p className="text-xs font-semibold mb-3">Cek Kelayakan Sertifikat</p>
+                                <ul className="space-y-2 text-xs text-gray-400">
+                                    <li className="flex justify-between items-center">
+                                        <span className="flex items-center gap-2"><span className={completedQuizzesCount >= totalModules ? "text-green-500" : "text-gray-600"}>✔</span> Selesaikan semua Modul Akademik</span>
+                                        <span className="flex items-center gap-1">{completedQuizzesCount} / {totalModules} {completedQuizzesCount >= totalModules ? <span className="text-green-500">✅</span> : <span className="text-red-500">❌</span>}</span>
+                                    </li>
+                                    <li className="flex justify-between items-center">
+                                        <span className="flex items-center gap-2"><span className={completedQuizzesCount >= totalVideos ? "text-green-500" : "text-gray-600"}>✔</span> Tonton semua Video Tutorial</span>
+                                        <span className="flex items-center gap-1">{completedQuizzesCount} / {totalVideos} {completedQuizzesCount >= totalVideos ? <span className="text-green-500">✅</span> : <span className="text-red-500">❌</span>}</span>
+                                    </li>
+                                    <li className="flex justify-between items-center">
+                                        <span className="flex items-center gap-2"><span className="text-gray-600">✔</span> Minimal 1 Konten Disetujui</span>
+                                        <span className="flex items-center gap-1">0 / 1 <span className="text-red-500">❌</span></span>
+                                    </li>
+                                    <li className="flex justify-between items-center">
+                                        <span className="flex items-center gap-2"><span className={completedQuizzesCount >= totalKuis ? "text-green-500" : "text-gray-600"}>✔</span> Selesaikan semua Kuis</span>
+                                        <span className="flex items-center gap-1">{completedQuizzesCount} / {totalKuis} {completedQuizzesCount >= totalKuis ? <span className="text-green-500">✅</span> : <span className="text-red-500">❌</span>}</span>
+                                    </li>
+                                </ul>
+
+                                <button disabled className="w-full mt-4 py-2.5 rounded-lg bg-gray-800 text-gray-500 font-semibold text-xs border border-white/5 cursor-not-allowed flex items-center justify-center gap-2">
+                                    <span>🔒</span> Claim Sertifikat
+                                </button>
+                                <p className="text-[10px] text-red-400 text-center mt-2">Lengkapi syarat untuk mengaktifkan tombol.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Riwayat Sertifikat header */}
+                    <div className="flex items-center justify-between pt-2">
+                        <div className="flex items-start gap-3">
+                            <div className="text-xl text-gray-400">🧾</div>
+                            <div>
+                                <h3 className="font-semibold text-sm">Riwayat Sertifikat</h3>
+                                <p className="text-xs text-gray-500 mt-0.5">Sertifikat yang telah diperoleh</p>
+                            </div>
+                        </div>
+                        <Link href="/dashboard" className="text-xs text-cyan-400 hover:text-cyan-300 font-medium flex items-center gap-1">
+                            Lihat Semua ➔
                         </Link>
                     </div>
-
-                    {/* Row 2: Progress + Quiz */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-
-                        {/* Progres Belajar */}
-                        <div className={`backdrop-blur-xl rounded-2xl p-6 border ${isDark ? "bg-white/[0.04] border-white/10" : "bg-white border-gray-100 shadow-sm"} hover:border-blue-500/30 transition-colors`}>
-                            <h3 className={`font-bold mb-5 flex items-center gap-2 text-sm ${isDark ? "text-white" : "text-gray-800"}`}>
-                                <span>📈</span> Progres Belajar
-                            </h3>
-                            <div className="space-y-5">
-                                {dashboardData.learning_progress.map((progress: any) => {
-                                    const colorMap: Record<string, string> = {
-                                        emerald: 'from-emerald-500 to-teal-400',
-                                        amber: 'from-amber-500 to-orange-400',
-                                        blue: 'from-blue-500 to-cyan-400',
-                                    };
-                                    const textMap: Record<string, string> = {
-                                        emerald: 'text-emerald-400',
-                                        amber: 'text-amber-400',
-                                        blue: 'text-cyan-400',
-                                    };
-                                    const c = progress.color || 'blue';
-                                    return (
-                                        <div key={progress.course_id}>
-                                            <div className="flex justify-between text-xs font-semibold mb-2">
-                                                <span className={isDark ? 'text-gray-300' : 'text-gray-700'}>{progress.title}</span>
-                                                <span className={textMap[c] || 'text-cyan-400'}>{progress.progress_percentage}%</span>
-                                            </div>
-                                            <div className={`rounded-full h-2 overflow-hidden ${isDark ? 'bg-white/10' : 'bg-gray-100'}`}>
-                                                <div
-                                                    className={`bg-gradient-to-r ${colorMap[c] || colorMap.blue} h-full rounded-full`}
-                                                    style={{ width: `${progress.progress_percentage}%` }}
-                                                />
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
+                    
+                    {/* Riwayat Sertifikat content */}
+                    <div className={`rounded-2xl p-8 border border-dashed flex items-center justify-center gap-4 ${isDark ? 'bg-transparent border-white/10' : 'bg-gray-50 border-gray-300'}`}>
+                        <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-2xl text-gray-500">
+                            🏅
                         </div>
-
-                        {/* Ringkasan Kuis */}
-                        <div className={`backdrop-blur-xl rounded-2xl p-6 border ${isDark ? "bg-white/[0.04] border-white/10" : "bg-white border-gray-100 shadow-sm"} hover:border-blue-500/30 transition-colors`}>
-                            <h3 className={`font-bold mb-5 flex items-center gap-2 text-sm ${isDark ? "text-white" : "text-gray-800"}`}>
-                                <span>📝</span> Ringkasan Skor Kuis
-                            </h3>
-                            <div className="space-y-3">
-                                {dashboardData.recent_quizzes.length === 0 && (
-                                    <p className="text-sm text-gray-500 text-center py-4">Belum ada kuis yang dikerjakan.</p>
-                                )}
-                                {dashboardData.recent_quizzes.map((quiz: any) => {
-                                    const c = quiz.color || 'blue';
-                                    const bgMap: Record<string, string> = {
-                                        emerald: 'bg-emerald-500/10 border-emerald-500/20',
-                                        amber: 'bg-amber-500/10 border-amber-500/20',
-                                        blue: 'bg-blue-500/10 border-blue-500/20',
-                                    };
-                                    const textMap: Record<string, string> = {
-                                        emerald: 'text-emerald-400',
-                                        amber: 'text-amber-400',
-                                        blue: 'text-cyan-400',
-                                    };
-                                    return (
-                                        <div key={quiz.quiz_id} className={`flex justify-between items-center p-3 rounded-xl border ${bgMap[c] || bgMap.blue}`}>
-                                            <span className={`text-sm font-medium ${isDark ? "text-gray-300" : "text-gray-700"}`}>{quiz.title}</span>
-                                            <span className={`text-sm font-black ${textMap[c] || 'text-cyan-400'}`}>{quiz.score} / {quiz.max_score ?? 100}</span>
-                                        </div>
-                                    );
-                                })}
-                            </div>
+                        <div>
+                            <p className="text-sm font-semibold text-gray-300 mb-1">Belum ada sertifikat yang diklaim.</p>
+                            <p className="text-xs text-gray-500">Selesaikan semua syarat dan klaim sertifikat pertamamu!</p>
                         </div>
-                    </div>
-
-                    {/* Row 3: Leaderboard + Tantangan + Reward */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-
-                        {/* Leaderboard */}
-                        <div className={`backdrop-blur-xl rounded-2xl p-6 border ${isDark ? "bg-white/[0.04] border-white/10" : "bg-white border-gray-100 shadow-sm"} hover:border-yellow-500/20 transition-colors`}>
-                            <h3 className={`font-bold mb-5 flex items-center gap-2 text-sm ${isDark ? "text-white" : "text-gray-800"}`}>
-                                <span>👑</span> Leaderboard Top 3
-                            </h3>
-                            <div className="space-y-3">
-                                {dashboardData.leaderboard.map((user: any) => {
-                                    const rankStyle: Record<number, string> = {
-                                        1: 'border-yellow-500/30 bg-yellow-500/10',
-                                        2: 'border-gray-400/20 bg-gray-400/10',
-                                        3: 'border-orange-500/20 bg-orange-500/10',
-                                    };
-                                    const rankBadge: Record<number, string> = {
-                                        1: 'bg-gradient-to-br from-yellow-400 to-orange-400',
-                                        2: 'bg-gradient-to-br from-gray-300 to-gray-400',
-                                        3: 'bg-gradient-to-br from-orange-400 to-amber-500',
-                                    };
-                                    return (
-                                        <div key={user.rank} className={`flex items-center gap-3 p-2.5 rounded-xl border ${rankStyle[user.rank] || 'border-white/10 bg-white/5'}`}>
-                                            <div className={`w-7 h-7 rounded-full ${rankBadge[user.rank] || 'bg-blue-500'} text-white flex items-center justify-center font-black text-xs shadow-sm`}>{user.rank}</div>
-                                            <div className="w-9 h-9 bg-white/10 rounded-full flex items-center justify-center text-lg">{user.avatar_emoji}</div>
-                                            <div className="flex-1 min-w-0">
-                                                <p className={`text-sm font-bold truncate ${isDark ? "text-white" : "text-gray-900"}`}>{user.name}</p>
-                                                <p className="text-xs text-gray-400 font-medium">{user.xp} XP</p>
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </div>
-
-                        {/* Tantangan Harian */}
-                        <div className={`backdrop-blur-xl rounded-2xl p-6 border ${isDark ? "bg-white/[0.04] border-white/10" : "bg-white border-gray-100 shadow-sm"} hover:border-blue-500/30 transition-colors`}>
-                            <h3 className={`font-bold mb-5 flex items-center gap-2 text-sm ${isDark ? "text-white" : "text-gray-800"}`}>
-                                <span>⚔️</span> Tantangan Harian
-                            </h3>
-                            <div className="space-y-4">
-                                {dashboardData.daily_challenges.map((challenge: any) => {
-                                    const isEven = challenge.id % 2 === 0;
-                                    return (
-                                        <div key={challenge.id} className={`p-4 rounded-xl border ${isDark ? "bg-white/5 border-white/10" : "bg-gray-50 border-gray-100"}`}>
-                                            <p className={`text-sm font-bold mb-2 ${isDark ? "text-white" : "text-gray-900"}`}>{challenge.title}</p>
-                                            <div className={`rounded-full h-1.5 overflow-hidden mb-2 ${isDark ? "bg-white/10" : "bg-gray-200"}`}>
-                                                <div
-                                                    className={`h-full rounded-full ${isEven ? 'bg-gradient-to-r from-emerald-500 to-teal-400' : 'bg-gradient-to-r from-blue-500 to-cyan-400'}`}
-                                                    style={{ width: `${challenge.progress_percentage}%` }}
-                                                />
-                                            </div>
-                                            <p className={`text-xs font-semibold flex items-center gap-1 ${isEven ? 'text-emerald-400' : 'text-cyan-400'}`}>
-                                                <span>{challenge.reward_icon}</span> {challenge.reward_text}
-                                            </p>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </div>
-
-                        {/* Reward System */}
-                        <div className="bg-gradient-to-br from-blue-700 to-blue-900 backdrop-blur-xl rounded-2xl p-6 border border-blue-500/30 flex flex-col justify-center items-center text-center hover:border-blue-400/50 transition-colors shadow-lg shadow-blue-900/20">
-                            <h3 className="font-bold text-yellow-400 mb-4 flex items-center gap-2 text-sm">
-                                <span>🎁</span> Reward System
-                            </h3>
-                            <p className="text-xs text-blue-200 mb-1">Total Gems Anda</p>
-                            <div className="text-5xl font-black text-white flex items-center gap-2 mb-6">
-                                <span>💎</span>
-                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-300">{dashboardData.user.gems}</span>
-                            </div>
-                            <button className="w-full bg-gradient-to-r from-yellow-400 to-orange-400 hover:opacity-90 text-orange-950 font-black py-3 px-4 rounded-xl transition-all hover:-translate-y-0.5 shadow-lg shadow-yellow-500/20 text-sm">
-                                Tukar Reward
-                            </button>
-                            <p className="mt-3 text-xs text-blue-300/70">3 item e-book eksklusif tersedia</p>
-                        </div>
-
                     </div>
                 </div>
 
