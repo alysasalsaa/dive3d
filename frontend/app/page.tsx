@@ -231,7 +231,6 @@ export default function HomePage() {
                   <span className="text-[14px] transform -rotate-45 group-hover:rotate-0 transition-transform duration-300">➤</span>
                 </div>
                 MULAI JELAJAH
-                <span className="text-xl leading-none ml-2 group-hover:translate-x-2 transition-transform duration-300">→</span>
               </Link>
             </div>
 
