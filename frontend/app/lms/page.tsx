@@ -824,9 +824,14 @@ export default function LMSPage() {
                   </div>
                </div>
 
-               <button onClick={handleLogout} className="w-full py-4 rounded-xl font-bold text-white bg-gradient-to-r from-red-600 to-rose-500 hover:scale-[1.02] transition-all shadow-xl shadow-red-500/25">
-                 Logout
-               </button>
+               <div className="flex flex-col gap-3">
+                 <button onClick={() => setView('user_modules')} className="w-full py-4 rounded-xl font-bold text-white bg-gradient-to-r from-blue-600 to-cyan-500 hover:scale-[1.02] transition-all shadow-xl shadow-blue-500/25">
+                   Kembali ke Daftar Modul
+                 </button>
+                 <button onClick={() => setView('user_dashboard')} className="w-full py-4 rounded-xl font-bold text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 transition-all border border-transparent hover:border-white/10">
+                   Kembali ke Dashboard LMS
+                 </button>
+               </div>
              </div>
            )}
          </div>
