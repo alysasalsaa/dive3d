@@ -24,3 +24,33 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+@keyframes wave-animation {
+  0% { transform: translateX(-50%) rotate(0deg); }
+  100% { transform: translateX(-50%) rotate(360deg); }
+}
+
+.btn-interactive-wave {
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.btn-interactive-wave::before {
+  content: "";
+  position: absolute;
+  top: 120%;
+  left: 50%;
+  width: 250%;
+  height: 250%;
+  background-color: rgba(255, 255, 255, 0.15);
+  transition: top 0.6s ease-in-out;
+  transform: translateX(-50%) rotate(0deg);
+  border-radius: 40%;
+  z-index: -1;
+  animation: wave-animation 5s infinite linear;
+}
+
+.btn-interactive-wave:hover::before {
+  top: -50%;
+}
