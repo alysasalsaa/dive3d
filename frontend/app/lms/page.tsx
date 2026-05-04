@@ -47,6 +47,13 @@ export default function LMSPage() {
     }
   }, []);
 
+  useEffect(() => {
+    if (view === 'user_modules') {
+      loadAllModuleProgress();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [view]);
+
   // ==========================================
   // DATABASE SIMULATION (Bisa diakses Admin & User)
   // ==========================================
@@ -113,6 +120,7 @@ export default function LMSPage() {
   const [hasBadge, setHasBadge] = useState(false);
   const [hasCertificate, setHasCertificate] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [completedModules, setCompletedModules] = useState<Record<string, boolean>>({});
 
   // Reset semua state sementara saat logout
   const handleLogout = () => {
@@ -216,6 +224,24 @@ export default function LMSPage() {
     if (readProgress < 100) setReadProgress((prev) => Math.min(prev + 25, 100));
   };
 
+  const loadAllModuleProgress = async () => {
+    const token = localStorage.getItem('auth_token');
+    if (!token) return;
+    const results: Record<string, boolean> = {};
+    for (const mod of modules) {
+      try {
+        const res = await fetch(`http://localhost:8000/api/progress/${mod.slug}`, {
+          headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' },
+        });
+        const data = await res.json();
+        results[mod.slug] = data.completed === true;
+      } catch {
+        results[mod.slug] = false;
+      }
+    }
+    setCompletedModules(results);
+  };
+
   const loadUserQuiz = async (slug: string) => {
     setQuizUserLoading(true);
     const token = localStorage.getItem('auth_token');
@@ -276,6 +302,7 @@ export default function LMSPage() {
               completed: true,
             }),
           });
+          setCompletedModules(prev => ({ ...prev, [selectedModule.slug]: true }));
         }
       } catch {
         // Gagal simpan tidak crash tampilan
@@ -537,27 +564,41 @@ export default function LMSPage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-              {modules.map((mod) => (
-                <div key={mod.id} className="p-6 rounded-2xl bg-white/5 border border-white/10 hover:border-cyan-500/50 transition-all group flex flex-col">
-                  <div className="h-40 rounded-xl bg-gradient-to-br from-blue-900/30 to-black mb-6 flex items-center justify-center group-hover:scale-[1.02] transition-transform border border-white/5">
-                    <span className="text-6xl drop-shadow-2xl">{mod.icon}</span>
+              {modules.map((mod) => {
+                const isCompleted = completedModules[mod.slug] === true;
+                return (
+                  <div key={mod.id} className={`p-6 rounded-2xl border transition-all group flex flex-col ${isCompleted ? 'bg-emerald-500/5 border-emerald-500/30' : 'bg-white/5 border-white/10 hover:border-cyan-500/50'}`}>
+                    <div className={`h-40 rounded-xl mb-6 flex items-center justify-center transition-transform border border-white/5 relative ${isCompleted ? 'bg-gradient-to-br from-emerald-900/30 to-black' : 'bg-gradient-to-br from-blue-900/30 to-black group-hover:scale-[1.02]'}`}>
+                      <span className="text-6xl drop-shadow-2xl">{mod.icon}</span>
+                      {isCompleted && (
+                        <div className="absolute top-3 right-3 px-2 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 text-xs font-bold">
+                          ✅ Selesai
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-grow">
+                      <h3 className="text-xl font-bold text-white mb-2">{mod.title}</h3>
+                      <p className="text-sm text-gray-400 mb-6">{mod.desc}</p>
+                    </div>
+                    {isCompleted ? (
+                      <div className="w-full py-3 rounded-xl font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 text-center cursor-default">
+                        ✅ Sudah Diselesaikan
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => {
+                          setSelectedModule(mod);
+                          setReadProgress(0);
+                          setView('user_read_module');
+                        }}
+                        className="w-full py-3 rounded-xl font-bold text-cyan-400 bg-cyan-500/10 hover:bg-cyan-500 hover:text-white transition-all border border-cyan-500/30 hover:border-cyan-400"
+                      >
+                        Pilih Modul Ini
+                      </button>
+                    )}
                   </div>
-                  <div className="flex-grow">
-                    <h3 className="text-xl font-bold text-white mb-2">{mod.title}</h3>
-                    <p className="text-sm text-gray-400 mb-6">{mod.desc}</p>
-                  </div>
-                  <button
-                    onClick={() => {
-                      setSelectedModule(mod);
-                      setReadProgress(0);
-                      setView('user_read_module');
-                    }}
-                    className="w-full py-3 rounded-xl font-bold text-cyan-400 bg-cyan-500/10 hover:bg-cyan-500 hover:text-white transition-all border border-cyan-500/30 hover:border-cyan-400"
-                  >
-                    Pilih Modul Ini
-                  </button>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}
@@ -571,14 +612,20 @@ export default function LMSPage() {
               <span className="text-4xl">{selectedModule?.icon}</span>
               Materi: {selectedModule?.title}
             </h1>
-            
+
+            {completedModules[selectedModule?.slug ?? ''] && (
+              <div className="mb-6 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 font-medium text-center">
+                ✅ Kamu sudah menyelesaikan modul ini. Quiz tidak dapat diulang.
+              </div>
+            )}
+
             <div className="mb-6">
               <div className="flex justify-between text-xs text-cyan-400 font-bold mb-2 uppercase tracking-wider">
                 <span>Progres Membaca</span>
                 <span>{readProgress}%</span>
               </div>
               <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
-                <div 
+                <div
                   className="h-full bg-gradient-to-r from-blue-500 to-cyan-400 transition-all duration-500"
                   style={{ width: `${readProgress}%` }}
                 />
@@ -587,7 +634,7 @@ export default function LMSPage() {
 
             <div className="prose prose-invert max-w-none text-gray-300 space-y-4 mb-8 min-h-[200px]">
               <p>Ini adalah konten pengantar untuk modul <strong>{selectedModule?.title}</strong>. Pelajari dengan saksama karena evaluasi quiz akan berdasarkan materi ini.</p>
-              
+
               {readProgress >= 25 && (
                 <p className="animate-in fade-in duration-500">Materi Bagian 1: {selectedModule?.desc}</p>
               )}
@@ -600,12 +647,12 @@ export default function LMSPage() {
             </div>
 
             <div className="flex flex-col gap-4 pt-6 border-t border-white/10">
-              {readProgress >= 100 && (
+              {readProgress >= 100 && !completedModules[selectedModule?.slug ?? ''] && (
                 <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-medium text-center">
                   ✅ Materi Selesai Dibaca!
                 </div>
               )}
-              
+
               <div className="flex items-center justify-between">
                 <button
                   onClick={() => setView('user_modules')}
@@ -614,7 +661,11 @@ export default function LMSPage() {
                   <span>← Kembali ke Modul</span>
                 </button>
 
-                {readProgress < 100 ? (
+                {completedModules[selectedModule?.slug ?? ''] ? (
+                  <div className="px-8 py-4 rounded-xl font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30">
+                    ✅ Modul Selesai
+                  </div>
+                ) : readProgress < 100 ? (
                   <button
                     onClick={handleSimulateScroll}
                     className="px-6 py-4 rounded-xl font-bold text-cyan-400 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/20 transition-all flex items-center gap-2"
