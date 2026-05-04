@@ -24,18 +24,18 @@ class DatabaseSeeder extends Seeder
         );
 
         User::firstOrCreate(
-            ['email' => 'user2@email.com'],
+            ['email' => 'abyan@email.com'],
             [
-                'name'     => 'User 2',
+                'name'     => 'Abyan',
                 'password' => Hash::make('password'),
                 'role'     => 'user',
             ]
         );
 
         User::firstOrCreate(
-            ['email' => 'user3@email.com'],
+            ['email' => 'rafi@email.com'],
             [
-                'name'     => 'User 3',
+                'name'     => 'Rafi',
                 'password' => Hash::make('password'),
                 'role'     => 'user',
             ]
@@ -52,5 +52,7 @@ class DatabaseSeeder extends Seeder
         $this->call(UserProgressTableSeeder::class);
         $this->call(QuizResultsTableSeeder::class);
         $this->call(UserBadgesTableSeeder::class);
+        $this->call(QuizQuestionsTableSeeder::class);
+        $this->call(BadgesTableSeeder::class);
     }
 }
