@@ -29,7 +29,7 @@ class UserProgressController extends Controller
     {
         $request->validate([
             'moduleId'    => 'required|string',
-            'visitedPois' => 'required|array',
+            'visitedPois' => 'nullable|array',
             'completed'   => 'required|boolean'
         ]);
 
@@ -38,7 +38,7 @@ class UserProgressController extends Controller
         $progress = UserProgress::updateOrCreate(
             ['user_id' => auth()->id(), 'module_id' => $module->id],
             [
-                'visited_pois' => $request->visitedPois,
+                'visited_pois' => $request->visitedPois ?? [],
                 'completed'    => $request->completed
             ]
         );
