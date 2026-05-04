@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTheme } from '../lib/useTheme';
+import toast from 'react-hot-toast';
 
 const LoadingScreen = () => (
   <div className="fixed inset-0 z-[100] bg-[#00040a] flex flex-col items-center justify-center">
@@ -76,6 +77,7 @@ export default function HomePage() {
       setUserRole(role);
       setUserName(data.user?.name ?? '');
       setShowLoginModal(false);
+      toast.success('Login Berhasil!');
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -161,6 +163,7 @@ export default function HomePage() {
                   setIsLoggedIn(false);
                   setUserRole(null);
                   setUserName(null);
+                  toast.success('Logout Berhasil!');
                 }}
                 className={`text-xs font-semibold px-3 py-1.5 rounded-full border transition-all ${isDark ? 'bg-red-500/10 text-red-400 border-red-500/20 hover:bg-red-500/20' : 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100'}`}
               >
