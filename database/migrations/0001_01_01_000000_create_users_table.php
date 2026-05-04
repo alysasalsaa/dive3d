@@ -39,10 +39,7 @@ return new class extends Migration
             $table->integer('last_activity')->index();
         });
 
-        Schema::create('contents', function (Blueprint $table) {
-            $table->enum('status',['pending','approved','rejected'])
-            ->default('pending');
-        });
+
     }
 
     /**

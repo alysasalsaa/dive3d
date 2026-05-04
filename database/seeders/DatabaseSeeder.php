@@ -23,6 +23,24 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
+        User::firstOrCreate(
+            ['email' => 'user2@email.com'],
+            [
+                'name'     => 'User 2',
+                'password' => Hash::make('password'),
+                'role'     => 'user',
+            ]
+        );
+
+        User::firstOrCreate(
+            ['email' => 'user3@email.com'],
+            [
+                'name'     => 'User 3',
+                'password' => Hash::make('password'),
+                'role'     => 'user',
+            ]
+        );
+
         // --- Konten pembelajaran ---
         $this->call([
             ModuleSeeder::class,
