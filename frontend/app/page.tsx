@@ -223,16 +223,20 @@ export default function HomePage() {
             </p>
 
             <div className="flex flex-wrap gap-4 mb-8">
-              <Link
-                href="/panduan"
-                className="group btn-interactive-wave flex items-center gap-4 px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white text-base font-black rounded-full transition-all duration-300 shadow-[0_0_40px_-10px_rgba(0,168,255,0.5)] hover:shadow-[0_0_60px_-15px_rgba(0,168,255,0.7)] hover:-translate-y-1"
+              <a
+                href="#info-raja-ampat"
+                onClick={(e) => {
+                  e.preventDefault();
+                  document.getElementById('info-raja-ampat')?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="group btn-interactive-wave flex items-center gap-4 px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white text-base font-black rounded-full transition-all duration-300 shadow-[0_0_40px_-10px_rgba(0,168,255,0.5)] hover:shadow-[0_0_60px_-15px_rgba(0,168,255,0.7)] hover:-translate-y-1 cursor-pointer"
               >
                 <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white group-hover:bg-white group-hover:text-blue-600 transition-all duration-300">
                   <span className="text-[14px] transform -rotate-45 group-hover:rotate-0 transition-transform duration-300">➤</span>
                 </div>
                 MULAI JELAJAH
                 <span className="text-xl leading-none ml-2 group-hover:translate-x-2 transition-transform duration-300">→</span>
-              </Link>
+              </a>
             </div>
 
             <div className={`inline-flex items-center gap-3 px-5 py-2.5 rounded-full text-sm font-semibold mb-12 transition-colors ${isDark ? 'bg-blue-900/40 text-blue-300' : 'bg-[#dff1ff] text-[#0066cc]'}`}>
@@ -273,6 +277,82 @@ export default function HomePage() {
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* INFORMASI RAJA AMPAT SECTION */}
+      <section id="info-raja-ampat" className="relative py-24 min-h-screen flex items-center">
+        {/* Background */}
+        <div 
+          className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat bg-fixed"
+          style={{ backgroundImage: 'url(/images/hero-bg.jpg)' }}
+        >
+          <div className={`absolute inset-0 transition-colors duration-1000 ${isDark ? 'bg-[#00040a]/90' : 'bg-sky-900/80 backdrop-blur-sm'}`}></div>
+        </div>
+
+        <div className="relative z-10 max-w-7xl mx-auto px-6 w-full">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-black mb-4 text-white">Informasi Tentang Raja Ampat</h2>
+            <div className="w-24 h-1 bg-cyan-400 mx-auto rounded-full"></div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Card 1 */}
+            <div className={`p-8 rounded-2xl border backdrop-blur-md transition-transform hover:-translate-y-2 duration-300 ${isDark ? 'bg-black/50 border-white/10' : 'bg-white/10 border-white/20 shadow-xl'}`}>
+              <div className="w-14 h-14 rounded-full bg-blue-500/20 flex items-center justify-center text-3xl mb-6 shadow-[0_0_15px_rgba(59,130,246,0.5)]">🐠</div>
+              <h3 className="text-2xl font-bold text-white mb-2">Mengapa Raja Ampat Istimewa?</h3>
+              <p className="text-cyan-300 text-sm font-semibold mb-4 uppercase tracking-wider">Coral Triangle · Biodiversitas</p>
+              <p className="text-gray-200 text-sm leading-relaxed mb-4">
+                Raja Ampat adalah epicentrum biodiversitas laut dunia — bagian dari Coral Triangle yang mencakup 6 juta km² perairan tropis. Di sini terdapat:
+              </p>
+              <ul className="text-gray-200 text-sm leading-relaxed list-disc list-inside space-y-2 mb-4">
+                <li>Lebih dari 550–600 spesies karang (~75% spesies karang dunia)</li>
+                <li>Lebih dari 1.600 spesies ikan termasuk hiu, manta, dan penyu</li>
+                <li>Ekosistem tiga lapis: terumbu karang, padang lamun, dan mangrove</li>
+              </ul>
+              <p className="text-gray-300 text-sm italic border-l-2 border-cyan-400 pl-3">
+                Kawasan ini berfungsi sebagai reservoir genetik — menyebarkan larva ikan ke seluruh Indo-Pasifik bila ekosistem lain terganggu.
+              </p>
+            </div>
+
+            {/* Card 2 */}
+            <div className={`p-8 rounded-2xl border backdrop-blur-md transition-transform hover:-translate-y-2 duration-300 ${isDark ? 'bg-black/50 border-white/10' : 'bg-white/10 border-white/20 shadow-xl'}`}>
+              <div className="w-14 h-14 rounded-full bg-red-500/20 flex items-center justify-center text-3xl mb-6 shadow-[0_0_15px_rgba(239,68,68,0.5)]">⚠️</div>
+              <h3 className="text-2xl font-bold text-white mb-2">Ancaman Nyata Ekosistem</h3>
+              <p className="text-red-300 text-sm font-semibold mb-4 uppercase tracking-wider">Dampak Manusia · Perubahan Iklim</p>
+              <p className="text-gray-200 text-sm leading-relaxed mb-4">
+                Ekosistem Raja Ampat menghadapi tekanan dari dua arah:
+              </p>
+              <ul className="text-gray-200 text-sm leading-relaxed list-disc list-inside space-y-2 mb-4">
+                <li><strong className="text-white">Overfishing</strong> — berkurangnya ikan herbivora menyebabkan alga tumbuh tak terkendali dan menutupi karang</li>
+                <li><strong className="text-white">Coral Bleaching</strong> — kenaikan suhu laut memicu karang kehilangan alga simbion (zooxanthellae) dan perlahan mati</li>
+                <li><strong className="text-white">Polusi plastik</strong> — mikroplastik masuk ke rantai makanan laut hingga ke tubuh manusia</li>
+                <li><strong className="text-white">Sedimentasi</strong> — menutup polip karang dan menghambat penetrasi cahaya untuk fotosintesis</li>
+              </ul>
+              <p className="text-gray-300 text-sm italic border-l-2 border-red-400 pl-3">
+                Setiap penyelam yang menyentuh karang, sekecil apapun, berkontribusi pada kerusakan yang tidak bisa pulih dalam hitungan tahun.
+              </p>
+            </div>
+
+            {/* Card 3 */}
+            <div className={`p-8 rounded-2xl border backdrop-blur-md transition-transform hover:-translate-y-2 duration-300 ${isDark ? 'bg-black/50 border-white/10' : 'bg-white/10 border-white/20 shadow-xl'}`}>
+              <div className="w-14 h-14 rounded-full bg-green-500/20 flex items-center justify-center text-3xl mb-6 shadow-[0_0_15px_rgba(34,197,94,0.5)]">🛡️</div>
+              <h3 className="text-2xl font-bold text-white mb-2">Strategi Pelestarian</h3>
+              <p className="text-green-300 text-sm font-semibold mb-4 uppercase tracking-wider">MPA · Sasi Laut · Ekowisata</p>
+              <p className="text-gray-200 text-sm leading-relaxed mb-4">
+                Berbagai pendekatan digunakan untuk menjaga laut Raja Ampat tetap sehat:
+              </p>
+              <ul className="text-gray-200 text-sm leading-relaxed list-disc list-inside space-y-2 mb-4">
+                <li><strong className="text-white">Kawasan Konservasi Perairan (MPA)</strong> — zonasi ketat: zona inti bebas aktivitas manusia, zona wisata diawasi</li>
+                <li><strong className="text-white">Sasi Laut</strong> — kearifan lokal yang membatasi pengambilan hasil laut secara musiman, terbukti efektif</li>
+                <li><strong className="text-white">Transplantasi Karang</strong> — rehabilitasi terumbu rusak menggunakan reef star dan spider frame</li>
+                <li><strong className="text-white">Retribusi Konservasi</strong> — setiap wisatawan membayar tag konservasi untuk mendanai patroli dan monitoring</li>
+              </ul>
+              <p className="text-gray-300 text-sm italic border-l-2 border-green-400 pl-3">
+                Sebagai penyelam, kamu adalah bagian dari solusi — jangan sentuh karang, gunakan mooring buoy, dan bawa kembali sampahmu.
+              </p>
             </div>
           </div>
         </div>
