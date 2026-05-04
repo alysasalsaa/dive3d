@@ -204,6 +204,8 @@ export default function HomePage() {
           <img src="/images/hero-bg.jpg" alt="Raja Ampat" className="w-full h-full object-cover object-center" />
           {/* Gradient Overlay */}
           <div className={`absolute inset-0 transition-colors duration-1000 ${isDark ? 'bg-gradient-to-r from-[#00040a] via-[#00040a]/80 to-transparent' : 'bg-gradient-to-r from-[#eef8ff] via-[#eef8ff]/90 to-transparent'}`}></div>
+          {/* Bottom Fade Overlay for smooth transition */}
+          <div className={`absolute bottom-0 left-0 right-0 h-40 transition-colors duration-1000 ${isDark ? 'bg-gradient-to-t from-[#00040a] to-transparent' : 'bg-gradient-to-t from-[#eef8ff] to-transparent'}`}></div>
         </div>
 
         {/* Konten */}
@@ -235,7 +237,6 @@ export default function HomePage() {
                   <span className="text-[14px] transform -rotate-45 group-hover:rotate-0 transition-transform duration-300">➤</span>
                 </div>
                 MULAI JELAJAH
-                <span className="text-xl leading-none ml-2 group-hover:translate-x-2 transition-transform duration-300">→</span>
               </a>
             </div>
 
@@ -289,7 +290,9 @@ export default function HomePage() {
           className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat bg-fixed"
           style={{ backgroundImage: 'url(/images/hero-bg.jpg)' }}
         >
-          <div className={`absolute inset-0 transition-colors duration-1000 ${isDark ? 'bg-[#00040a]/90' : 'bg-sky-900/80 backdrop-blur-sm'}`}></div>
+          <div className={`absolute inset-0 transition-colors duration-1000 ${isDark ? 'bg-[#00040a]/90' : 'bg-sky-900/90 backdrop-blur-sm'}`}></div>
+          {/* Top Fade Overlay for smooth transition from hero */}
+          <div className={`absolute top-0 left-0 right-0 h-40 transition-colors duration-1000 ${isDark ? 'bg-gradient-to-b from-[#00040a] to-transparent' : 'bg-gradient-to-b from-[#eef8ff] to-transparent'}`}></div>
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-6 w-full">
