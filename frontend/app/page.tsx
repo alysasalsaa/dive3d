@@ -225,23 +225,14 @@ export default function HomePage() {
             <div className="flex flex-wrap gap-4 mb-10">
               <Link
                 href="/panduan"
-                className="flex items-center gap-3 px-6 py-3.5 bg-[#0044aa] hover:bg-[#003388] text-white text-sm font-bold rounded-full transition-all shadow-lg"
+                className="group flex items-center gap-4 px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white text-base font-black rounded-full transition-all duration-300 shadow-[0_0_40px_-10px_rgba(0,168,255,0.5)] hover:shadow-[0_0_60px_-15px_rgba(0,168,255,0.7)] hover:-translate-y-1"
               >
-                <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center text-[#0044aa]">
-                  <span className="text-[12px] transform -rotate-45">➤</span>
+                <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white group-hover:bg-white group-hover:text-blue-600 transition-all duration-300">
+                  <span className="text-[14px] transform -rotate-45 group-hover:rotate-0 transition-transform duration-300">➤</span>
                 </div>
-                Mulai Jelajah
-                <span className="text-lg leading-none ml-1">→</span>
+                MULAI JELAJAH
+                <span className="text-xl leading-none ml-2 group-hover:translate-x-2 transition-transform duration-300">→</span>
               </Link>
-              <button
-                onClick={() => setShowTrailer(true)}
-                className={`flex items-center gap-3 px-6 py-3.5 border-2 text-sm font-bold rounded-full transition-all bg-white hover:bg-gray-50 ${isDark ? 'border-white text-[#0044aa]' : 'border-transparent text-[#0044aa] shadow-md'}`}
-              >
-                <div className="w-6 h-6 bg-[#0044aa] rounded-full flex items-center justify-center text-white">
-                  <span className="text-[10px] ml-0.5">▶</span>
-                </div>
-                Tonton Trailer
-              </button>
             </div>
 
             <div className={`inline-flex items-center gap-3 px-5 py-2.5 rounded-full text-sm font-semibold transition-colors ${isDark ? 'bg-blue-900/40 text-blue-300' : 'bg-[#dff1ff] text-[#0066cc]'}`}>
