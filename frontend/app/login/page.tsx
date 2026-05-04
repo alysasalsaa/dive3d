@@ -2,8 +2,11 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import toast from 'react-hot-toast';
+import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -33,11 +36,11 @@ export default function LoginPage() {
       localStorage.setItem('user_name', data.user.name);
       localStorage.setItem('user_email', data.user.email);
 
-      alert("Login Berhasil!");
+      toast.success("Login Berhasil!");
       // Admin langsung ke LMS, user biasa ke dashboard
-      window.location.href = data.role === 'admin' ? '/lms' : '/dashboard';
+      router.push(data.role === 'admin' ? '/lms' : '/dashboard');
     } catch (error: any) {
-      alert(error.message);
+      toast.error(error.message);
     } finally {
       setIsLoading(false);
     }
