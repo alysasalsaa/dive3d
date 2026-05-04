@@ -36,12 +36,13 @@ export default function RegisterPage() {
         throw new Error(data.message || 'Terjadi kesalahan saat mendaftar');
       }
 
-      // Simpan token (bisa di localStorage atau cookies)
       localStorage.setItem('auth_token', data.token);
+      localStorage.setItem('user_role', data.role ?? 'user');
+      localStorage.setItem('user_name', data.user.name);
+      localStorage.setItem('user_email', data.user.email);
 
       alert("Pendaftaran Berhasil!");
-      // Redirect ke dashboard atau halaman lain bisa dilakukan di sini misal dengan useRouter
-      window.location.href = '/dashboard';
+      window.location.href = data.role === 'admin' ? '/lms' : '/dashboard';
     } catch (error: any) {
       alert(error.message);
     } finally {
