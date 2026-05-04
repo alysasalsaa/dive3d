@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTheme } from '../../lib/useTheme';
+import toast from 'react-hot-toast';
 
 const CATEGORIES = [
     { value: 'all', label: 'Semua' },
@@ -231,7 +232,7 @@ export default function CommunityGallery() {
                                 className={`px-6 py-3 font-bold rounded-xl transition-colors ${isDark ? 'text-gray-300 hover:bg-white/10' : 'text-gray-600 hover:bg-gray-200'}`}
                             >Batal</button>
                             <button
-                                onClick={() => { alert('Fitur unggah akan segera tersedia!'); setIsModalOpen(false); }}
+                                onClick={() => { toast('Fitur unggah akan segera tersedia!', { icon: '🚧' }); setIsModalOpen(false); }}
                                 className="px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-500 hover:opacity-90 text-white font-bold rounded-xl shadow-lg shadow-blue-500/20 transition-all"
                             >Kirim Karya</button>
                         </div>
