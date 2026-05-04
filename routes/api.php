@@ -26,6 +26,9 @@ Route::post('/upload', [ContentController::class, 'upload']);
 // Endpoint untuk Modul Pembelajaran
 Route::get('/modules', [ModuleController::class, 'index']);
 
+// Endpoint publik quiz questions (read-only)
+Route::get('/quiz/questions/{moduleSlug}', [QuizQuestionController::class, 'index']);
+
 // Endpoint untuk Menyimpan dan Mengambil Data Progres
 Route::middleware('auth:sanctum')->group(function () {
 
@@ -49,7 +52,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Rute Quiz
     Route::post('/quiz/submit', [QuizController::class, 'submit']);
-    Route::get('/quiz/questions/{moduleSlug}', [QuizQuestionController::class, 'index']);
     Route::post('/quiz/questions', [QuizQuestionController::class, 'store']);
     Route::delete('/quiz/questions/{id}', [QuizQuestionController::class, 'destroy']);
 
