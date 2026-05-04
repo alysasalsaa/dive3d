@@ -207,10 +207,13 @@ export default function DashboardPage() {
                         </div>
 
                         {/* Badges */}
-                        <div className={`backdrop-blur-xl rounded-2xl p-6 border ${isDark ? "bg-white/[0.04] border-white/10" : "bg-white border-gray-100 shadow-sm"} hover:border-blue-500/30 transition-colors`}>
-                            <h3 className={`font-bold mb-4 flex items-center gap-2 text-sm ${isDark ? "text-white" : "text-gray-800"}`}>
-                                <span>🏅</span> Koleksi Lencana
-                            </h3>
+                        <Link href="/dashboard/badges" className={`block backdrop-blur-xl rounded-2xl p-6 border ${isDark ? "bg-white/[0.04] border-white/10" : "bg-white border-gray-100 shadow-sm"} hover:border-blue-500/30 hover:-translate-y-1 transition-all cursor-pointer group`}>
+                            <div className="flex justify-between items-center mb-4">
+                                <h3 className={`font-bold flex items-center gap-2 text-sm ${isDark ? "text-white" : "text-gray-800"}`}>
+                                    <span>🏅</span> Koleksi Lencana
+                                </h3>
+                                <span className={`text-xs opacity-0 group-hover:opacity-100 transition-opacity font-bold ${isDark ? "text-cyan-400" : "text-blue-600"}`}>Detail Lencana ➔</span>
+                            </div>
                             <div className="flex gap-3 flex-wrap justify-center">
                                 {dashboardData.badges.map((badge: any) => (
                                     <div
@@ -226,7 +229,7 @@ export default function DashboardPage() {
                                     </div>
                                 ))}
                             </div>
-                        </div>
+                        </Link>
                     </div>
 
                     {/* Row 2: Progress + Quiz */}
