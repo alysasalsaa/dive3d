@@ -219,6 +219,46 @@ class UserProgressTableSeeder extends Seeder
                 'created_at' => '2026-05-04 06:31:45',
                 'updated_at' => '2026-05-04 06:32:55',
             ),
+            20 => 
+            array (
+                'id' => 49,
+                'user_id' => 15,
+                'module_id' => 4,
+                'visited_pois' => '[]',
+                'completed' => false,
+                'created_at' => '2026-05-04 07:22:06',
+                'updated_at' => '2026-05-04 07:22:06',
+            ),
+            21 => 
+            array (
+                'id' => 50,
+                'user_id' => 15,
+                'module_id' => 1,
+                'visited_pois' => '[]',
+                'completed' => false,
+                'created_at' => '2026-05-04 07:22:26',
+                'updated_at' => '2026-05-04 07:22:26',
+            ),
+            22 => 
+            array (
+                'id' => 51,
+                'user_id' => 15,
+                'module_id' => 2,
+                'visited_pois' => '[]',
+                'completed' => false,
+                'created_at' => '2026-05-04 07:22:40',
+                'updated_at' => '2026-05-04 07:22:40',
+            ),
+            23 => 
+            array (
+                'id' => 52,
+                'user_id' => 15,
+                'module_id' => 3,
+                'visited_pois' => '[]',
+                'completed' => false,
+                'created_at' => '2026-05-04 07:22:51',
+                'updated_at' => '2026-05-04 07:22:51',
+            ),
         ));
         
         
