@@ -37,6 +37,7 @@ export default function HomePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userRole, setUserRole] = useState<string | null>(null);
+  const [userName, setUserName] = useState<string | null>(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [isLoginProcessing, setIsLoginProcessing] = useState(false);
   const [email, setEmail] = useState('');
@@ -64,19 +65,16 @@ export default function HomePage() {
         throw new Error(data.message || 'Email atau password salah!');
       }
 
-      // Simpan token
+      const role = data.role ?? data.user?.role ?? 'user';
+
       localStorage.setItem('auth_token', data.token);
-
-      // Coba ambil role dari response, jika tidak ada, gunakan 'user'
-      // Untuk testing, jika email admin, paksa jadi admin
-      let role = data.user?.role || 'user';
-      if (email === 'admin@lms.com') {
-        role = 'admin';
-      }
-
       localStorage.setItem('user_role', role);
+      localStorage.setItem('user_name', data.user?.name ?? '');
+      localStorage.setItem('user_email', data.user?.email ?? '');
+
       setIsLoggedIn(true);
       setUserRole(role);
+      setUserName(data.user?.name ?? '');
       setShowLoginModal(false);
     } catch (err: any) {
       setError(err.message);
@@ -98,6 +96,7 @@ export default function HomePage() {
     const timer = setTimeout(() => setIsLoading(false), 3000);
     setIsLoggedIn(!!localStorage.getItem('auth_token'));
     setUserRole(localStorage.getItem('user_role'));
+    setUserName(localStorage.getItem('user_name'));
     return () => clearTimeout(timer);
   }, []);
 
@@ -151,14 +150,17 @@ export default function HomePage() {
           {isLoggedIn ? (
             <div className="flex items-center gap-4 px-2">
               <span className={`text-sm font-bold ${isDark ? 'text-white' : 'text-blue-900'}`}>
-                Halo, {userRole === 'admin' ? 'Admin' : 'User'}!
+                Halo, {userName || 'Pengguna'}!
               </span>
               <button 
                 onClick={() => {
                   localStorage.removeItem('auth_token');
                   localStorage.removeItem('user_role');
+                  localStorage.removeItem('user_name');
+                  localStorage.removeItem('user_email');
                   setIsLoggedIn(false);
                   setUserRole(null);
+                  setUserName(null);
                 }}
                 className={`text-xs font-semibold px-3 py-1.5 rounded-full border transition-all ${isDark ? 'bg-red-500/10 text-red-400 border-red-500/20 hover:bg-red-500/20' : 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100'}`}
               >
