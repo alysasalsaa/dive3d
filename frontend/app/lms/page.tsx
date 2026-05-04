@@ -47,13 +47,6 @@ export default function LMSPage() {
     }
   }, []);
 
-  useEffect(() => {
-    if (view === 'user_modules') {
-      loadAllModuleProgress();
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [view]);
-
   // ==========================================
   // DATABASE SIMULATION (Bisa diakses Admin & User)
   // ==========================================
@@ -104,7 +97,7 @@ export default function LMSPage() {
   const [quizOptionB, setQuizOptionB] = useState('');
   const [quizOptionC, setQuizOptionC] = useState('');
   const [quizOptionD, setQuizOptionD] = useState('');
-  const [quizCorrectAnswer, setQuizCorrectAnswer] = useState<'A'|'B'|'C'|'D'>('A');
+  const [quizCorrectAnswer, setQuizCorrectAnswer] = useState<'A' | 'B' | 'C' | 'D'>('A');
   const [existingQuestions, setExistingQuestions] = useState<QuizQuestion[]>([]);
   const [quizAdminLoading, setQuizAdminLoading] = useState(false);
 
@@ -120,7 +113,6 @@ export default function LMSPage() {
   const [hasBadge, setHasBadge] = useState(false);
   const [hasCertificate, setHasCertificate] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [completedModules, setCompletedModules] = useState<Record<string, boolean>>({});
 
   // Reset semua state sementara saat logout
   const handleLogout = () => {
@@ -146,12 +138,12 @@ export default function LMSPage() {
         };
         setModules([...modules, newMod]);
       }
-      
+
       // Reset form
       setNewTitle('');
       setNewDesc('');
       setNewIcon('📦');
-      
+
       setIsAdminProcessing(false);
       // Sesuai flowchart: kembali ke "Ingin mengelola data?" (Dashboard)
       setView('admin_dashboard');
@@ -216,30 +208,12 @@ export default function LMSPage() {
         headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' },
       });
       await loadQuizQuestions(quizModuleSlug);
-    } catch {}
+    } catch { }
   };
 
   // --- LOGIKA USER ---
   const handleSimulateScroll = () => {
     if (readProgress < 100) setReadProgress((prev) => Math.min(prev + 25, 100));
-  };
-
-  const loadAllModuleProgress = async () => {
-    const token = localStorage.getItem('auth_token');
-    if (!token) return;
-    const results: Record<string, boolean> = {};
-    for (const mod of modules) {
-      try {
-        const res = await fetch(`http://localhost:8000/api/progress/${mod.slug}`, {
-          headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' },
-        });
-        const data = await res.json();
-        results[mod.slug] = data.completed === true;
-      } catch {
-        results[mod.slug] = false;
-      }
-    }
-    setCompletedModules(results);
   };
 
   const loadUserQuiz = async (slug: string) => {
@@ -302,7 +276,6 @@ export default function LMSPage() {
               completed: true,
             }),
           });
-          setCompletedModules(prev => ({ ...prev, [selectedModule.slug]: true }));
         }
       } catch {
         // Gagal simpan tidak crash tampilan
@@ -353,7 +326,7 @@ export default function LMSPage() {
         {/* ========================================= */}
         {view === 'admin_dashboard' && (
           <div className="w-full max-w-4xl p-8 rounded-[32px] bg-[#000814] border border-white/10 shadow-2xl relative z-10 animate-in fade-in zoom-in-95 duration-500">
-             <div className="flex items-center gap-4 mb-8">
+            <div className="flex items-center gap-4 mb-8">
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-600 to-blue-500 flex items-center justify-center text-3xl shadow-lg shadow-purple-500/20">
                 👨‍💼
               </div>
@@ -381,18 +354,18 @@ export default function LMSPage() {
             </div>
 
             <div className="grid grid-cols-3 gap-4 border-t border-white/10 pt-8">
-               <div className="p-4 rounded-xl bg-white/5 border border-white/5">
-                 <div className="text-sm text-gray-500 mb-1">Total Modul</div>
-                 <div className="text-2xl font-black text-white">{modules.length}</div>
-               </div>
-               <div className="p-4 rounded-xl bg-white/5 border border-white/5">
-                 <div className="text-sm text-gray-500 mb-1">Total Pengguna</div>
-                 <div className="text-2xl font-black text-white">124</div>
-               </div>
-               <div className="p-4 rounded-xl bg-white/5 border border-white/5">
-                 <div className="text-sm text-gray-500 mb-1">Sistem Status</div>
-                 <div className="text-2xl font-black text-emerald-400">Online</div>
-               </div>
+              <div className="p-4 rounded-xl bg-white/5 border border-white/5">
+                <div className="text-sm text-gray-500 mb-1">Total Modul</div>
+                <div className="text-2xl font-black text-white">{modules.length}</div>
+              </div>
+              <div className="p-4 rounded-xl bg-white/5 border border-white/5">
+                <div className="text-sm text-gray-500 mb-1">Total Pengguna</div>
+                <div className="text-2xl font-black text-white">124</div>
+              </div>
+              <div className="p-4 rounded-xl bg-white/5 border border-white/5">
+                <div className="text-sm text-gray-500 mb-1">Sistem Status</div>
+                <div className="text-2xl font-black text-emerald-400">Online</div>
+              </div>
             </div>
           </div>
         )}
@@ -402,38 +375,38 @@ export default function LMSPage() {
         {/* ========================================= */}
         {view === 'admin_manage' && (
           <div className="w-full max-w-4xl p-8 rounded-[32px] bg-[#000814] border border-white/10 shadow-2xl relative z-10 animate-in slide-in-from-right-8 duration-500">
-             <div className="flex items-center justify-between mb-8">
-               <div>
-                 <h1 className="text-3xl font-black text-white mb-2">Pilih Menu Kelola Data</h1>
-                 <p className="text-gray-400">Pilih entitas data yang ingin Anda kelola.</p>
-               </div>
-               <button onClick={() => setView('admin_dashboard')} className="px-6 py-3 rounded-xl font-bold text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 transition-all border border-transparent hover:border-white/10">
-                 ← Kembali
-               </button>
-             </div>
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h1 className="text-3xl font-black text-white mb-2">Pilih Menu Kelola Data</h1>
+                <p className="text-gray-400">Pilih entitas data yang ingin Anda kelola.</p>
+              </div>
+              <button onClick={() => setView('admin_dashboard')} className="px-6 py-3 rounded-xl font-bold text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 transition-all border border-transparent hover:border-white/10">
+                ← Kembali
+              </button>
+            </div>
 
-             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {[
-                  { title: 'Modul', icon: '📚', color: 'from-blue-500 to-cyan-400', desc: 'Tambah atau ubah modul pembelajaran.' },
-                  { title: 'Materi', icon: '📄', color: 'from-emerald-500 to-teal-400', desc: 'Kelola isi konten teks dan media pada modul.' },
-                  { title: 'Quiz', icon: '📝', color: 'from-purple-500 to-pink-500', desc: 'Atur pertanyaan dan jawaban evaluasi.' },
-                  { title: 'User', icon: '👥', color: 'from-orange-500 to-amber-400', desc: 'Manajemen hak akses dan profil mahasiswa.' }
-                ].map((item) => (
-                  <div 
-                    key={item.title}
-                    onClick={() => openManageForm(item.title as 'Modul'|'Materi'|'Quiz'|'User')}
-                    className="group p-6 rounded-2xl bg-white/5 border border-white/10 hover:border-cyan-400/50 hover:bg-white/10 transition-all cursor-pointer flex items-start gap-6"
-                  >
-                    <div className={`w-14 h-14 rounded-xl flex items-center justify-center text-3xl bg-gradient-to-br ${item.color} shrink-0`}>
-                      {item.icon}
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-bold text-white mb-2 group-hover:text-cyan-400 transition-colors">Kelola {item.title}</h3>
-                      <p className="text-sm text-gray-500 leading-relaxed">{item.desc}</p>
-                    </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {[
+                { title: 'Modul', icon: '📚', color: 'from-blue-500 to-cyan-400', desc: 'Tambah atau ubah modul pembelajaran.' },
+                { title: 'Materi', icon: '📄', color: 'from-emerald-500 to-teal-400', desc: 'Kelola isi konten teks dan media pada modul.' },
+                { title: 'Quiz', icon: '📝', color: 'from-purple-500 to-pink-500', desc: 'Atur pertanyaan dan jawaban evaluasi.' },
+                { title: 'User', icon: '👥', color: 'from-orange-500 to-amber-400', desc: 'Manajemen hak akses dan profil mahasiswa.' }
+              ].map((item) => (
+                <div
+                  key={item.title}
+                  onClick={() => openManageForm(item.title as 'Modul' | 'Materi' | 'Quiz' | 'User')}
+                  className="group p-6 rounded-2xl bg-white/5 border border-white/10 hover:border-cyan-400/50 hover:bg-white/10 transition-all cursor-pointer flex items-start gap-6"
+                >
+                  <div className={`w-14 h-14 rounded-xl flex items-center justify-center text-3xl bg-gradient-to-br ${item.color} shrink-0`}>
+                    {item.icon}
                   </div>
-                ))}
-             </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-white mb-2 group-hover:text-cyan-400 transition-colors">Kelola {item.title}</h3>
+                    <p className="text-sm text-gray-500 leading-relaxed">{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
@@ -443,11 +416,11 @@ export default function LMSPage() {
         {view === 'admin_edit_data' && (
           <div className="w-full max-w-2xl p-8 rounded-[32px] bg-[#000814] border border-cyan-500/30 shadow-[0_0_50px_-12px_rgba(6,182,212,0.15)] relative z-10 animate-in slide-in-from-bottom-8 duration-500">
             {isAdminProcessing ? (
-               <div className="py-24 flex flex-col items-center justify-center text-center">
-                 <div className="w-16 h-16 border-4 border-cyan-500/30 border-t-cyan-400 rounded-full animate-spin mb-6" />
-                 <h2 className="text-2xl font-bold text-cyan-400 animate-pulse">Sistem update database...</h2>
-                 <p className="text-gray-500 mt-2">Menyimpan perubahan {manageCategory} ke server. Mohon tunggu.</p>
-               </div>
+              <div className="py-24 flex flex-col items-center justify-center text-center">
+                <div className="w-16 h-16 border-4 border-cyan-500/30 border-t-cyan-400 rounded-full animate-spin mb-6" />
+                <h2 className="text-2xl font-bold text-cyan-400 animate-pulse">Sistem update database...</h2>
+                <p className="text-gray-500 mt-2">Menyimpan perubahan {manageCategory} ke server. Mohon tunggu.</p>
+              </div>
             ) : (
               <>
                 <div className="mb-8 border-b border-white/10 pb-6">
@@ -478,7 +451,7 @@ export default function LMSPage() {
                       placeholder="Tuliskan detail selengkapnya di sini..."
                     />
                   </div>
-                  
+
                   {manageCategory === 'Modul' && (
                     <div>
                       <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Pilih Ikon (Khusus Modul)</label>
@@ -502,8 +475,8 @@ export default function LMSPage() {
                   <button onClick={() => setView('admin_manage')} className="px-6 py-4 rounded-xl font-bold text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 transition-all border border-transparent hover:border-white/10">
                     Batal
                   </button>
-                  <button 
-                    onClick={handleSaveAdminData} 
+                  <button
+                    onClick={handleSaveAdminData}
                     disabled={!newTitle || !newDesc}
                     className="px-8 py-4 rounded-xl font-bold text-white bg-gradient-to-r from-blue-600 to-cyan-500 hover:scale-[1.02] transition-all shadow-xl shadow-blue-500/25 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                   >
@@ -520,7 +493,7 @@ export default function LMSPage() {
         {/* ========================================= */}
         {view === 'user_dashboard' && (
           <div className="w-full max-w-4xl p-8 rounded-[32px] bg-[#000814] border border-white/10 shadow-2xl relative z-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
-             <div className="flex items-center gap-4 mb-8">
+            <div className="flex items-center gap-4 mb-8">
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center text-3xl shadow-lg shadow-emerald-500/20">
                 👨‍🎓
               </div>
@@ -558,47 +531,33 @@ export default function LMSPage() {
                 <h1 className="text-3xl font-black text-white">Pilih Modul</h1>
                 <p className="text-gray-400">Pilih modul yang ingin Anda pelajari hari ini.</p>
               </div>
-               <button onClick={() => setView('user_dashboard')} className="px-6 py-3 rounded-xl font-bold text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 transition-all border border-transparent hover:border-white/10">
-                 ← Kembali
-               </button>
+              <button onClick={() => setView('user_dashboard')} className="px-6 py-3 rounded-xl font-bold text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 transition-all border border-transparent hover:border-white/10">
+                ← Kembali
+              </button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-              {modules.map((mod) => {
-                const isCompleted = completedModules[mod.slug] === true;
-                return (
-                  <div key={mod.id} className={`p-6 rounded-2xl border transition-all group flex flex-col ${isCompleted ? 'bg-emerald-500/5 border-emerald-500/30' : 'bg-white/5 border-white/10 hover:border-cyan-500/50'}`}>
-                    <div className={`h-40 rounded-xl mb-6 flex items-center justify-center transition-transform border border-white/5 relative ${isCompleted ? 'bg-gradient-to-br from-emerald-900/30 to-black' : 'bg-gradient-to-br from-blue-900/30 to-black group-hover:scale-[1.02]'}`}>
-                      <span className="text-6xl drop-shadow-2xl">{mod.icon}</span>
-                      {isCompleted && (
-                        <div className="absolute top-3 right-3 px-2 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 text-xs font-bold">
-                          ✅ Selesai
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex-grow">
-                      <h3 className="text-xl font-bold text-white mb-2">{mod.title}</h3>
-                      <p className="text-sm text-gray-400 mb-6">{mod.desc}</p>
-                    </div>
-                    {isCompleted ? (
-                      <div className="w-full py-3 rounded-xl font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 text-center cursor-default">
-                        ✅ Sudah Diselesaikan
-                      </div>
-                    ) : (
-                      <button
-                        onClick={() => {
-                          setSelectedModule(mod);
-                          setReadProgress(0);
-                          setView('user_read_module');
-                        }}
-                        className="w-full py-3 rounded-xl font-bold text-cyan-400 bg-cyan-500/10 hover:bg-cyan-500 hover:text-white transition-all border border-cyan-500/30 hover:border-cyan-400"
-                      >
-                        Pilih Modul Ini
-                      </button>
-                    )}
+              {modules.map((mod) => (
+                <div key={mod.id} className="p-6 rounded-2xl bg-white/5 border border-white/10 hover:border-cyan-500/50 transition-all group flex flex-col">
+                  <div className="h-40 rounded-xl bg-gradient-to-br from-blue-900/30 to-black mb-6 flex items-center justify-center group-hover:scale-[1.02] transition-transform border border-white/5">
+                    <span className="text-6xl drop-shadow-2xl">{mod.icon}</span>
                   </div>
-                );
-              })}
+                  <div className="flex-grow">
+                    <h3 className="text-xl font-bold text-white mb-2">{mod.title}</h3>
+                    <p className="text-sm text-gray-400 mb-6">{mod.desc}</p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setSelectedModule(mod);
+                      setReadProgress(0);
+                      setView('user_read_module');
+                    }}
+                    className="w-full py-3 rounded-xl font-bold text-cyan-400 bg-cyan-500/10 hover:bg-cyan-500 hover:text-white transition-all border border-cyan-500/30 hover:border-cyan-400"
+                  >
+                    Pilih Modul Ini
+                  </button>
+                </div>
+              ))}
             </div>
           </div>
         )}
@@ -612,12 +571,6 @@ export default function LMSPage() {
               <span className="text-4xl">{selectedModule?.icon}</span>
               Materi: {selectedModule?.title}
             </h1>
-
-            {completedModules[selectedModule?.slug ?? ''] && (
-              <div className="mb-6 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 font-medium text-center">
-                ✅ Kamu sudah menyelesaikan modul ini. Quiz tidak dapat diulang.
-              </div>
-            )}
 
             <div className="mb-6">
               <div className="flex justify-between text-xs text-cyan-400 font-bold mb-2 uppercase tracking-wider">
@@ -647,7 +600,7 @@ export default function LMSPage() {
             </div>
 
             <div className="flex flex-col gap-4 pt-6 border-t border-white/10">
-              {readProgress >= 100 && !completedModules[selectedModule?.slug ?? ''] && (
+              {readProgress >= 100 && (
                 <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-medium text-center">
                   ✅ Materi Selesai Dibaca!
                 </div>
@@ -661,11 +614,7 @@ export default function LMSPage() {
                   <span>← Kembali ke Modul</span>
                 </button>
 
-                {completedModules[selectedModule?.slug ?? ''] ? (
-                  <div className="px-8 py-4 rounded-xl font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30">
-                    ✅ Modul Selesai
-                  </div>
-                ) : readProgress < 100 ? (
+                {readProgress < 100 ? (
                   <button
                     onClick={handleSimulateScroll}
                     className="px-6 py-4 rounded-xl font-bold text-cyan-400 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/20 transition-all flex items-center gap-2"
@@ -744,7 +693,7 @@ export default function LMSPage() {
               <div>
                 <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Jawaban Benar</label>
                 <div className="flex gap-3">
-                  {(['A','B','C','D'] as const).map(opt => (
+                  {(['A', 'B', 'C', 'D'] as const).map(opt => (
                     <button key={opt} onClick={() => setQuizCorrectAnswer(opt)}
                       className={`w-12 h-12 rounded-xl font-black text-lg transition-all border ${quizCorrectAnswer === opt ? 'bg-emerald-500/20 border-emerald-400 text-emerald-300' : 'bg-black/50 border-white/10 text-gray-400 hover:border-white/30'}`}>
                       {opt}
@@ -765,26 +714,26 @@ export default function LMSPage() {
               {existingQuestions.length === 0
                 ? <p className="text-gray-500 text-sm text-center py-6">Belum ada soal untuk modul ini.</p>
                 : <div className="space-y-3">
-                    {existingQuestions.map((q, i) => (
-                      <div key={q.id} className="p-4 rounded-xl bg-white/5 border border-white/10 flex items-start justify-between gap-4">
-                        <div className="flex-1 min-w-0">
-                          <p className="text-white font-medium mb-2">{i+1}. {q.question}</p>
-                          <div className="grid grid-cols-2 gap-1 text-xs text-gray-400">
-                            {(['a','b','c','d'] as const).map(k => (
-                              <span key={k} className={q.correct_answer === k.toUpperCase() ? 'text-emerald-400 font-bold' : ''}>
-                                {k.toUpperCase()}. {q[`option_${k}` as keyof QuizQuestion]}
-                                {q.correct_answer === k.toUpperCase() && ' ✓'}
-                              </span>
-                            ))}
-                          </div>
+                  {existingQuestions.map((q, i) => (
+                    <div key={q.id} className="p-4 rounded-xl bg-white/5 border border-white/10 flex items-start justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-white font-medium mb-2">{i + 1}. {q.question}</p>
+                        <div className="grid grid-cols-2 gap-1 text-xs text-gray-400">
+                          {(['a', 'b', 'c', 'd'] as const).map(k => (
+                            <span key={k} className={q.correct_answer === k.toUpperCase() ? 'text-emerald-400 font-bold' : ''}>
+                              {k.toUpperCase()}. {q[`option_${k}` as keyof QuizQuestion]}
+                              {q.correct_answer === k.toUpperCase() && ' ✓'}
+                            </span>
+                          ))}
                         </div>
-                        <button onClick={() => handleDeleteQuestion(q.id)}
-                          className="shrink-0 px-3 py-2 rounded-lg text-red-400 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-xs font-bold transition-all">
-                          Hapus
-                        </button>
                       </div>
-                    ))}
-                  </div>
+                      <button onClick={() => handleDeleteQuestion(q.id)}
+                        className="shrink-0 px-3 py-2 rounded-lg text-red-400 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-xs font-bold transition-all">
+                        Hapus
+                      </button>
+                    </div>
+                  ))}
+                </div>
               }
             </div>
           </div>
@@ -813,9 +762,9 @@ export default function LMSPage() {
               <div className="space-y-8 mb-10">
                 {quizQuestions.map((q, i) => (
                   <div key={q.id} className="p-6 rounded-2xl bg-white/5 border border-white/10">
-                    <p className="text-lg font-medium text-white mb-4">{i+1}. {q.question}</p>
+                    <p className="text-lg font-medium text-white mb-4">{i + 1}. {q.question}</p>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      {(['A','B','C','D'] as const).map(key => {
+                      {(['A', 'B', 'C', 'D'] as const).map(key => {
                         const optKey = `option_${key.toLowerCase()}` as keyof QuizQuestion;
                         const optText = q[optKey] as string;
                         return (
@@ -848,23 +797,23 @@ export default function LMSPage() {
         )}
 
         {view === 'user_quiz_result' && (
-           <div className="w-full max-w-2xl p-8 rounded-[32px] bg-[#000814] border border-white/10 shadow-2xl relative z-10 animate-in zoom-in-95 duration-500 text-center">
-           {isProcessing ? (
-             <div className="py-20 flex flex-col items-center justify-center">
-               <div className="w-16 h-16 border-4 border-cyan-500/30 border-t-cyan-400 rounded-full animate-spin mb-6" />
-               <h2 className="text-xl font-bold text-cyan-400 animate-pulse">Menyimpan Nilai & Update Progress...</h2>
-             </div>
-           ) : (
-             <div className="animate-in fade-in slide-in-from-bottom-8 duration-700">
-               <div className="mb-8">
-                 <div className="inline-block p-6 rounded-full bg-gradient-to-b from-white/10 to-transparent border border-white/10 mb-6">
-                   <span className="text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">{score}</span>
-                 </div>
-                 <h1 className="text-3xl font-black text-white mb-2">Nilai Akhir Anda</h1>
-                 <p className="text-gray-400 text-lg">Evaluasi selesai.</p>
-               </div>
+          <div className="w-full max-w-2xl p-8 rounded-[32px] bg-[#000814] border border-white/10 shadow-2xl relative z-10 animate-in zoom-in-95 duration-500 text-center">
+            {isProcessing ? (
+              <div className="py-20 flex flex-col items-center justify-center">
+                <div className="w-16 h-16 border-4 border-cyan-500/30 border-t-cyan-400 rounded-full animate-spin mb-6" />
+                <h2 className="text-xl font-bold text-cyan-400 animate-pulse">Menyimpan Nilai & Update Progress...</h2>
+              </div>
+            ) : (
+              <div className="animate-in fade-in slide-in-from-bottom-8 duration-700">
+                <div className="mb-8">
+                  <div className="inline-block p-6 rounded-full bg-gradient-to-b from-white/10 to-transparent border border-white/10 mb-6">
+                    <span className="text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">{score}</span>
+                  </div>
+                  <h1 className="text-3xl font-black text-white mb-2">Nilai Akhir Anda</h1>
+                  <p className="text-gray-400 text-lg">Evaluasi selesai.</p>
+                </div>
 
-               <div className="grid grid-cols-2 gap-4 mb-10">
+                <div className="grid grid-cols-2 gap-4 mb-10">
                   <div className={`p-6 rounded-2xl border ${hasBadge ? 'bg-amber-500/10 border-amber-500/30' : 'bg-black/50 border-white/5 opacity-50'}`}>
                     <div className="text-4xl mb-3">{hasBadge ? '🏅' : '🔒'}</div>
                     <h3 className={`font-bold ${hasBadge ? 'text-amber-400' : 'text-gray-500'}`}>Badge</h3>
@@ -873,19 +822,14 @@ export default function LMSPage() {
                     <div className="text-4xl mb-3">{hasCertificate ? '📜' : '🔒'}</div>
                     <h3 className={`font-bold ${hasCertificate ? 'text-cyan-400' : 'text-gray-500'}`}>Sertifikat</h3>
                   </div>
-               </div>
+                </div>
 
-               <div className="flex flex-col gap-3">
-                 <button onClick={() => setView('user_modules')} className="w-full py-4 rounded-xl font-bold text-white bg-gradient-to-r from-blue-600 to-cyan-500 hover:scale-[1.02] transition-all shadow-xl shadow-blue-500/25">
-                   Kembali ke Daftar Modul
-                 </button>
-                 <button onClick={() => setView('user_dashboard')} className="w-full py-4 rounded-xl font-bold text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 transition-all border border-transparent hover:border-white/10">
-                   Kembali ke Dashboard LMS
-                 </button>
-               </div>
-             </div>
-           )}
-         </div>
+                <button onClick={handleLogout} className="w-full py-4 rounded-xl font-bold text-white bg-gradient-to-r from-red-600 to-rose-500 hover:scale-[1.02] transition-all shadow-xl shadow-red-500/25">
+                  Logout
+                </button>
+              </div>
+            )}
+          </div>
         )}
       </main>
     </div>
