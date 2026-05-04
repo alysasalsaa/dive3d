@@ -51,29 +51,50 @@ class DashboardController extends Controller
             ];
         });
 
-        // --- Leaderboard: user diurutkan berdasarkan jumlah modul selesai ---
-        $leaderboard = DB::table('users')
+        // --- User info: XP dari rata-rata skor quiz × modul selesai ---
+        $completedCount = UserProgress::where('user_id', $user->id)
+            ->where('completed', true)->count();
+        $avgScore = QuizResult::where('user_id', $user->id)->avg('score') ?? 0;
+        $currentXp = (int) round($completedCount * $avgScore);
+
+        // --- Leaderboard: top 5 berdasarkan total XP (modul selesai × rata-rata skor) ---
+        $allUsers = DB::table('users')
             ->leftJoin('user_progress', function ($join) {
                 $join->on('users.id', '=', 'user_progress.user_id')
                      ->where('user_progress.completed', true);
             })
-            ->select('users.id', 'users.name', DB::raw('COUNT(user_progress.id) as completed_count'))
+            ->leftJoin('quiz_results', 'users.id', '=', 'quiz_results.user_id')
+            ->select(
+                'users.id',
+                'users.name',
+                DB::raw('COUNT(DISTINCT user_progress.id) as completed_count'),
+                DB::raw('COALESCE(AVG(quiz_results.score), 0) as avg_score')
+            )
             ->groupBy('users.id', 'users.name')
-            ->orderByDesc('completed_count')
-            ->limit(3)
-            ->get()
-            ->values()
-            ->map(fn($u, $i) => [
-                'rank'         => $i + 1,
-                'name'         => $u->name,
-                'xp'           => $u->completed_count * 100,
-                'avatar_emoji' => '👤',
-            ]);
+            ->orderByDesc(DB::raw('COUNT(DISTINCT user_progress.id) * COALESCE(AVG(quiz_results.score), 0)'))
+            ->orderByDesc(DB::raw('COUNT(DISTINCT user_progress.id)'))
+            ->get();
 
-        // --- User info (XP & gems masih dummy sampai sistem XP dibuat) ---
-        $completedCount = UserProgress::where('user_id', $user->id)
-            ->where('completed', true)->count();
-        $currentXp = $completedCount * 100;
+        $leaderboard = $allUsers->take(5)->values()->map(fn($u, $i) => [
+            'rank'         => $i + 1,
+            'name'         => $u->name,
+            'xp'           => (int) round($u->completed_count * $u->avg_score),
+            'avatar_emoji' => '👤',
+            'is_me'        => $u->id === $user->id,
+        ]);
+
+        // Tambahkan posisi user sendiri jika tidak masuk top 5
+        $myRank = $allUsers->search(fn($u) => $u->id === $user->id);
+        if ($myRank !== false && $myRank >= 5) {
+            $me = $allUsers[$myRank];
+            $leaderboard->push([
+                'rank'         => $myRank + 1,
+                'name'         => $me->name . ' (Kamu)',
+                'xp'           => (int) round($me->completed_count * $me->avg_score),
+                'avatar_emoji' => '🤿',
+                'is_me'        => true,
+            ]);
+        }
 
         $data = [
             'user' => [
