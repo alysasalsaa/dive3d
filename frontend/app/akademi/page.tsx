@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { getModules, getUserProgress } from '../../lib/api';
 import type { ModuleData } from '../../lib/mockData';
-import ModelViewer from '../../components/ModelViewer';
 import { useTheme } from '../../lib/useTheme';
 
 // ============================================================
@@ -145,74 +144,45 @@ export default function AkademiPage() {
       </section>
 
       {/* ============================================================ */}
-      {/* PREVIEW MODEL 3D KARANG (WP 2.2.3) */}
+      {/* CARD SHORTCUT KE HALAMAN MODEL 3D */}
       {/* ============================================================ */}
       <section className="px-6 pb-16">
         <div className="max-w-7xl mx-auto">
-          {/* Judul Section */}
-          <div className="mb-6">
-            <div className={`inline-block px-4 py-1.5 mb-3 rounded-full border text-[11px] font-black tracking-[0.2em] uppercase ${isDark ? 'bg-cyan-500/15 border-cyan-400/30 text-cyan-300' : 'bg-cyan-500/10 border-cyan-400/20 text-cyan-600'}`}>
-              🪸 Spesimen 3D Interaktif
+          <Link
+            href="/akademi/model-3d"
+            className={`group relative flex flex-col md:flex-row items-center gap-8 p-8 rounded-[32px] border transition-all duration-500 hover:scale-[1.01] shadow-xl hover:shadow-2xl overflow-hidden ${isDark ? 'bg-[#000814] border-white/5 hover:border-cyan-500/30' : 'bg-white border-gray-100 hover:border-cyan-200 hover:shadow-cyan-100'}`}
+          >
+            {/* Background glow */}
+            <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 via-transparent to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+            {/* Icon area */}
+            <div className={`shrink-0 w-32 h-32 rounded-2xl flex items-center justify-center text-6xl shadow-lg transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3 ${isDark ? 'bg-gradient-to-br from-cyan-900/50 to-blue-900/30 border border-cyan-500/20' : 'bg-gradient-to-br from-cyan-50 to-blue-50 border border-cyan-200'}`}>
+              🪸
             </div>
-            <h2 className={`text-3xl md:text-4xl font-black mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
-              Model Terumbu Karang
-            </h2>
-            <p className={`text-sm max-w-xl ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-              Putar dan perbesar model untuk mempelajari struktur terumbu karang
-              secara langsung. Gunakan kursor atau sentuhan untuk berinteraksi.
-            </p>
-          </div>
 
-          {/* Komponen ModelViewer — memanggil file GLTF dari folder public/models */}
-          <ModelViewer
-            url="/models/usnm_74016-100k-2048-gltf_std/usnm_74016-100k-2048.gltf"
-            className="w-full h-[500px]"
-          />
-
-          {/* Keterangan singkat di bawah model */}
-          <div className={`mt-4 flex items-center gap-3 text-xs ${isDark ? 'text-gray-600' : 'text-gray-400'}`}>
-            <span>🖱️ Klik + Tarik untuk memutar</span>
-            <span className="w-px h-4 bg-white/10" />
-            <span>🔍 Scroll untuk zoom</span>
-            <span className="w-px h-4 bg-white/10" />
-            <span>📦 USNM 74016 — Smithsonian 3D Digitization</span>
-          </div>
-        </div>
-      </section>
-
-      {/* ============================================================ */}
-      {/* PREVIEW MODEL 3D IKAN BADUT (CLOWNFISH) */}
-      {/* ============================================================ */}
-      <section className="px-6 pb-16">
-        <div className="max-w-7xl mx-auto">
-          {/* Judul Section */}
-          <div className="mb-6">
-            <div className={`inline-block px-4 py-1.5 mb-3 rounded-full border text-[11px] font-black tracking-[0.2em] uppercase ${isDark ? 'bg-orange-500/15 border-orange-400/30 text-orange-400' : 'bg-orange-500/10 border-orange-400/20 text-orange-600'}`}>
-              🐟 Spesimen 3D Interaktif
+            {/* Text */}
+            <div className="flex-grow relative z-10">
+              <div className={`inline-block px-3 py-1 mb-3 rounded-full border text-[10px] font-black tracking-[0.2em] uppercase ${isDark ? 'bg-cyan-500/15 border-cyan-400/30 text-cyan-300' : 'bg-cyan-500/10 border-cyan-400/20 text-cyan-600'}`}>
+                🔬 2 Spesimen Tersedia
+              </div>
+              <h2 className={`text-2xl md:text-3xl font-black mb-2 group-hover:text-cyan-400 transition-colors ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                Eksplorasi Model 3D Biota Laut
+              </h2>
+              <p className={`text-sm leading-relaxed max-w-lg ${isDark ? 'text-gray-500' : 'text-gray-600'}`}>
+                Jelajahi Terumbu Karang dan Ikan Badut dalam tampilan 3D interaktif berteknologi WebGL. Putar, perbesar, dan amati setiap detail spesimen.
+              </p>
+              <div className="mt-4 flex items-center gap-2 text-cyan-400 font-bold text-sm group-hover:gap-3 transition-all">
+                <span>Buka Halaman Model 3D</span>
+                <span className="group-hover:translate-x-1 transition-transform">→</span>
+              </div>
             </div>
-            <h2 className={`text-3xl md:text-4xl font-black mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
-              Model Ikan Badut (Clownfish)
-            </h2>
-            <p className={`text-sm max-w-xl ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-              Putar dan perbesar model untuk mempelajari karakteristik Ikan Badut 
-              secara langsung. Gunakan kursor atau sentuhan untuk berinteraksi.
-            </p>
-          </div>
 
-          {/* Komponen ModelViewer — memanggil file GLB clownfish */}
-          <ModelViewer
-            url="/models/ClownFish3D/ClownFish3d.glb"
-            className="w-full h-[500px]"
-          />
-
-          {/* Keterangan singkat di bawah model */}
-          <div className={`mt-4 flex items-center gap-3 text-xs ${isDark ? 'text-gray-600' : 'text-gray-400'}`}>
-            <span>🖱️ Klik + Tarik untuk memutar</span>
-            <span className="w-px h-4 bg-white/10" />
-            <span>🔍 Scroll untuk zoom</span>
-            <span className="w-px h-4 bg-white/10" />
-            <span>📦 Koleksi Divexplore 3D</span>
-          </div>
+            {/* Decorative icons */}
+            <div className="shrink-0 hidden lg:flex flex-col gap-4 relative z-10 opacity-60 group-hover:opacity-100 transition-opacity">
+              <div className={`w-14 h-14 rounded-xl flex items-center justify-center text-3xl ${isDark ? 'bg-white/5 border border-white/10' : 'bg-gray-50 border border-gray-200'}`}>🐟</div>
+              <div className={`w-14 h-14 rounded-xl flex items-center justify-center text-3xl ${isDark ? 'bg-white/5 border border-white/10' : 'bg-gray-50 border border-gray-200'}`}>🌊</div>
+            </div>
+          </Link>
         </div>
       </section>
 

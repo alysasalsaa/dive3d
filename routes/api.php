@@ -68,6 +68,14 @@ Route::get('/showcase/{limit}', [ContentController::class, 'showcaseLimit']);
 // Gallery paginated
 Route::get('/gallery/paginated', [GalleryController::class, 'paginated']);
 
+// 1. Mengambil soal kuis berdasarkan slug (Data is_correct disembunyikan)
+Route::get('/quizzes/{slug}', [QuizController::class, 'show']);
 
+// 2. Submit jawaban untuk dihitung skornya di Backend
+Route::post('/quizzes/submit', [QuizController::class, 'submit']);
+
+// 3. Manajemen soal oleh Admin
+Route::post('/quizzes/questions', [QuizQuestionController::class, 'store']);
+Route::delete('/quizzes/questions/{id}', [QuizQuestionController::class, 'destroy']);
 
 
