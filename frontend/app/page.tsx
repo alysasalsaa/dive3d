@@ -225,7 +225,7 @@ export default function HomePage() {
             <div className="flex flex-wrap gap-4 mb-8">
               <Link
                 href="/panduan"
-                className="group flex items-center gap-4 px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white text-base font-black rounded-full transition-all duration-300 shadow-[0_0_40px_-10px_rgba(0,168,255,0.5)] hover:shadow-[0_0_60px_-15px_rgba(0,168,255,0.7)] hover:-translate-y-1"
+                className="group btn-interactive-wave flex items-center gap-4 px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white text-base font-black rounded-full transition-all duration-300 shadow-[0_0_40px_-10px_rgba(0,168,255,0.5)] hover:shadow-[0_0_60px_-15px_rgba(0,168,255,0.7)] hover:-translate-y-1"
               >
                 <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white group-hover:bg-white group-hover:text-blue-600 transition-all duration-300">
                   <span className="text-[14px] transform -rotate-45 group-hover:rotate-0 transition-transform duration-300">➤</span>
