@@ -38,10 +38,26 @@ export default function LMSPage() {
 
   useEffect(() => {
     const role = localStorage.getItem('user_role');
+    const token = localStorage.getItem('auth_token');
     if (role === 'admin') {
       setView('admin_dashboard');
     } else if (role === 'user') {
       setView('user_dashboard');
+      if (token) {
+        fetch('http://localhost:8000/api/dashboard', {
+          headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' },
+        })
+          .then(res => res.json())
+          .then(data => {
+            if (data.status === 'success') {
+              const doneQuizzes = data.data.recent_quizzes
+                .filter((q: any) => q.score === 100)
+                .map((q: any) => q.title);
+              setCompletedQuizzes(doneQuizzes);
+            }
+          })
+          .catch(() => {});
+      }
     } else {
       window.location.href = '/';
     }
@@ -113,6 +129,7 @@ export default function LMSPage() {
   const [hasBadge, setHasBadge] = useState(false);
   const [hasCertificate, setHasCertificate] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [completedQuizzes, setCompletedQuizzes] = useState<string[]>([]);
 
   // Reset semua state sementara saat logout
   const handleLogout = () => {
@@ -132,6 +149,7 @@ export default function LMSPage() {
       if (manageCategory === 'Modul') {
         const newMod: ModuleData = {
           id: `m${Date.now()}`,
+          slug: `modul-${Date.now()}`,
           title: newTitle || 'Modul Baru',
           desc: newDesc || 'Deskripsi modul baru.',
           icon: newIcon || '📦'
@@ -242,6 +260,10 @@ export default function LMSPage() {
     setIsProcessing(true);
     setView('user_quiz_result');
 
+    if (calculatedScore === 100 && selectedModule) {
+      setCompletedQuizzes(prev => [...prev, `Kuis: ${selectedModule.title}`]);
+    }
+
     // Simpan hasil quiz & update progress ke backend
     const token = localStorage.getItem('auth_token');
     if (token && selectedModule) {
@@ -285,7 +307,9 @@ export default function LMSPage() {
     setTimeout(() => {
       setIsProcessing(false);
       setHasBadge(calculatedScore >= 50);
-      setHasCertificate(calculatedScore === 100);
+      
+      const isComplete = new Set([...completedQuizzes, ...(calculatedScore === 100 ? [`Kuis: ${selectedModule?.title}`] : [])]).size >= modules.length;
+      setHasCertificate(isComplete);
     }, 2000);
   };
 
@@ -546,16 +570,25 @@ export default function LMSPage() {
                     <h3 className="text-xl font-bold text-white mb-2">{mod.title}</h3>
                     <p className="text-sm text-gray-400 mb-6">{mod.desc}</p>
                   </div>
-                  <button
-                    onClick={() => {
-                      setSelectedModule(mod);
-                      setReadProgress(0);
-                      setView('user_read_module');
-                    }}
-                    className="w-full py-3 rounded-xl font-bold text-cyan-400 bg-cyan-500/10 hover:bg-cyan-500 hover:text-white transition-all border border-cyan-500/30 hover:border-cyan-400"
-                  >
-                    Pilih Modul Ini
-                  </button>
+                  {completedQuizzes.includes(`Kuis: ${mod.title}`) ? (
+                    <button
+                      disabled
+                      className="w-full py-3 rounded-xl font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 opacity-80 cursor-not-allowed flex items-center justify-center gap-2"
+                    >
+                      <span>✅ Selesai</span>
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        setSelectedModule(mod);
+                        setReadProgress(0);
+                        setView('user_read_module');
+                      }}
+                      className="w-full py-3 rounded-xl font-bold text-cyan-400 bg-cyan-500/10 hover:bg-cyan-500 hover:text-white transition-all border border-cyan-500/30 hover:border-cyan-400"
+                    >
+                      Pilih Modul Ini
+                    </button>
+                  )}
                 </div>
               ))}
             </div>
@@ -621,6 +654,14 @@ export default function LMSPage() {
                   >
                     <span>Lanjut Membaca (Scroll ↓)</span>
                   </button>
+                ) : completedQuizzes.includes(`Kuis: ${selectedModule?.title}`) ? (
+                  <div className="px-6 py-4 rounded-xl font-bold text-blue-400 bg-blue-500/10 border border-blue-500/20 shadow-inner flex items-center gap-3">
+                    <span className="text-2xl">📝</span>
+                    <div>
+                      <p className="text-sm">Kuis Selesai</p>
+                      <p className="text-xs text-blue-400/80 font-medium">Anda sudah mengerjakan kuis ini sebelumnya.</p>
+                    </div>
+                  </div>
                 ) : (
                   <button
                     onClick={() => {
@@ -824,9 +865,14 @@ export default function LMSPage() {
                   </div>
                 </div>
 
-                <button onClick={handleLogout} className="w-full py-4 rounded-xl font-bold text-white bg-gradient-to-r from-red-600 to-rose-500 hover:scale-[1.02] transition-all shadow-xl shadow-red-500/25">
-                  Logout
-                </button>
+                <div className="flex flex-col gap-3 mt-8">
+                  <button onClick={() => setView('user_modules')} className="w-full py-4 rounded-xl font-bold text-white bg-gradient-to-r from-blue-600 to-cyan-500 hover:scale-[1.02] transition-all shadow-lg shadow-blue-500/25">
+                    Kembali ke Pemilihan Modul
+                  </button>
+                  <Link href="/akademi" className="w-full py-4 rounded-xl font-bold text-gray-400 bg-white/5 border border-white/10 hover:bg-white/10 hover:text-white transition-all block">
+                    Kembali ke Akademi
+                  </Link>
+                </div>
               </div>
             )}
           </div>
