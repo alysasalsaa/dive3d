@@ -2,8 +2,11 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import toast from 'react-hot-toast';
+import { useRouter } from 'next/navigation';
 
 export default function RegisterPage() {
+  const router = useRouter();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -14,7 +17,7 @@ export default function RegisterPage() {
     e.preventDefault();
 
     if (password !== confirmPassword) {
-      alert("Kata sandi tidak cocok!");
+      toast.error("Kata sandi tidak cocok!");
       return;
     }
 
@@ -41,10 +44,10 @@ export default function RegisterPage() {
       localStorage.setItem('user_name', data.user.name);
       localStorage.setItem('user_email', data.user.email);
 
-      alert("Pendaftaran Berhasil!");
-      window.location.href = data.role === 'admin' ? '/lms' : '/dashboard';
+      toast.success("Pendaftaran Berhasil!");
+      router.push(data.role === 'admin' ? '/lms' : '/dashboard');
     } catch (error: any) {
-      alert(error.message);
+      toast.error(error.message);
     } finally {
       setIsLoading(false);
     }
