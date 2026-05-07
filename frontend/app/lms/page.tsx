@@ -44,7 +44,7 @@ export default function LMSPage() {
     } else if (role === 'user') {
       setView('user_dashboard');
       if (token) {
-        fetch('http://localhost:8000/api/dashboard', {
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/dashboard`, {
           headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' },
         })
           .then(res => res.json())
@@ -185,7 +185,7 @@ export default function LMSPage() {
     setQuizAdminLoading(true);
     const token = localStorage.getItem('auth_token');
     try {
-      const res = await fetch(`http://localhost:8000/api/quiz/questions/${slug}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/quiz/questions/${slug}`, {
         headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' },
       });
       const data = await res.json();
@@ -199,7 +199,7 @@ export default function LMSPage() {
     setQuizAdminLoading(true);
     const token = localStorage.getItem('auth_token');
     try {
-      await fetch('http://localhost:8000/api/quiz/questions', {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/quiz/questions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({
@@ -221,7 +221,7 @@ export default function LMSPage() {
   const handleDeleteQuestion = async (id: number) => {
     const token = localStorage.getItem('auth_token');
     try {
-      await fetch(`http://localhost:8000/api/quiz/questions/${id}`, {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/quiz/questions/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' },
       });
@@ -238,7 +238,7 @@ export default function LMSPage() {
     setQuizUserLoading(true);
     const token = localStorage.getItem('auth_token');
     try {
-      const res = await fetch(`http://localhost:8000/api/quiz/questions/${slug}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/quiz/questions/${slug}`, {
         headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' },
       });
       const data = await res.json();
@@ -269,7 +269,7 @@ export default function LMSPage() {
     if (token && selectedModule) {
       try {
         // 1. Simpan skor quiz
-        await fetch('http://localhost:8000/api/quiz/submit', {
+        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/quiz/submit`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -285,7 +285,7 @@ export default function LMSPage() {
 
         // 2. Tandai modul sebagai selesai jika lulus (score >= 50)
         if (calculatedScore >= 50) {
-          await fetch('http://localhost:8000/api/progress', {
+          await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/progress`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

@@ -18,7 +18,7 @@ export default function DashboardPage() {
             window.location.href = '/login';
             return;
         }
-        fetch('http://localhost:8000/api/dashboard', {
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/dashboard`, {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Accept': 'application/json',

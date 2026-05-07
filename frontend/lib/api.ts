@@ -19,7 +19,7 @@ function delay(ms: number) {
  * Ganti isi fungsi ini dengan fetch('/api/modules') saat backend siap.
  */
 export async function getModules(): Promise<ModuleData[]> {
-  const response = await fetch('http://127.0.0.1:8000/api/modules', { cache: 'no-store' });
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/modules`, { cache: 'no-store' });
   const data = await response.json();
   return data.map((mod: any) => ({
     id: mod.slug,
@@ -51,7 +51,7 @@ export async function getUserProgress(moduleId: string) {
   // 1. Ambil token dari brankas Chrome
   const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
 
-  const response = await fetch(`http://127.0.0.1:8000/api/progress/${moduleId}`, {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/progress/${moduleId}`, {
     headers: {
       'Authorization': `Bearer ${token}` // 2. Serahkan KTP ke Satpam Sanctum
     },
@@ -63,7 +63,7 @@ export async function getUserProgress(moduleId: string) {
 export async function saveUserProgress(moduleId: string, visitedPois: string[], completed: boolean) {
   const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
 
-  const response = await fetch(`http://127.0.0.1:8000/api/progress`, {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/progress`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
