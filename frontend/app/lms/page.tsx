@@ -37,10 +37,10 @@ const TRACKS: TrackData[] = [
     icon: '🪸',
     color: 'from-blue-500 to-cyan-400',
     modules: [
-      { id: 'm1', slug: 'terumbu-karang', title: 'Ekosistem Terumbu Karang', desc: 'Mempelajari struktur dan fungsi ekosistem terumbu karang di lautan bebas.', icon: '🪸' },
-      { id: 'm2', slug: 'keanekaragaman-laut', title: 'Keanekaragaman Hayati Laut', desc: 'Eksplorasi ragam spesies ikan, moluska, dan invertebrata yang menghuni perairan Raja Ampat.', icon: '🐠' },
-      { id: 'm3', slug: 'ancaman-lingkungan', title: 'Ancaman Lingkungan Laut', desc: 'Pahami dampak perubahan iklim, pemutihan karang, dan polusi terhadap ekosistem laut.', icon: '⚠️' },
-      { id: 'm4', slug: 'konservasi-aksi', title: 'Aksi Konservasi Nyata', desc: 'Temukan cara nyata untuk berkontribusi pada pelestarian laut.', icon: '💚' },
+      { id: 'm1', slug: 'ekosistem-laut', title: 'Ekosistem Laut', desc: 'Mempelajari struktur dan fungsi ekosistem laut secara komprehensif.', icon: '🌊' },
+      { id: 'm2', slug: 'biota-laut', title: 'Biota Laut', desc: 'Eksplorasi ragam spesies ikan, moluska, dan invertebrata yang menghuni perairan Raja Ampat.', icon: '🐠' },
+      { id: 'm3', slug: 'terumbu-karang', title: 'Terumbu Karang', desc: 'Mempelajari pentingnya ekosistem terumbu karang dan ancaman yang dihadapinya.', icon: '🪸' },
+      { id: 'm4', slug: 'sampah-laut', title: 'Sampah Laut', desc: 'Pahami dampak polusi sampah plastik dan cara nyata untuk berkontribusi pada pelestarian laut.', icon: '♻️' },
     ],
   },
   {
@@ -82,10 +82,68 @@ export default function LMSPage() {
 
   useEffect(() => {
     const role = localStorage.getItem('user_role');
+    setUserName(localStorage.getItem('user_name'));
     if (role === 'admin') {
       // Admin tidak diizinkan masuk ke ruang kelas LMS, arahkan ke Pusat Kendali di Dashboard
       window.location.href = '/dashboard';
     } else if (role === 'user') {
+      // Check query params for direct module access
+      const params = new URLSearchParams(window.location.search);
+      const trackId = params.get('track');
+      const moduleSlug = params.get('module');
+      const action = params.get('action');
+
+      if (trackId && moduleSlug) {
+        const track = TRACKS.find(t => t.id === trackId);
+        if (track) {
+           setSelectedTrack(track);
+           setModules(track.modules);
+           
+           const userEmail = (localStorage.getItem('user_email') || '').toLowerCase();
+           let loadedQuizzes: string[] = [];
+           if (userEmail === 'vinzcan11@gmail.com') {
+             loadedQuizzes = track.modules.map(m => `Kuis: ${m.title}`);
+           } else {
+             const saved = localStorage.getItem(`completed_quizzes_${userEmail}_${track.id}`);
+             if (saved) loadedQuizzes = JSON.parse(saved);
+           }
+           setCompletedQuizzes(loadedQuizzes);
+
+           if (moduleSlug === 'all') {
+              setView('user_modules');
+              return;
+           }
+
+           const mod = track.modules.find(m => m.slug === moduleSlug);
+           if (mod) {
+              setSelectedModule(mod);
+              if (action === 'quiz') {
+                setQuizUserLoading(true);
+                const token = localStorage.getItem('auth_token');
+                fetch(`http://localhost:8000/api/quiz/questions/${mod.slug}`, {
+                  headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' },
+                })
+                .then(res => res.json())
+                .then(data => {
+                  setQuizQuestions(data.data ?? []);
+                  setQuizUserLoading(false);
+                  setQuizAnswers({});
+                  setView('user_quiz');
+                })
+                .catch(() => {
+                  setQuizQuestions([]);
+                  setQuizUserLoading(false);
+                  setQuizAnswers({});
+                  setView('user_quiz');
+                });
+              } else {
+                setReadProgress(0);
+                setView('user_read_module');
+              }
+              return;
+           }
+        }
+      }
       setView('user_track_select');
     } else {
       window.location.href = '/';
@@ -108,7 +166,7 @@ export default function LMSPage() {
   const [isAdminProcessing, setIsAdminProcessing] = useState(false);
 
   // STATE ADMIN QUIZ
-  const [quizModuleSlug, setQuizModuleSlug] = useState('terumbu-karang');
+  const [quizModuleSlug, setQuizModuleSlug] = useState('ekosistem-laut');
   const [quizQuestion, setQuizQuestion] = useState('');
   const [quizOptionA, setQuizOptionA] = useState('');
   const [quizOptionB, setQuizOptionB] = useState('');
@@ -170,6 +228,8 @@ export default function LMSPage() {
   const [completedQuizzes, setCompletedQuizzes] = useState<string[]>([]);
   const [certificateName, setCertificateName] = useState('');
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+  const [showBackConfirm, setShowBackConfirm] = useState(false);
+  const [userName, setUserName] = useState<string | null>(null);
 
   // Simpan progress ke localStorage setiap kali berubah
   useEffect(() => {
@@ -249,7 +309,7 @@ export default function LMSPage() {
     setNewDesc('');
     setNewIcon('📦');
     if (category === 'Quiz') {
-      loadQuizQuestions('terumbu-karang');
+      loadQuizQuestions('ekosistem-laut');
       setView('admin_quiz');
     } else if (category === 'Galeri') {
       loadPendingGallery();
@@ -422,9 +482,9 @@ export default function LMSPage() {
           <span className="text-xl font-black tracking-widest">DIVEXPLORE LMS</span>
         </div>
         <div className="flex items-center gap-4">
-          <Link href="/akademi" className="text-sm font-semibold text-gray-400 hover:text-white transition-colors">
-            ← Kembali ke Akademi
-          </Link>
+          <span className="text-sm font-bold text-white pr-2">
+            Halo, {userName || 'Pengguna'}!
+          </span>
           {view !== 'login' && (
             <button
               onClick={handleLogout}
@@ -837,10 +897,10 @@ export default function LMSPage() {
 
               <div className="flex items-center justify-between">
                 <button
-                  onClick={() => setView('user_modules')}
+                  onClick={() => setShowBackConfirm(true)}
                   className="px-6 py-4 rounded-xl font-bold text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 transition-all border border-transparent hover:border-white/10 flex items-center gap-2"
                 >
-                  <span>← Kembali ke Modul</span>
+                  <span>← Kembali ke Akademi</span>
                 </button>
 
                 {readProgress < 100 ? (
@@ -1151,17 +1211,22 @@ export default function LMSPage() {
               {/* Preview Sertifikat */}
               <div className="lg:col-span-2 overflow-x-auto bg-black/50 rounded-2xl p-4 flex items-center justify-center border border-white/5">
                 <div className="relative w-[800px] h-[565px] shrink-0 bg-white shadow-2xl overflow-hidden" id="certificate-preview">
-                  {/* Background Certificate */}
-                  <img src="/images/sertifikat%20konservasi%20laut.jpeg" alt="Background Sertifikat" className="absolute inset-0 w-full h-full object-cover z-0" />
-                  
+                  {/* Background Certificate sesuai track */}
+                  <img
+                    src={selectedTrack?.id === 'konten-digital' ? '/images/sertifikat-konten-digital.jpeg' : '/images/sertifikat-konservasi-laut.jpeg'}
+                    alt="Background Sertifikat"
+                    className="absolute inset-0 w-full h-full object-cover z-0"
+                  />
+
                   {/* Text Overlay */}
                   <div className="absolute inset-0 z-10 flex flex-col items-center pt-[215px]">
-                    <h2 className="text-5xl font-serif text-[#0b1c3d] tracking-wide mb-4 italic" style={{ fontFamily: "'Playfair Display', 'Times New Roman', serif" }}>
+                    <h2 className="text-4xl font-serif text-[#0b1c3d] tracking-wide italic font-bold" style={{ fontFamily: "'Playfair Display', 'Times New Roman', serif" }}>
                       {certificateName || 'Nama Peserta'}
                     </h2>
-                    
-                    <div className="absolute bottom-[70px] right-[100px] text-center w-[200px]">
-                      <p className="text-xl font-serif text-[#0b1c3d]" style={{ fontFamily: "'Playfair Display', 'Times New Roman', serif" }}>
+
+                    {/* Posisi tanggal: top dari atas sertifikat (565px tinggi), left dari kiri (800px lebar) */}
+                    <div style={{ position: 'absolute', top: '440px', left: '375px', width: '310px', textAlign: 'center' }}>
+                      <p className="text-base font-serif text-[#0b1c3d] font-bold" style={{ fontFamily: "'Playfair Display', 'Times New Roman', serif" }}>
                         {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
                       </p>
                     </div>
@@ -1172,6 +1237,34 @@ export default function LMSPage() {
           </div>
         )}
       </main>
+
+      {/* MODAL KONFIRMASI KEMBALI */}
+      {showBackConfirm && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowBackConfirm(false)} />
+          <div className="bg-[#001020] border border-white/10 rounded-[32px] p-8 max-w-md w-full relative z-10 animate-in fade-in zoom-in-95 duration-200 shadow-2xl">
+            <div className="w-20 h-20 bg-blue-500/10 text-blue-400 rounded-full flex items-center justify-center text-4xl mb-6 mx-auto">
+              🌊
+            </div>
+            <h3 className="text-2xl font-black text-white text-center mb-2">Konfirmasi Keluar</h3>
+            <p className="text-gray-400 text-center mb-8 text-sm leading-relaxed">Apakah Anda yakin ingin keluar dari sistem LMS dan kembali ke Halaman Akademi?</p>
+            <div className="flex gap-4">
+              <button
+                onClick={() => setShowBackConfirm(false)}
+                className="flex-1 px-6 py-3.5 rounded-xl font-bold text-gray-300 bg-white/5 hover:bg-white/10 transition-colors border border-white/10"
+              >
+                Batal
+              </button>
+              <button
+                onClick={() => window.location.href = '/akademi'}
+                className="flex-1 px-6 py-3.5 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-700 transition-colors shadow-lg shadow-blue-600/20"
+              >
+                Ya, Kembali
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
