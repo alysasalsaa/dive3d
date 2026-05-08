@@ -14,14 +14,16 @@ class ContentController extends Controller
     {
         $request->validate([
             "file" => "required|file|max:102400",
-            'title' => 'required|string'
+            'title' => 'required|string',
+            'category' => 'required|string',
+            'author' => 'required|string'
         ]);
 
         $extension = $request->file('file')->getClientOriginalExtension();
-        if (!in_array(strtolower($extension), ['glb', 'gltf', 'obj'])) {
+        if (!in_array(strtolower($extension), ['glb', 'gltf', 'obj', 'jpg', 'jpeg', 'png'])) {
             return response()->json([
-                'message' => 'The file field must be a file of type: glb, gltf, obj.',
-                'errors' => ['file' => ['The file extension must be .glb, .gltf, or .obj.']]
+                'message' => 'The file field must be a file of type: glb, gltf, obj, jpg, jpeg, png.',
+                'errors' => ['file' => ['The file extension must be .glb, .gltf, .obj, .jpg, .jpeg, or .png.']]
             ], 422);
         }
 
@@ -29,6 +31,8 @@ class ContentController extends Controller
         $url = asset('storage/' . $path);
         Content::create([
             'title' => $request->title,
+            'category' => $request->category,
+            'author' => $request->author,
             'file_path' => $url,
             'status' => 'pending'
         ]);
