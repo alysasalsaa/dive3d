@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 type ViewState =
   | 'login'
@@ -13,7 +15,8 @@ type ViewState =
   | 'user_modules'
   | 'user_read_module'
   | 'user_quiz'
-  | 'user_quiz_result';
+  | 'user_quiz_result'
+  | 'user_certificate';
 
 type QuizQuestion = {
   id: number;
@@ -130,6 +133,15 @@ export default function LMSPage() {
   const [hasCertificate, setHasCertificate] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [completedQuizzes, setCompletedQuizzes] = useState<string[]>([]);
+  const [certificateName, setCertificateName] = useState('');
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+
+  // Kalkulasi jika semua kuis selesai
+  useEffect(() => {
+    if (modules.length > 0 && completedQuizzes.length >= modules.length) {
+      setHasCertificate(true);
+    }
+  }, [completedQuizzes, modules]);
 
   // Reset semua state sementara saat logout
   const handleLogout = () => {
@@ -230,6 +242,24 @@ export default function LMSPage() {
   };
 
   // --- LOGIKA USER ---
+  const handleDownloadPDF = async () => {
+    const element = document.getElementById('certificate-preview');
+    if (!element) return;
+    
+    setIsGeneratingPDF(true);
+    try {
+      const canvas = await html2canvas(element, { scale: 2, useCORS: true });
+      const imgData = canvas.toDataURL('image/png');
+      
+      const pdf = new jsPDF('l', 'px', [800, 565]);
+      pdf.addImage(imgData, 'PNG', 0, 0, 800, 565);
+      pdf.save(`Sertifikat_${certificateName.replace(/\s+/g, '_') || 'Peserta'}.pdf`);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+    }
+    setIsGeneratingPDF(false);
+  };
+
   const handleSimulateScroll = () => {
     if (readProgress < 100) setReadProgress((prev) => Math.min(prev + 25, 100));
   };
@@ -555,9 +585,16 @@ export default function LMSPage() {
                 <h1 className="text-3xl font-black text-white">Pilih Modul</h1>
                 <p className="text-gray-400">Pilih modul yang ingin Anda pelajari hari ini.</p>
               </div>
-              <button onClick={() => setView('user_dashboard')} className="px-6 py-3 rounded-xl font-bold text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 transition-all border border-transparent hover:border-white/10">
-                ← Kembali
-              </button>
+              <div className="flex gap-4">
+                {hasCertificate && (
+                  <button onClick={() => setView('user_certificate')} className="px-6 py-3 rounded-xl font-bold text-white bg-gradient-to-r from-emerald-500 to-teal-400 hover:scale-105 shadow-xl shadow-emerald-500/20 transition-all flex items-center gap-2">
+                    <span>📜 Cetak Sertifikat</span>
+                  </button>
+                )}
+                <button onClick={() => setView('user_dashboard')} className="px-6 py-3 rounded-xl font-bold text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 transition-all border border-transparent hover:border-white/10">
+                  ← Kembali
+                </button>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
@@ -875,6 +912,83 @@ export default function LMSPage() {
                 </div>
               </div>
             )}
+          </div>
+        )}
+
+        {/* ========================================= */}
+        {/* VIEW: USER CERTIFICATE */}
+        {/* ========================================= */}
+        {view === 'user_certificate' && (
+          <div className="w-full max-w-5xl p-8 rounded-[32px] bg-[#000814] border border-cyan-500/30 shadow-[0_0_50px_-12px_rgba(6,182,212,0.15)] relative z-10 animate-in fade-in zoom-in-95 duration-500">
+            <div className="flex justify-between items-center mb-8 border-b border-white/10 pb-6">
+              <div>
+                <h1 className="text-3xl font-black text-white">Sertifikat Penghargaan</h1>
+                <p className="text-gray-400">Selamat! Anda telah menyelesaikan seluruh modul pembelajaran.</p>
+              </div>
+              <button onClick={() => setView('user_modules')} className="px-6 py-3 rounded-xl font-bold text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 transition-all border border-transparent hover:border-white/10">
+                ← Kembali
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Form Input */}
+              <div className="lg:col-span-1 space-y-6">
+                <div className="p-6 rounded-2xl bg-white/5 border border-white/10">
+                  <h3 className="text-lg font-bold text-white mb-4">Detail Sertifikat</h3>
+                  <div className="mb-4">
+                    <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Nama di Sertifikat</label>
+                    <input
+                      type="text"
+                      value={certificateName}
+                      onChange={(e) => setCertificateName(e.target.value)}
+                      className="w-full px-5 py-4 rounded-xl bg-black/50 border border-white/10 text-white placeholder-gray-600 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-all"
+                      placeholder="Masukkan nama lengkap..."
+                    />
+                  </div>
+                  <button
+                    onClick={handleDownloadPDF}
+                    disabled={!certificateName || isGeneratingPDF}
+                    className="w-full py-4 rounded-xl font-bold text-white bg-gradient-to-r from-blue-600 to-cyan-500 hover:scale-[1.02] transition-all shadow-xl shadow-blue-500/25 disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    {isGeneratingPDF ? (
+                      <>
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <span>Memproses...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>📥</span>
+                        <span>Download PDF</span>
+                      </>
+                    )}
+                  </button>
+                  <p className="text-xs text-gray-500 mt-4 leading-relaxed">
+                    Pastikan nama yang dimasukkan sudah benar. Sertifikat dapat diunduh berkali-kali.
+                  </p>
+                </div>
+              </div>
+
+              {/* Preview Sertifikat */}
+              <div className="lg:col-span-2 overflow-x-auto bg-black/50 rounded-2xl p-4 flex items-center justify-center border border-white/5">
+                <div className="relative w-[800px] h-[565px] shrink-0 bg-white shadow-2xl overflow-hidden" id="certificate-preview">
+                  {/* Background Certificate */}
+                  <img src="/images/sertifikat%20konservasi%20laut.jpeg" alt="Background Sertifikat" className="absolute inset-0 w-full h-full object-cover z-0" />
+                  
+                  {/* Text Overlay */}
+                  <div className="absolute inset-0 z-10 flex flex-col items-center pt-[215px]">
+                    <h2 className="text-5xl font-serif text-[#0b1c3d] tracking-wide mb-4 italic" style={{ fontFamily: "'Playfair Display', 'Times New Roman', serif" }}>
+                      {certificateName || 'Nama Peserta'}
+                    </h2>
+                    
+                    <div className="absolute bottom-[70px] right-[100px] text-center w-[200px]">
+                      <p className="text-xl font-serif text-[#0b1c3d]" style={{ fontFamily: "'Playfair Display', 'Times New Roman', serif" }}>
+                        {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </main>
