@@ -55,6 +55,15 @@ class UserBadgesTableSeeder extends Seeder
                 'created_at' => '2026-05-04 06:32:58',
                 'updated_at' => '2026-05-04 06:32:58',
             ),
+            4 => 
+            array (
+                'id' => 8,
+                'user_id' => 14,
+                'badge_id' => 4,
+                'earned_at' => '2026-05-08 12:59:34',
+                'created_at' => '2026-05-08 12:59:34',
+                'updated_at' => '2026-05-08 12:59:34',
+            ),
         ));
         
         
