@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
@@ -12,11 +12,51 @@ type ViewState =
   | 'admin_edit_data'
   | 'admin_quiz'
   | 'user_dashboard'
+  | 'user_track_select'
   | 'user_modules'
   | 'user_read_module'
   | 'user_quiz'
   | 'user_quiz_result'
   | 'user_certificate';
+
+type TrackData = {
+  id: string;
+  title: string;
+  desc: string;
+  icon: string;
+  color: string;
+  modules: ModuleData[];
+};
+
+const TRACKS: TrackData[] = [
+  {
+    id: 'konservasi-laut',
+    title: 'Konservasi Laut',
+    desc: '4 modul tentang ekosistem dan pelestarian laut Raja Ampat.',
+    icon: '🪸',
+    color: 'from-blue-500 to-cyan-400',
+    modules: [
+      { id: 'm1', slug: 'terumbu-karang', title: 'Ekosistem Terumbu Karang', desc: 'Mempelajari struktur dan fungsi ekosistem terumbu karang di lautan bebas.', icon: '🪸' },
+      { id: 'm2', slug: 'keanekaragaman-laut', title: 'Keanekaragaman Hayati Laut', desc: 'Eksplorasi ragam spesies ikan, moluska, dan invertebrata yang menghuni perairan Raja Ampat.', icon: '🐠' },
+      { id: 'm3', slug: 'ancaman-lingkungan', title: 'Ancaman Lingkungan Laut', desc: 'Pahami dampak perubahan iklim, pemutihan karang, dan polusi terhadap ekosistem laut.', icon: '⚠️' },
+      { id: 'm4', slug: 'konservasi-aksi', title: 'Aksi Konservasi Nyata', desc: 'Temukan cara nyata untuk berkontribusi pada pelestarian laut.', icon: '💚' },
+    ],
+  },
+  {
+    id: 'konten-digital',
+    title: 'Konten Digital Bahari',
+    desc: '5 modul tentang pembuatan dan distribusi konten digital bertema bahari.',
+    icon: '🎬',
+    color: 'from-purple-500 to-pink-400',
+    modules: [
+      { id: 'kd1', slug: 'fotografi-laut', title: 'Fotografi Bawah Laut', desc: 'Teknik mengabadikan keindahan bawah laut dengan peralatan dan komposisi yang tepat.', icon: '📸' },
+      { id: 'kd2', slug: 'videografi-bahari', title: 'Videografi Bahari', desc: 'Dasar-dasar produksi video bawah laut mulai dari peralatan hingga teknik pengambilan gambar.', icon: '🎬' },
+      { id: 'kd3', slug: 'editing-produksi', title: 'Editing & Post-Production', desc: 'Teknik editing foto dan video bahari agar tampak profesional dan menarik perhatian.', icon: '🎞️' },
+      { id: 'kd4', slug: 'storytelling-digital', title: 'Storytelling Digital', desc: 'Cara membangun narasi yang kuat dan emosional melalui konten digital bahari.', icon: '✍️' },
+      { id: 'kd5', slug: 'distribusi-monetisasi', title: 'Distribusi & Monetisasi', desc: 'Strategi menyebarkan konten ke berbagai platform dan menghasilkan pendapatan dari karya bahari.', icon: '💰' },
+    ],
+  },
+];
 
 type QuizQuestion = {
   id: number;
@@ -41,26 +81,10 @@ export default function LMSPage() {
 
   useEffect(() => {
     const role = localStorage.getItem('user_role');
-    const token = localStorage.getItem('auth_token');
     if (role === 'admin') {
       setView('admin_dashboard');
     } else if (role === 'user') {
-      setView('user_dashboard');
-      if (token) {
-        fetch('http://localhost:8000/api/dashboard', {
-          headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' },
-        })
-          .then(res => res.json())
-          .then(data => {
-            if (data.status === 'success') {
-              const doneQuizzes = data.data.recent_quizzes
-                .filter((q: any) => q.score === 100)
-                .map((q: any) => q.title);
-              setCompletedQuizzes(doneQuizzes);
-            }
-          })
-          .catch(() => {});
-      }
+      setView('user_track_select');
     } else {
       window.location.href = '/';
     }
@@ -69,36 +93,8 @@ export default function LMSPage() {
   // ==========================================
   // DATABASE SIMULATION (Bisa diakses Admin & User)
   // ==========================================
-  const [modules, setModules] = useState<ModuleData[]>([
-    {
-      id: 'm1',
-      slug: 'terumbu-karang',
-      title: 'Ekosistem Terumbu Karang',
-      desc: 'Mempelajari struktur dan fungsi ekosistem terumbu karang di lautan bebas.',
-      icon: '🪸'
-    },
-    {
-      id: 'm2',
-      slug: 'keanekaragaman-laut',
-      title: 'Keanekaragaman Hayati Laut',
-      desc: 'Eksplorasi ragam spesies ikan, moluska, dan invertebrata yang menghuni perairan Raja Ampat.',
-      icon: '🐠'
-    },
-    {
-      id: 'm3',
-      slug: 'ancaman-lingkungan',
-      title: 'Ancaman Lingkungan Laut',
-      desc: 'Pahami dampak perubahan iklim, pemutihan karang, dan polusi terhadap ekosistem laut.',
-      icon: '⚠️'
-    },
-    {
-      id: 'm4',
-      slug: 'konservasi-aksi',
-      title: 'Aksi Konservasi Nyata',
-      desc: 'Temukan cara nyata untuk berkontribusi pada pelestarian laut.',
-      icon: '💚'
-    },
-  ]);
+  const [modules, setModules] = useState<ModuleData[]>([]);
+  const [selectedTrack, setSelectedTrack] = useState<TrackData | null>(null);
 
   // ==========================================
   // STATE ADMIN
@@ -136,7 +132,16 @@ export default function LMSPage() {
   const [certificateName, setCertificateName] = useState('');
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
 
-  // Kalkulasi jika semua kuis selesai
+  // Simpan progress ke localStorage setiap kali berubah
+  useEffect(() => {
+    const userEmail = (localStorage.getItem('user_email') || '').toLowerCase();
+    if (userEmail && completedQuizzes.length > 0 && selectedTrack) {
+      localStorage.setItem(`completed_quizzes_${userEmail}_${selectedTrack.id}`, JSON.stringify(completedQuizzes));
+    }
+  }, [completedQuizzes, selectedTrack]);
+
+
+  // Cek apakah semua modul sudah selesai
   useEffect(() => {
     if (modules.length > 0 && completedQuizzes.length >= modules.length) {
       setHasCertificate(true);
@@ -150,6 +155,25 @@ export default function LMSPage() {
     localStorage.removeItem('user_name');
     localStorage.removeItem('user_email');
     window.location.href = '/';
+  };
+
+  // --- PILIH TRACK ---
+  const handleSelectTrack = (track: TrackData) => {
+    const userEmail = (localStorage.getItem('user_email') || '').toLowerCase();
+    setSelectedTrack(track);
+    setModules(track.modules);
+    setCompletedQuizzes([]);
+
+    // TEST: vinzcan11 langsung semua selesai
+    if (userEmail === 'vinzcan11@gmail.com') {
+      setCompletedQuizzes(track.modules.map(m => `Kuis: ${m.title}`));
+    } else {
+      const savedKey = `completed_quizzes_${userEmail}_${track.id}`;
+      const saved = localStorage.getItem(savedKey);
+      if (saved) setCompletedQuizzes(JSON.parse(saved));
+    }
+
+    setView('user_modules');
   };
 
   // --- LOGIKA ADMIN ---
@@ -337,7 +361,7 @@ export default function LMSPage() {
     setTimeout(() => {
       setIsProcessing(false);
       setHasBadge(calculatedScore >= 50);
-      
+
       const isComplete = new Set([...completedQuizzes, ...(calculatedScore === 100 ? [`Kuis: ${selectedModule?.title}`] : [])]).size >= modules.length;
       setHasCertificate(isComplete);
     }, 2000);
@@ -539,6 +563,41 @@ export default function LMSPage() {
                 </div>
               </>
             )}
+          </div>
+        )}
+
+        {/* ========================================= */}
+        {/* VIEW: USER TRACK SELECT */}
+        {/* ========================================= */}
+        {view === 'user_track_select' && (
+          <div className="w-full max-w-4xl relative z-10 animate-in fade-in zoom-in-95 duration-500">
+            <div className="text-center mb-10">
+              <h1 className="text-4xl font-black text-white mb-3">Pilih Jalur Pembelajaran</h1>
+              <p className="text-gray-400">Pilih salah satu jalur untuk memulai dan mendapatkan sertifikat.</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {TRACKS.map((track) => (
+                <div
+                  key={track.id}
+                  onClick={() => handleSelectTrack(track)}
+                  className="group p-8 rounded-[28px] bg-[#000814] border border-white/10 hover:border-cyan-400/40 hover:bg-white/5 transition-all cursor-pointer flex flex-col gap-5"
+                >
+                  <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-4xl bg-gradient-to-br ${track.color} shadow-lg`}>
+                    {track.icon}
+                  </div>
+                  <div className="flex-1">
+                    <h2 className="text-2xl font-black text-white mb-2 group-hover:text-cyan-400 transition-colors">{track.title}</h2>
+                    <p className="text-gray-400 text-sm leading-relaxed">{track.desc}</p>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">{track.modules.length} Modul</span>
+                    <span className={`px-4 py-2 rounded-full text-xs font-bold text-white bg-gradient-to-r ${track.color}`}>
+                      Mulai →
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
@@ -896,13 +955,34 @@ export default function LMSPage() {
                     <div className="text-4xl mb-3">{hasBadge ? '🏅' : '🔒'}</div>
                     <h3 className={`font-bold ${hasBadge ? 'text-amber-400' : 'text-gray-500'}`}>Badge</h3>
                   </div>
-                  <div className={`p-6 rounded-2xl border ${hasCertificate ? 'bg-cyan-500/10 border-cyan-500/30' : 'bg-black/50 border-white/5 opacity-50'}`}>
+                  <div
+                    onClick={() => hasCertificate && setView('user_certificate')}
+                    className={`p-6 rounded-2xl border transition-all ${hasCertificate ? 'bg-cyan-500/10 border-cyan-500/30 cursor-pointer hover:bg-cyan-500/20 hover:scale-[1.02]' : 'bg-black/50 border-white/5 opacity-50 cursor-not-allowed'}`}
+                  >
                     <div className="text-4xl mb-3">{hasCertificate ? '📜' : '🔒'}</div>
                     <h3 className={`font-bold ${hasCertificate ? 'text-cyan-400' : 'text-gray-500'}`}>Sertifikat</h3>
+                    {hasCertificate && <p className="text-xs text-cyan-400/70 mt-1">Klik untuk cetak</p>}
                   </div>
                 </div>
 
                 <div className="flex flex-col gap-3 mt-8">
+                  {(() => {
+                    const currentIndex = modules.findIndex(m => m.id === selectedModule?.id);
+                    const nextModule = modules[currentIndex + 1];
+                    return nextModule && score === 100 ? (
+                      <button
+                        onClick={() => {
+                          setSelectedModule(nextModule);
+                          setReadProgress(0);
+                          setQuizAnswers({});
+                          setView('user_read_module');
+                        }}
+                        className="w-full py-4 rounded-xl font-bold text-white bg-gradient-to-r from-emerald-500 to-teal-400 hover:scale-[1.02] transition-all shadow-lg shadow-emerald-500/25"
+                      >
+                        Lanjut ke Modul Berikutnya: {nextModule.icon} {nextModule.title}
+                      </button>
+                    ) : null;
+                  })()}
                   <button onClick={() => setView('user_modules')} className="w-full py-4 rounded-xl font-bold text-white bg-gradient-to-r from-blue-600 to-cyan-500 hover:scale-[1.02] transition-all shadow-lg shadow-blue-500/25">
                     Kembali ke Pemilihan Modul
                   </button>
@@ -923,7 +1003,7 @@ export default function LMSPage() {
             <div className="flex justify-between items-center mb-8 border-b border-white/10 pb-6">
               <div>
                 <h1 className="text-3xl font-black text-white">Sertifikat Penghargaan</h1>
-                <p className="text-gray-400">Selamat! Anda telah menyelesaikan seluruh modul pembelajaran.</p>
+                <p className="text-gray-400">Selamat! Anda telah menyelesaikan seluruh modul <span className="text-cyan-400 font-semibold">{selectedTrack?.title}</span>.</p>
               </div>
               <button onClick={() => setView('user_modules')} className="px-6 py-3 rounded-xl font-bold text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 transition-all border border-transparent hover:border-white/10">
                 ← Kembali
