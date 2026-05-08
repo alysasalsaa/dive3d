@@ -32,8 +32,11 @@ export default function AkademiPage() {
   const [modules, setModules] = useState<ModuleData[]>([]);
   const [progresses, setProgresses] = useState<Record<string, any>>({});
   const [loading, setLoading] = useState(true);
+  const [userRole, setUserRole] = useState('user');
 
   useEffect(() => {
+    setUserRole(localStorage.getItem('user_role') || 'user');
+
     getModules()
       .then(async (modulesData) => {
         setModules(modulesData);
@@ -130,6 +133,7 @@ export default function AkademiPage() {
               Ampat dalam lingkungan 3D interaktif.
             </p>
 
+            {userRole !== 'admin' && (
             <div className="mt-8">
               <Link 
                 href="/lms" 
@@ -139,6 +143,7 @@ export default function AkademiPage() {
                 <span className="text-xl">🚀</span>
               </Link>
             </div>
+            )}
           </div>
         </div>
       </section>
