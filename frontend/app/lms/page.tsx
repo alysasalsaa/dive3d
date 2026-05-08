@@ -1051,17 +1051,22 @@ export default function LMSPage() {
               {/* Preview Sertifikat */}
               <div className="lg:col-span-2 overflow-x-auto bg-black/50 rounded-2xl p-4 flex items-center justify-center border border-white/5">
                 <div className="relative w-[800px] h-[565px] shrink-0 bg-white shadow-2xl overflow-hidden" id="certificate-preview">
-                  {/* Background Certificate */}
-                  <img src="/images/sertifikat%20konservasi%20laut.jpeg" alt="Background Sertifikat" className="absolute inset-0 w-full h-full object-cover z-0" />
-                  
+                  {/* Background Certificate sesuai track */}
+                  <img
+                    src={selectedTrack?.id === 'konten-digital' ? '/images/sertifikat-konten-digital.jpeg' : '/images/sertifikat-konservasi-laut.jpeg'}
+                    alt="Background Sertifikat"
+                    className="absolute inset-0 w-full h-full object-cover z-0"
+                  />
+
                   {/* Text Overlay */}
                   <div className="absolute inset-0 z-10 flex flex-col items-center pt-[215px]">
-                    <h2 className="text-5xl font-serif text-[#0b1c3d] tracking-wide mb-4 italic" style={{ fontFamily: "'Playfair Display', 'Times New Roman', serif" }}>
+                    <h2 className="text-4xl font-serif text-[#0b1c3d] tracking-wide italic font-bold" style={{ fontFamily: "'Playfair Display', 'Times New Roman', serif" }}>
                       {certificateName || 'Nama Peserta'}
                     </h2>
-                    
-                    <div className="absolute bottom-[70px] right-[100px] text-center w-[200px]">
-                      <p className="text-xl font-serif text-[#0b1c3d]" style={{ fontFamily: "'Playfair Display', 'Times New Roman', serif" }}>
+
+                    {/* Posisi tanggal: top dari atas sertifikat (565px tinggi), left dari kiri (800px lebar) */}
+                    <div style={{ position: 'absolute', top: '440px', left: '375px', width: '310px', textAlign: 'center' }}>
+                      <p className="text-base font-serif text-[#0b1c3d] font-bold" style={{ fontFamily: "'Playfair Display', 'Times New Roman', serif" }}>
                         {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
                       </p>
                     </div>
