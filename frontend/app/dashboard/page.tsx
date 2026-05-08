@@ -11,6 +11,24 @@ export default function DashboardPage() {
     const [loading, setLoading] = useState(true);
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [activeMenu, setActiveMenu] = useState(0);
+    const [konservasiDone, setKonservasiDone] = useState(0);
+    const [digitalDone, setDigitalDone] = useState(0);
+
+    useEffect(() => {
+        const userEmail = (localStorage.getItem('user_email') || '').toLowerCase();
+
+        // TEST: vinzcan11 langsung semua selesai
+        if (userEmail === 'vinzcan11@gmail.com') {
+            setKonservasiDone(4);
+            setDigitalDone(5);
+            return;
+        }
+
+        const k = localStorage.getItem(`completed_quizzes_${userEmail}_konservasi-laut`);
+        const d = localStorage.getItem(`completed_quizzes_${userEmail}_konten-digital`);
+        if (k) setKonservasiDone(JSON.parse(k).length);
+        if (d) setDigitalDone(JSON.parse(d).length);
+    }, []);
 
     useEffect(() => {
         const token = localStorage.getItem('auth_token');
@@ -354,35 +372,42 @@ export default function DashboardPage() {
                                 <div className="text-xl text-yellow-400">📜</div>
                                 <div>
                                     <h3 className="font-semibold text-sm">Claim Sertifikat</h3>
-                                    <p className="text-xs text-gray-500 mt-0.5">Klaim sertifikat setelah memenuhi syarat.</p>
+                                    <p className="text-xs text-gray-500 mt-0.5">Selesaikan jalur pembelajaran untuk klaim sertifikat.</p>
                                 </div>
                             </div>
-                            
-                            <div className={`rounded-xl p-4 border ${isDark ? 'bg-[#0F172A]/50 border-white/5' : 'bg-white border-gray-200'}`}>
-                                <p className="text-xs font-semibold mb-3">Cek Kelayakan Sertifikat</p>
+
+                            {/* Jalur 1: Konservasi Laut */}
+                            <div className={`rounded-xl p-4 border mb-3 ${isDark ? 'bg-[#0F172A]/50 border-white/5' : 'bg-white border-gray-200'}`}>
+                                <div className="flex items-center gap-2 mb-3">
+                                    <span>🪸</span>
+                                    <p className="text-xs font-semibold">Konservasi Laut (4 Modul)</p>
+                                </div>
                                 <ul className="space-y-2 text-xs text-gray-400">
                                     <li className="flex justify-between items-center">
-                                        <span className="flex items-center gap-2"><span className={completedQuizzesCount >= totalModules ? "text-green-500" : "text-gray-600"}>✔</span> Selesaikan semua Modul Akademik</span>
-                                        <span className="flex items-center gap-1">{completedQuizzesCount} / {totalModules} {completedQuizzesCount >= totalModules ? <span className="text-green-500">✅</span> : <span className="text-red-500">❌</span>}</span>
-                                    </li>
-                                    <li className="flex justify-between items-center">
-                                        <span className="flex items-center gap-2"><span className={completedQuizzesCount >= totalVideos ? "text-green-500" : "text-gray-600"}>✔</span> Tonton semua Video Tutorial</span>
-                                        <span className="flex items-center gap-1">{completedQuizzesCount} / {totalVideos} {completedQuizzesCount >= totalVideos ? <span className="text-green-500">✅</span> : <span className="text-red-500">❌</span>}</span>
-                                    </li>
-                                    <li className="flex justify-between items-center">
-                                        <span className="flex items-center gap-2"><span className="text-gray-600">✔</span> Minimal 1 Konten Disetujui</span>
-                                        <span className="flex items-center gap-1">0 / 1 <span className="text-red-500">❌</span></span>
-                                    </li>
-                                    <li className="flex justify-between items-center">
-                                        <span className="flex items-center gap-2"><span className={completedQuizzesCount >= totalKuis ? "text-green-500" : "text-gray-600"}>✔</span> Selesaikan semua Kuis</span>
-                                        <span className="flex items-center gap-1">{completedQuizzesCount} / {totalKuis} {completedQuizzesCount >= totalKuis ? <span className="text-green-500">✅</span> : <span className="text-red-500">❌</span>}</span>
+                                        <span className="flex items-center gap-2"><span className={konservasiDone >= 4 ? "text-green-500" : "text-gray-600"}>✔</span> Selesaikan semua Modul & Kuis</span>
+                                        <span className="flex items-center gap-1">{konservasiDone} / 4 {konservasiDone >= 4 ? <span className="text-green-500">✅</span> : <span className="text-red-500">❌</span>}</span>
                                     </li>
                                 </ul>
-
-                                <button disabled className="w-full mt-4 py-2.5 rounded-lg bg-gray-800 text-gray-500 font-semibold text-xs border border-white/5 cursor-not-allowed flex items-center justify-center gap-2">
-                                    <span>🔒</span> Claim Sertifikat
+                                <button disabled={konservasiDone < 4} className={`w-full mt-3 py-2 rounded-lg font-semibold text-xs flex items-center justify-center gap-2 transition-all ${konservasiDone >= 4 ? 'bg-cyan-500 text-white hover:bg-cyan-400 cursor-pointer' : 'bg-gray-800 text-gray-500 border border-white/5 cursor-not-allowed'}`}>
+                                    <span>{konservasiDone >= 4 ? '📜' : '🔒'}</span> Claim Sertifikat Konservasi Laut
                                 </button>
-                                <p className="text-[10px] text-red-400 text-center mt-2">Lengkapi syarat untuk mengaktifkan tombol.</p>
+                            </div>
+
+                            {/* Jalur 2: Konten Digital Bahari */}
+                            <div className={`rounded-xl p-4 border ${isDark ? 'bg-[#0F172A]/50 border-white/5' : 'bg-white border-gray-200'}`}>
+                                <div className="flex items-center gap-2 mb-3">
+                                    <span>🎬</span>
+                                    <p className="text-xs font-semibold">Konten Digital Bahari (5 Modul)</p>
+                                </div>
+                                <ul className="space-y-2 text-xs text-gray-400">
+                                    <li className="flex justify-between items-center">
+                                        <span className="flex items-center gap-2"><span className={digitalDone >= 5 ? "text-green-500" : "text-gray-600"}>✔</span> Selesaikan semua Modul & Kuis</span>
+                                        <span className="flex items-center gap-1">{digitalDone} / 5 {digitalDone >= 5 ? <span className="text-green-500">✅</span> : <span className="text-red-500">❌</span>}</span>
+                                    </li>
+                                </ul>
+                                <button disabled={digitalDone < 5} className={`w-full mt-3 py-2 rounded-lg font-semibold text-xs flex items-center justify-center gap-2 transition-all ${digitalDone >= 5 ? 'bg-purple-500 text-white hover:bg-purple-400 cursor-pointer' : 'bg-gray-800 text-gray-500 border border-white/5 cursor-not-allowed'}`}>
+                                    <span>{digitalDone >= 5 ? '📜' : '🔒'}</span> Claim Sertifikat Konten Digital
+                                </button>
                             </div>
                         </div>
                     </div>
