@@ -16,7 +16,7 @@ class QuizQuestionSeeder extends Seeder
             // Sumber: Daging Content Creator – Modul 1 Ekosistem Laut
             // =============================================
             [
-                'module_slug'    => 'terumbu-karang',
+                'module_slug'    => 'ekosistem-laut',
                 'question'       => 'Ekosistem laut adalah...',
                 'option_a'       => 'Kumpulan ikan di laut',
                 'option_b'       => 'Interaksi makhluk hidup dengan lingkungan laut',
@@ -25,7 +25,7 @@ class QuizQuestionSeeder extends Seeder
                 'correct_answer' => 'B',
             ],
             [
-                'module_slug'    => 'terumbu-karang',
+                'module_slug'    => 'ekosistem-laut',
                 'question'       => 'Contoh interaksi dalam ekosistem laut adalah...',
                 'option_a'       => 'Air laut menguap',
                 'option_b'       => 'Ikan memakan plankton',
@@ -34,7 +34,7 @@ class QuizQuestionSeeder extends Seeder
                 'correct_answer' => 'B',
             ],
             [
-                'module_slug'    => 'terumbu-karang',
+                'module_slug'    => 'ekosistem-laut',
                 'question'       => 'Yang termasuk komponen biotik dalam ekosistem laut adalah...',
                 'option_a'       => 'Air laut',
                 'option_b'       => 'Cahaya matahari',
@@ -43,7 +43,7 @@ class QuizQuestionSeeder extends Seeder
                 'correct_answer' => 'C',
             ],
             [
-                'module_slug'    => 'terumbu-karang',
+                'module_slug'    => 'ekosistem-laut',
                 'question'       => 'Komponen abiotik yang memengaruhi kehidupan biota laut adalah...',
                 'option_a'       => 'Karang',
                 'option_b'       => 'Ikan',
@@ -52,7 +52,7 @@ class QuizQuestionSeeder extends Seeder
                 'correct_answer' => 'C',
             ],
             [
-                'module_slug'    => 'terumbu-karang',
+                'module_slug'    => 'ekosistem-laut',
                 'question'       => 'Urutan rantai makanan di laut yang benar adalah...',
                 'option_a'       => 'Ikan besar → plankton → ikan kecil',
                 'option_b'       => 'Fitoplankton → zooplankton → ikan kecil',
@@ -61,7 +61,7 @@ class QuizQuestionSeeder extends Seeder
                 'correct_answer' => 'B',
             ],
             [
-                'module_slug'    => 'terumbu-karang',
+                'module_slug'    => 'ekosistem-laut',
                 'question'       => 'Dampak overfishing terhadap rantai makanan laut adalah...',
                 'option_a'       => 'Menambah jumlah ikan',
                 'option_b'       => 'Tidak berpengaruh sama sekali',
@@ -75,7 +75,7 @@ class QuizQuestionSeeder extends Seeder
             // Sumber: Daging Content Creator – Modul 2 Biota Laut
             // =============================================
             [
-                'module_slug'    => 'keanekaragaman-laut',
+                'module_slug'    => 'biota-laut',
                 'question'       => 'Contoh biota laut adalah...',
                 'option_a'       => 'Ayam',
                 'option_b'       => 'Kucing',
@@ -84,7 +84,7 @@ class QuizQuestionSeeder extends Seeder
                 'correct_answer' => 'C',
             ],
             [
-                'module_slug'    => 'keanekaragaman-laut',
+                'module_slug'    => 'biota-laut',
                 'question'       => 'Hewan laut yang termasuk mamalia adalah...',
                 'option_a'       => 'Ikan pari',
                 'option_b'       => 'Paus',
@@ -93,7 +93,7 @@ class QuizQuestionSeeder extends Seeder
                 'correct_answer' => 'B',
             ],
             [
-                'module_slug'    => 'keanekaragaman-laut',
+                'module_slug'    => 'biota-laut',
                 'question'       => 'Kima raksasa (Tridacna gigas) termasuk kelompok...',
                 'option_a'       => 'Ikan',
                 'option_b'       => 'Mamalia',
@@ -102,7 +102,7 @@ class QuizQuestionSeeder extends Seeder
                 'correct_answer' => 'C',
             ],
             [
-                'module_slug'    => 'keanekaragaman-laut',
+                'module_slug'    => 'biota-laut',
                 'question'       => 'Pengelompokan biota laut berdasarkan karakteristiknya bertujuan untuk...',
                 'option_a'       => 'Memperindah tampilan laut',
                 'option_b'       => 'Memudahkan memahami ekosistem',
@@ -111,7 +111,7 @@ class QuizQuestionSeeder extends Seeder
                 'correct_answer' => 'B',
             ],
             [
-                'module_slug'    => 'keanekaragaman-laut',
+                'module_slug'    => 'biota-laut',
                 'question'       => 'Peran ikan dalam ekosistem laut adalah...',
                 'option_a'       => 'Mengotori laut',
                 'option_b'       => 'Menjaga keseimbangan ekosistem',
@@ -120,7 +120,7 @@ class QuizQuestionSeeder extends Seeder
                 'correct_answer' => 'B',
             ],
             [
-                'module_slug'    => 'keanekaragaman-laut',
+                'module_slug'    => 'biota-laut',
                 'question'       => 'Jika salah satu biota laut punah, maka yang terjadi adalah...',
                 'option_a'       => 'Ekosistem tetap stabil',
                 'option_b'       => 'Tidak ada perubahan apapun',
@@ -134,7 +134,7 @@ class QuizQuestionSeeder extends Seeder
             // Sumber: Daging Content Creator – Modul 3 Terumbu Karang
             // =============================================
             [
-                'module_slug'    => 'ancaman-lingkungan',
+                'module_slug'    => 'terumbu-karang',
                 'question'       => 'Terumbu karang adalah...',
                 'option_a'       => 'Batu biasa yang ada di dasar laut',
                 'option_b'       => 'Struktur laut yang terbentuk dari organisme karang',
@@ -143,7 +143,7 @@ class QuizQuestionSeeder extends Seeder
                 'correct_answer' => 'B',
             ],
             [
-                'module_slug'    => 'ancaman-lingkungan',
+                'module_slug'    => 'terumbu-karang',
                 'question'       => 'Terumbu karang terbentuk dari...',
                 'option_a'       => 'Pasir laut yang terpadatkan',
                 'option_b'       => 'Kalsium karbonat yang dihasilkan organisme karang',
@@ -152,7 +152,7 @@ class QuizQuestionSeeder extends Seeder
                 'correct_answer' => 'B',
             ],
             [
-                'module_slug'    => 'ancaman-lingkungan',
+                'module_slug'    => 'terumbu-karang',
                 'question'       => 'Fungsi utama terumbu karang bagi ekosistem laut adalah...',
                 'option_a'       => 'Mengotori perairan laut',
                 'option_b'       => 'Menjadi tempat hidup berbagai biota laut',
@@ -161,7 +161,7 @@ class QuizQuestionSeeder extends Seeder
                 'correct_answer' => 'B',
             ],
             [
-                'module_slug'    => 'ancaman-lingkungan',
+                'module_slug'    => 'terumbu-karang',
                 'question'       => 'Terumbu karang membantu melindungi pantai dengan cara...',
                 'option_a'       => 'Menambah kekuatan ombak',
                 'option_b'       => 'Menahan dan meredam gelombang laut',
@@ -170,7 +170,7 @@ class QuizQuestionSeeder extends Seeder
                 'correct_answer' => 'B',
             ],
             [
-                'module_slug'    => 'ancaman-lingkungan',
+                'module_slug'    => 'terumbu-karang',
                 'question'       => 'Salah satu penyebab kerusakan terumbu karang adalah...',
                 'option_a'       => 'Menanam mangrove di sekitar pantai',
                 'option_b'       => 'Overfishing atau penangkapan ikan berlebihan',
@@ -179,7 +179,7 @@ class QuizQuestionSeeder extends Seeder
                 'correct_answer' => 'B',
             ],
             [
-                'module_slug'    => 'ancaman-lingkungan',
+                'module_slug'    => 'terumbu-karang',
                 'question'       => 'Coral bleaching (pemutihan karang) disebabkan oleh...',
                 'option_a'       => 'Curah hujan yang tinggi',
                 'option_b'       => 'Perubahan iklim yang menyebabkan kenaikan suhu laut',
@@ -193,7 +193,7 @@ class QuizQuestionSeeder extends Seeder
             // Sumber: Daging Content Creator – Modul 4 Sampah Laut
             // =============================================
             [
-                'module_slug'    => 'konservasi-aksi',
+                'module_slug'    => 'sampah-laut',
                 'question'       => 'Contoh sampah laut yang paling banyak ditemukan adalah...',
                 'option_a'       => 'Plastik',
                 'option_b'       => 'Air tawar',
@@ -202,7 +202,7 @@ class QuizQuestionSeeder extends Seeder
                 'correct_answer' => 'A',
             ],
             [
-                'module_slug'    => 'konservasi-aksi',
+                'module_slug'    => 'sampah-laut',
                 'question'       => 'Sampah yang paling sulit terurai di laut adalah...',
                 'option_a'       => 'Daun kering',
                 'option_b'       => 'Plastik',
@@ -211,7 +211,7 @@ class QuizQuestionSeeder extends Seeder
                 'correct_answer' => 'B',
             ],
             [
-                'module_slug'    => 'konservasi-aksi',
+                'module_slug'    => 'sampah-laut',
                 'question'       => 'Dampak utama sampah laut terhadap biota adalah...',
                 'option_a'       => 'Membuat laut lebih bersih',
                 'option_b'       => 'Menyebabkan kematian hewan laut',
@@ -220,7 +220,7 @@ class QuizQuestionSeeder extends Seeder
                 'correct_answer' => 'B',
             ],
             [
-                'module_slug'    => 'konservasi-aksi',
+                'module_slug'    => 'sampah-laut',
                 'question'       => 'Mikroplastik berbahaya bagi ekosistem laut karena...',
                 'option_a'       => 'Mudah terlihat oleh hewan laut',
                 'option_b'       => 'Masuk ke rantai makanan dan mengancam kesehatan',
@@ -229,7 +229,7 @@ class QuizQuestionSeeder extends Seeder
                 'correct_answer' => 'B',
             ],
             [
-                'module_slug'    => 'konservasi-aksi',
+                'module_slug'    => 'sampah-laut',
                 'question'       => 'Cara nyata mengurangi sampah laut yang bisa dilakukan sehari-hari adalah...',
                 'option_a'       => 'Membuang sampah langsung ke laut',
                 'option_b'       => 'Terus menggunakan plastik sekali pakai',
@@ -238,7 +238,7 @@ class QuizQuestionSeeder extends Seeder
                 'correct_answer' => 'C',
             ],
             [
-                'module_slug'    => 'konservasi-aksi',
+                'module_slug'    => 'sampah-laut',
                 'question'       => 'Upaya paling efektif untuk mengurangi sampah laut secara berkelanjutan adalah...',
                 'option_a'       => 'Menambah produksi plastik',
                 'option_b'       => 'Edukasi masyarakat dan pengelolaan sampah yang baik',
