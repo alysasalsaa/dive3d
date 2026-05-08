@@ -8,6 +8,8 @@ class Content extends Model
 {
     protected $fillable = [
         'title',
+        'category',
+        'author',
         'file_path',
         'status'
     ];

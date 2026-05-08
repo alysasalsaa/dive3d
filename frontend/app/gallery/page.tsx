@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTheme } from '../../lib/useTheme';
@@ -12,16 +12,7 @@ const CATEGORIES = [
     { value: 'environment', label: 'Lingkungan' },
 ];
 
-const MOCK_GALLERY_DATA = [
-    { id: 1, title: 'Keindahan Terumbu Karang', author: 'Rama Putra', category: 'coral' },
-    { id: 2, title: 'Penyu Hijau Berenang', author: 'Abyan Bergas', category: 'fish' },
-    { id: 3, title: 'Laut Bebas Plastik', author: 'Maulana Yudo', category: 'environment' },
-    { id: 4, title: 'Ikan Badut & Anemon', author: 'Fahryan', category: 'fish' },
-    { id: 5, title: 'Restorasi Karang Otak', author: 'Yossi Marluga', category: 'coral' },
-    { id: 6, title: 'Pembersihan Pantai', author: 'Relawan Laut', category: 'environment' },
-    { id: 7, title: 'Hiu Paus Raja Ampat', author: 'Diver Pro 99', category: 'fish' },
-    { id: 8, title: 'Terumbu Karang Sehat', author: 'Eco Warrior', category: 'coral' },
-];
+// Mock data dihapus karena sekarang kita menggunakan data asli dari API
 
 export default function CommunityGallery() {
     const pathname = usePathname();
@@ -30,9 +21,75 @@ export default function CommunityGallery() {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('all');
 
-    const filteredGallery = MOCK_GALLERY_DATA.filter((item) => {
-        const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            item.author.toLowerCase().includes(searchQuery.toLowerCase());
+    const [galleryData, setGalleryData] = useState<any[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    // Form states
+    const [uploadTitle, setUploadTitle] = useState('');
+    const [uploadCategory, setUploadCategory] = useState('');
+    const [uploadFile, setUploadFile] = useState<File | null>(null);
+    const [isUploading, setIsUploading] = useState(false);
+
+    useEffect(() => {
+        fetchGallery();
+    }, []);
+
+    const fetchGallery = async () => {
+        setIsLoading(true);
+        try {
+            const res = await fetch('http://localhost:8000/api/gallery');
+            const data = await res.json();
+            if (data.status === 'success') {
+                setGalleryData(data.data);
+            }
+        } catch (error) {
+            console.error('Error fetching gallery:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleUpload = async () => {
+        if (!uploadTitle || !uploadCategory || !uploadFile) {
+            toast.error('Harap lengkapi semua data dan pilih gambar!');
+            return;
+        }
+
+        setIsUploading(true);
+        const formData = new FormData();
+        formData.append('title', uploadTitle);
+        formData.append('category', uploadCategory);
+        const authorName = typeof window !== 'undefined' ? localStorage.getItem('user_name') || 'Diver' : 'Diver';
+        formData.append('author', authorName);
+        formData.append('file', uploadFile);
+
+        try {
+            const res = await fetch('http://localhost:8000/api/upload', {
+                method: 'POST',
+                body: formData,
+            });
+            const data = await res.json();
+            
+            if (res.ok) {
+                toast.success('Karya berhasil diunggah! Menunggu persetujuan admin.');
+                setIsModalOpen(false);
+                setUploadTitle('');
+                setUploadCategory('');
+                setUploadFile(null);
+            } else {
+                toast.error(data.message || 'Gagal mengunggah karya.');
+            }
+        } catch (error) {
+            toast.error('Terjadi kesalahan jaringan.');
+        } finally {
+            setIsUploading(false);
+        }
+    };
+
+    const filteredGallery = galleryData.filter((item) => {
+        const titleMatch = item.title?.toLowerCase().includes(searchQuery.toLowerCase());
+        const authorMatch = item.author?.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesSearch = titleMatch || authorMatch;
         const matchesCategory = selectedCategory === 'all' || item.category === selectedCategory;
         return matchesSearch && matchesCategory;
     });
@@ -155,10 +212,16 @@ export default function CommunityGallery() {
                                 }`}
                             >
                                 <div className={`h-52 flex items-center justify-center relative overflow-hidden ${isDark ? 'bg-gradient-to-br from-blue-900/30 to-cyan-900/20' : 'bg-gradient-to-br from-blue-100 to-cyan-100'}`}>
-                                    <div className="absolute inset-0 bg-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                                    <span className={`font-bold text-lg transition-transform duration-300 group-hover:scale-110 ${isDark ? 'text-cyan-500/60' : 'text-blue-400/80'}`}>
-                                        Karya {item.id}
-                                    </span>
+                                    {item.image ? (
+                                        <img src={item.image} alt={item.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                    ) : (
+                                        <>
+                                            <div className="absolute inset-0 bg-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                                            <span className={`font-bold text-lg transition-transform duration-300 group-hover:scale-110 ${isDark ? 'text-cyan-500/60' : 'text-blue-400/80'}`}>
+                                                Karya {item.id}
+                                            </span>
+                                        </>
+                                    )}
                                 </div>
                                 <div className="p-5">
                                     <h3 className={`font-bold text-base group-hover:text-cyan-400 transition-colors line-clamp-1 ${isDark ? 'text-white' : 'text-gray-800'}`}>
@@ -205,19 +268,29 @@ export default function CommunityGallery() {
                             >✕</button>
                         </div>
                         <div className="p-6 space-y-5">
-                            <div className={`border-2 border-dashed rounded-2xl p-10 flex flex-col items-center justify-center cursor-pointer group transition-colors ${isDark ? 'border-blue-500/30 hover:border-blue-400/50 bg-blue-500/5' : 'border-blue-200 hover:border-blue-400 bg-blue-50/50'}`}>
-                                <div className={`w-16 h-16 rounded-full flex items-center justify-center text-3xl mb-3 group-hover:scale-110 transition-transform ${isDark ? 'bg-white/10' : 'bg-white shadow-sm'}`}>📥</div>
-                                <p className={`font-bold ${isDark ? 'text-blue-300' : 'text-blue-700'}`}>Pilih gambar atau tarik ke sini</p>
+                            <div className={`border-2 border-dashed rounded-2xl p-10 flex flex-col items-center justify-center cursor-pointer group transition-colors relative overflow-hidden ${isDark ? 'border-blue-500/30 hover:border-blue-400/50 bg-blue-500/5' : 'border-blue-200 hover:border-blue-400 bg-blue-50/50'}`}>
+                                <input type="file" className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" onChange={(e) => setUploadFile(e.target.files?.[0] || null)} />
+                                {uploadFile ? (
+                                    <div className="text-center">
+                                        <p className="font-bold text-emerald-500 mb-1">✅ File Terpilih</p>
+                                        <p className="text-sm text-gray-400 truncate max-w-[200px]">{uploadFile.name}</p>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <div className={`w-16 h-16 rounded-full flex items-center justify-center text-3xl mb-3 group-hover:scale-110 transition-transform ${isDark ? 'bg-white/10' : 'bg-white shadow-sm'}`}>📥</div>
+                                        <p className={`font-bold ${isDark ? 'text-blue-300' : 'text-blue-700'}`}>Pilih gambar atau tarik ke sini</p>
+                                    </>
+                                )}
                             </div>
                             <div>
                                 <label className={`block text-sm font-bold mb-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>Judul Karya <span className="text-red-500">*</span></label>
-                                <input type="text" placeholder="Beri judul yang menarik..."
+                                <input type="text" placeholder="Beri judul yang menarik..." value={uploadTitle} onChange={(e) => setUploadTitle(e.target.value)}
                                     className={`w-full p-3.5 rounded-xl border focus:outline-none transition-all font-medium ${isDark ? 'bg-white/5 border-white/10 text-white placeholder-gray-500 focus:border-blue-500/50' : 'bg-gray-50 border-gray-200 text-gray-900 focus:border-blue-400 focus:bg-white'}`}
                                 />
                             </div>
                             <div>
                                 <label className={`block text-sm font-bold mb-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>Kategori Karya <span className="text-red-500">*</span></label>
-                                <select defaultValue=""
+                                <select value={uploadCategory} onChange={(e) => setUploadCategory(e.target.value)}
                                     className={`w-full p-3.5 rounded-xl border focus:outline-none transition-all font-medium cursor-pointer ${isDark ? 'bg-white/5 border-white/10 text-gray-300 focus:border-blue-500/50' : 'bg-gray-50 border-gray-200 text-gray-700 focus:border-blue-400 focus:bg-white'}`}
                                 >
                                     <option value="" disabled>Pilih kategori yang sesuai...</option>
@@ -232,9 +305,10 @@ export default function CommunityGallery() {
                                 className={`px-6 py-3 font-bold rounded-xl transition-colors ${isDark ? 'text-gray-300 hover:bg-white/10' : 'text-gray-600 hover:bg-gray-200'}`}
                             >Batal</button>
                             <button
-                                onClick={() => { toast('Fitur unggah akan segera tersedia!', { icon: '🚧' }); setIsModalOpen(false); }}
-                                className="px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-500 hover:opacity-90 text-white font-bold rounded-xl shadow-lg shadow-blue-500/20 transition-all"
-                            >Kirim Karya</button>
+                                onClick={handleUpload}
+                                disabled={isUploading}
+                                className="px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-500 hover:opacity-90 text-white font-bold rounded-xl shadow-lg shadow-blue-500/20 transition-all disabled:opacity-50"
+                            >{isUploading ? 'Mengunggah...' : 'Kirim Karya'}</button>
                         </div>
                     </div>
                 </div>
