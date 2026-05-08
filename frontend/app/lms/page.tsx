@@ -49,11 +49,11 @@ const TRACKS: TrackData[] = [
     icon: '🎬',
     color: 'from-purple-500 to-pink-400',
     modules: [
-      { id: 'kd1', slug: 'fotografi-laut', title: 'Fotografi Bawah Laut', desc: 'Teknik mengabadikan keindahan bawah laut dengan peralatan dan komposisi yang tepat.', icon: '📸' },
-      { id: 'kd2', slug: 'videografi-bahari', title: 'Videografi Bahari', desc: 'Dasar-dasar produksi video bawah laut mulai dari peralatan hingga teknik pengambilan gambar.', icon: '🎬' },
-      { id: 'kd3', slug: 'editing-produksi', title: 'Editing & Post-Production', desc: 'Teknik editing foto dan video bahari agar tampak profesional dan menarik perhatian.', icon: '🎞️' },
-      { id: 'kd4', slug: 'storytelling-digital', title: 'Storytelling Digital', desc: 'Cara membangun narasi yang kuat dan emosional melalui konten digital bahari.', icon: '✍️' },
-      { id: 'kd5', slug: 'distribusi-monetisasi', title: 'Distribusi & Monetisasi', desc: 'Strategi menyebarkan konten ke berbagai platform dan menghasilkan pendapatan dari karya bahari.', icon: '💰' },
+      { id: 'kd1', slug: 'fotografi-bawah-laut', title: 'Fotografi Bawah Laut', desc: 'Teknik mengabadikan keindahan bawah laut dengan peralatan dan komposisi yang tepat.', icon: '📸' },
+      { id: 'kd2', slug: 'teknik-videografi', title: 'Teknik-Teknik Videografi', desc: 'Dasar-dasar dan teknik lanjutan produksi video bawah laut mulai dari peralatan hingga pengambilan gambar.', icon: '🎬' },
+      { id: 'kd3', slug: 'storytelling-digital', title: 'Storytelling Digital', desc: 'Cara membangun narasi yang kuat dan emosional melalui konten digital bahari.', icon: '✍️' },
+      { id: 'kd4', slug: 'editing-publishing', title: 'Editing dan Publishing Guide', desc: 'Panduan lengkap editing konten bahari dan strategi publishing ke berbagai platform digital.', icon: '🎞️' },
+      { id: 'kd5', slug: 'etika-konten', title: 'Etika dalam Membuat Konten', desc: 'Memahami tanggung jawab etis dalam pembuatan dan penyebaran konten bertema lingkungan laut.', icon: '⚖️' },
     ],
   },
 ];
