@@ -181,36 +181,6 @@ class UserProgressTableSeeder extends Seeder
             ),
             16 => 
             array (
-                'id' => 46,
-                'user_id' => 14,
-                'module_id' => 2,
-                'visited_pois' => '[]',
-                'completed' => false,
-                'created_at' => '2026-05-04 06:32:04',
-                'updated_at' => '2026-05-04 06:32:04',
-            ),
-            17 => 
-            array (
-                'id' => 47,
-                'user_id' => 14,
-                'module_id' => 3,
-                'visited_pois' => '[]',
-                'completed' => false,
-                'created_at' => '2026-05-04 06:32:21',
-                'updated_at' => '2026-05-04 06:32:21',
-            ),
-            18 => 
-            array (
-                'id' => 48,
-                'user_id' => 14,
-                'module_id' => 4,
-                'visited_pois' => '[]',
-                'completed' => false,
-                'created_at' => '2026-05-04 06:32:43',
-                'updated_at' => '2026-05-04 06:32:43',
-            ),
-            19 => 
-            array (
                 'id' => 45,
                 'user_id' => 14,
                 'module_id' => 1,
@@ -219,7 +189,7 @@ class UserProgressTableSeeder extends Seeder
                 'created_at' => '2026-05-04 06:31:45',
                 'updated_at' => '2026-05-04 06:32:55',
             ),
-            20 => 
+            17 => 
             array (
                 'id' => 49,
                 'user_id' => 15,
@@ -229,7 +199,7 @@ class UserProgressTableSeeder extends Seeder
                 'created_at' => '2026-05-04 07:22:06',
                 'updated_at' => '2026-05-04 07:22:06',
             ),
-            21 => 
+            18 => 
             array (
                 'id' => 50,
                 'user_id' => 15,
@@ -239,7 +209,7 @@ class UserProgressTableSeeder extends Seeder
                 'created_at' => '2026-05-04 07:22:26',
                 'updated_at' => '2026-05-04 07:22:26',
             ),
-            22 => 
+            19 => 
             array (
                 'id' => 51,
                 'user_id' => 15,
@@ -249,7 +219,7 @@ class UserProgressTableSeeder extends Seeder
                 'created_at' => '2026-05-04 07:22:40',
                 'updated_at' => '2026-05-04 07:22:40',
             ),
-            23 => 
+            20 => 
             array (
                 'id' => 52,
                 'user_id' => 15,
@@ -258,6 +228,156 @@ class UserProgressTableSeeder extends Seeder
                 'completed' => false,
                 'created_at' => '2026-05-04 07:22:51',
                 'updated_at' => '2026-05-04 07:22:51',
+            ),
+            21 => 
+            array (
+                'id' => 53,
+                'user_id' => 16,
+                'module_id' => 1,
+                'visited_pois' => '[]',
+                'completed' => false,
+                'created_at' => '2026-05-07 16:52:33',
+                'updated_at' => '2026-05-07 16:52:33',
+            ),
+            22 => 
+            array (
+                'id' => 54,
+                'user_id' => 16,
+                'module_id' => 2,
+                'visited_pois' => '[]',
+                'completed' => false,
+                'created_at' => '2026-05-07 16:52:38',
+                'updated_at' => '2026-05-07 16:52:38',
+            ),
+            23 => 
+            array (
+                'id' => 55,
+                'user_id' => 16,
+                'module_id' => 3,
+                'visited_pois' => '[]',
+                'completed' => false,
+                'created_at' => '2026-05-07 16:52:50',
+                'updated_at' => '2026-05-07 16:52:50',
+            ),
+            24 => 
+            array (
+                'id' => 56,
+                'user_id' => 16,
+                'module_id' => 4,
+                'visited_pois' => '[]',
+                'completed' => false,
+                'created_at' => '2026-05-07 16:52:55',
+                'updated_at' => '2026-05-07 16:52:55',
+            ),
+            25 => 
+            array (
+                'id' => 57,
+                'user_id' => 23,
+                'module_id' => 1,
+                'visited_pois' => '[]',
+                'completed' => false,
+                'created_at' => '2026-05-08 02:32:12',
+                'updated_at' => '2026-05-08 02:32:12',
+            ),
+            26 => 
+            array (
+                'id' => 58,
+                'user_id' => 23,
+                'module_id' => 2,
+                'visited_pois' => '[]',
+                'completed' => false,
+                'created_at' => '2026-05-08 02:32:20',
+                'updated_at' => '2026-05-08 02:32:20',
+            ),
+            27 => 
+            array (
+                'id' => 59,
+                'user_id' => 23,
+                'module_id' => 3,
+                'visited_pois' => '[]',
+                'completed' => false,
+                'created_at' => '2026-05-08 02:32:28',
+                'updated_at' => '2026-05-08 02:32:28',
+            ),
+            28 => 
+            array (
+                'id' => 60,
+                'user_id' => 23,
+                'module_id' => 4,
+                'visited_pois' => '[]',
+                'completed' => false,
+                'created_at' => '2026-05-08 02:32:36',
+                'updated_at' => '2026-05-08 02:32:36',
+            ),
+            29 => 
+            array (
+                'id' => 61,
+                'user_id' => 24,
+                'module_id' => 1,
+                'visited_pois' => '[]',
+                'completed' => false,
+                'created_at' => '2026-05-08 11:59:40',
+                'updated_at' => '2026-05-08 11:59:40',
+            ),
+            30 => 
+            array (
+                'id' => 62,
+                'user_id' => 24,
+                'module_id' => 2,
+                'visited_pois' => '[]',
+                'completed' => false,
+                'created_at' => '2026-05-08 11:59:48',
+                'updated_at' => '2026-05-08 11:59:48',
+            ),
+            31 => 
+            array (
+                'id' => 63,
+                'user_id' => 24,
+                'module_id' => 3,
+                'visited_pois' => '[]',
+                'completed' => false,
+                'created_at' => '2026-05-08 11:59:55',
+                'updated_at' => '2026-05-08 11:59:55',
+            ),
+            32 => 
+            array (
+                'id' => 64,
+                'user_id' => 24,
+                'module_id' => 4,
+                'visited_pois' => '[]',
+                'completed' => false,
+                'created_at' => '2026-05-08 12:00:03',
+                'updated_at' => '2026-05-08 12:00:03',
+            ),
+            33 => 
+            array (
+                'id' => 46,
+                'user_id' => 14,
+                'module_id' => 2,
+                'visited_pois' => '[]',
+                'completed' => true,
+                'created_at' => '2026-05-04 06:32:04',
+                'updated_at' => '2026-05-08 12:57:32',
+            ),
+            34 => 
+            array (
+                'id' => 47,
+                'user_id' => 14,
+                'module_id' => 3,
+                'visited_pois' => '[]',
+                'completed' => true,
+                'created_at' => '2026-05-04 06:32:21',
+                'updated_at' => '2026-05-08 12:59:33',
+            ),
+            35 => 
+            array (
+                'id' => 48,
+                'user_id' => 14,
+                'module_id' => 4,
+                'visited_pois' => '[]',
+                'completed' => true,
+                'created_at' => '2026-05-04 06:32:43',
+                'updated_at' => '2026-05-08 13:00:14',
             ),
         ));
         
