@@ -11,6 +11,7 @@ type ViewState =
   | 'admin_manage'
   | 'admin_edit_data'
   | 'admin_quiz'
+  | 'admin_gallery'
   | 'user_dashboard'
   | 'user_track_select'
   | 'user_modules'
@@ -82,7 +83,8 @@ export default function LMSPage() {
   useEffect(() => {
     const role = localStorage.getItem('user_role');
     if (role === 'admin') {
-      setView('admin_dashboard');
+      // Admin tidak diizinkan masuk ke ruang kelas LMS, arahkan ke Pusat Kendali di Dashboard
+      window.location.href = '/dashboard';
     } else if (role === 'user') {
       setView('user_track_select');
     } else {
@@ -99,7 +101,7 @@ export default function LMSPage() {
   // ==========================================
   // STATE ADMIN
   // ==========================================
-  const [manageCategory, setManageCategory] = useState<'Modul' | 'Materi' | 'Quiz' | 'User'>('Modul');
+  const [manageCategory, setManageCategory] = useState<string>('Modul');
   const [newTitle, setNewTitle] = useState('');
   const [newDesc, setNewDesc] = useState('');
   const [newIcon, setNewIcon] = useState('📦');
@@ -115,6 +117,43 @@ export default function LMSPage() {
   const [quizCorrectAnswer, setQuizCorrectAnswer] = useState<'A' | 'B' | 'C' | 'D'>('A');
   const [existingQuestions, setExistingQuestions] = useState<QuizQuestion[]>([]);
   const [quizAdminLoading, setQuizAdminLoading] = useState(false);
+
+  // STATE ADMIN GALLERY
+  const [pendingGallery, setPendingGallery] = useState<any[]>([]);
+  const [galleryLoading, setGalleryLoading] = useState(false);
+
+  const loadPendingGallery = async () => {
+    setGalleryLoading(true);
+    const token = localStorage.getItem('auth_token');
+    try {
+      const res = await fetch('http://localhost:8000/api/admin/pending', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      setPendingGallery(data || []);
+    } catch(e) {
+      console.error(e);
+    }
+    setGalleryLoading(false);
+  };
+
+  const handleApproveGallery = async (id: number) => {
+    const token = localStorage.getItem('auth_token');
+    await fetch(`http://localhost:8000/api/admin/approve/${id}`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    loadPendingGallery();
+  };
+
+  const handleRejectGallery = async (id: number) => {
+    const token = localStorage.getItem('auth_token');
+    await fetch(`http://localhost:8000/api/admin/reject/${id}`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    loadPendingGallery();
+  };
 
   // ==========================================
   // STATE USER
@@ -204,7 +243,7 @@ export default function LMSPage() {
     }, 2000);
   };
 
-  const openManageForm = (category: 'Modul' | 'Materi' | 'Quiz' | 'User') => {
+  const openManageForm = (category: string) => {
     setManageCategory(category);
     setNewTitle('');
     setNewDesc('');
@@ -212,6 +251,9 @@ export default function LMSPage() {
     if (category === 'Quiz') {
       loadQuizQuestions('terumbu-karang');
       setView('admin_quiz');
+    } else if (category === 'Galeri') {
+      loadPendingGallery();
+      setView('admin_gallery');
     } else {
       setView('admin_edit_data');
     }
@@ -463,17 +505,18 @@ export default function LMSPage() {
               </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[
                 { title: 'Modul', icon: '📚', color: 'from-blue-500 to-cyan-400', desc: 'Tambah atau ubah modul pembelajaran.' },
-                { title: 'Materi', icon: '📄', color: 'from-emerald-500 to-teal-400', desc: 'Kelola isi konten teks dan media pada modul.' },
+                { title: 'Materi', icon: '📄', color: 'from-emerald-500 to-teal-400', desc: 'Kelola isi konten teks dan media.' },
                 { title: 'Quiz', icon: '📝', color: 'from-purple-500 to-pink-500', desc: 'Atur pertanyaan dan jawaban evaluasi.' },
-                { title: 'User', icon: '👥', color: 'from-orange-500 to-amber-400', desc: 'Manajemen hak akses dan profil mahasiswa.' }
+                { title: 'User', icon: '👥', color: 'from-orange-500 to-amber-400', desc: 'Manajemen akses dan profil mahasiswa.' },
+                { title: 'Galeri', icon: '🖼️', color: 'from-indigo-500 to-blue-500', desc: 'Setujui atau tolak karya unggahan pengguna.' }
               ].map((item) => (
                 <div
                   key={item.title}
-                  onClick={() => openManageForm(item.title as 'Modul' | 'Materi' | 'Quiz' | 'User')}
-                  className="group p-6 rounded-2xl bg-white/5 border border-white/10 hover:border-cyan-400/50 hover:bg-white/10 transition-all cursor-pointer flex items-start gap-6"
+                  onClick={() => openManageForm(item.title)}
+                  className="group p-6 rounded-2xl bg-white/5 border border-white/10 hover:border-cyan-400/50 hover:bg-white/10 transition-all cursor-pointer flex flex-col items-start gap-4"
                 >
                   <div className={`w-14 h-14 rounded-xl flex items-center justify-center text-3xl bg-gradient-to-br ${item.color} shrink-0`}>
                     {item.icon}
@@ -562,6 +605,63 @@ export default function LMSPage() {
                   </button>
                 </div>
               </>
+            )}
+          </div>
+        )}
+
+        {/* ========================================= */}
+        {/* VIEW: ADMIN GALLERY */}
+        {/* ========================================= */}
+        {view === 'admin_gallery' && (
+          <div className="w-full max-w-5xl p-8 rounded-[32px] bg-[#000814] border border-indigo-500/30 shadow-[0_0_50px_-12px_rgba(99,102,241,0.15)] relative z-10 animate-in slide-in-from-bottom-8 duration-500">
+            <div className="flex items-center justify-between mb-8 pb-6 border-b border-white/10">
+              <div>
+                <div className="inline-block px-3 py-1 mb-3 rounded-full border border-indigo-400/30 bg-indigo-500/15 text-indigo-300 text-[10px] font-black uppercase tracking-widest">
+                  Pengawasan Konten
+                </div>
+                <h1 className="text-3xl font-black text-white mb-2">Persetujuan Karya Galeri</h1>
+                <p className="text-gray-400">Karya-karya di bawah ini menunggu persetujuan Anda sebelum tampil ke publik.</p>
+              </div>
+              <button onClick={() => setView('admin_manage')} className="px-6 py-3 rounded-xl font-bold text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 transition-all border border-transparent hover:border-white/10">
+                ← Kembali
+              </button>
+            </div>
+
+            {galleryLoading ? (
+              <div className="py-20 text-center">
+                <div className="w-12 h-12 border-4 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin mx-auto mb-4"></div>
+                <p className="text-indigo-400 font-bold">Memuat daftar karya...</p>
+              </div>
+            ) : pendingGallery.length === 0 ? (
+              <div className="py-32 text-center border-2 border-dashed border-white/5 rounded-2xl bg-white/[0.02]">
+                <div className="text-6xl mb-4">✨</div>
+                <h3 className="text-xl font-bold text-white mb-2">Bersih Sepenuhnya!</h3>
+                <p className="text-gray-500">Tidak ada karya baru yang mengantre untuk disetujui.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {pendingGallery.map((item: any) => (
+                  <div key={item.id} className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden flex flex-col hover:border-indigo-500/50 hover:-translate-y-1 transition-all duration-300">
+                    <img src={item.file_path} alt={item.title} className="w-full h-48 object-cover bg-[#000814]" />
+                    <div className="p-5 flex-1 flex flex-col">
+                      <h3 className="font-bold text-lg text-white mb-1 line-clamp-1">{item.title}</h3>
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className="px-2 py-0.5 rounded-md bg-indigo-500/20 text-indigo-300 text-[10px] font-bold uppercase">{item.category || 'Lainnya'}</span>
+                        <span className="text-xs text-gray-400">Oleh: {item.author || 'Diver'}</span>
+                      </div>
+                      <p className="text-xs text-gray-500 mb-6">{new Date(item.created_at).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                      <div className="flex gap-3 mt-auto">
+                        <button onClick={() => handleApproveGallery(item.id)} className="flex-1 py-2.5 rounded-xl bg-emerald-500/10 text-emerald-400 font-bold hover:bg-emerald-500/20 hover:scale-105 transition-all text-sm border border-emerald-500/20">
+                          ✅ Setujui
+                        </button>
+                        <button onClick={() => handleRejectGallery(item.id)} className="flex-1 py-2.5 rounded-xl bg-red-500/10 text-red-400 font-bold hover:bg-red-500/20 hover:scale-105 transition-all text-sm border border-red-500/20">
+                          ❌ Tolak
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             )}
           </div>
         )}

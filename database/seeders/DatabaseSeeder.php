@@ -23,14 +23,6 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        User::firstOrCreate(
-            ['email' => 'abyan@email.com'],
-            [
-                'name' => 'Abyan',
-                'password' => Hash::make('password'),
-                'role' => 'user',
-            ]
-        );
 
         User::firstOrCreate(
             ['email' => 'rafi@email.com'],

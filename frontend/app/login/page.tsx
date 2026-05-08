@@ -37,8 +37,8 @@ export default function LoginPage() {
       localStorage.setItem('user_email', data.user.email);
 
       toast.success("Login Berhasil!");
-      // Admin langsung ke LMS, user biasa ke dashboard
-      router.push(data.role === 'admin' ? '/lms' : '/dashboard');
+      // Semua pengguna (admin dan user) diarahkan ke dashboard
+      router.push('/dashboard');
     } catch (error: any) {
       toast.error(error.message);
     } finally {

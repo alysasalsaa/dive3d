@@ -6,10 +6,16 @@ import { useTheme } from '../../lib/useTheme';
 import toast from 'react-hot-toast';
 
 const CATEGORIES = [
-    { value: 'all', label: 'Semua' },
+    { value: 'all', label: 'Semua Kategori' },
     { value: 'coral', label: 'Karang' },
     { value: 'fish', label: 'Ikan' },
     { value: 'environment', label: 'Lingkungan' },
+];
+
+const FORMATS = [
+    { value: 'all', label: 'Semua Format' },
+    { value: 'photo', label: '📷 Foto' },
+    { value: 'video', label: '🎥 Video' },
 ];
 
 // Mock data dihapus karena sekarang kita menggunakan data asli dari API
@@ -18,20 +24,25 @@ export default function CommunityGallery() {
     const pathname = usePathname();
     const { isDark, toggleTheme } = useTheme();
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedItem, setSelectedItem] = useState<any>(null);
     const [searchQuery, setSearchQuery] = useState('');
-    const [selectedCategory, setSelectedCategory] = useState('all');
+    const [selectedCategories, setSelectedCategories] = useState<string[]>(['all']);
+    const [selectedFormat, setSelectedFormat] = useState('all');
+    const [isAdmin, setIsAdmin] = useState(false);
 
     const [galleryData, setGalleryData] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
     // Form states
     const [uploadTitle, setUploadTitle] = useState('');
-    const [uploadCategory, setUploadCategory] = useState('');
+    const [uploadCategories, setUploadCategories] = useState<string[]>([]);
     const [uploadFile, setUploadFile] = useState<File | null>(null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [isUploading, setIsUploading] = useState(false);
 
     useEffect(() => {
         fetchGallery();
+        setIsAdmin(localStorage.getItem('user_role') === 'admin');
     }, []);
 
     const fetchGallery = async () => {
@@ -50,7 +61,7 @@ export default function CommunityGallery() {
     };
 
     const handleUpload = async () => {
-        if (!uploadTitle || !uploadCategory || !uploadFile) {
+        if (!uploadTitle || uploadCategories.length === 0 || !uploadFile) {
             toast.error('Harap lengkapi semua data dan pilih gambar!');
             return;
         }
@@ -58,7 +69,7 @@ export default function CommunityGallery() {
         setIsUploading(true);
         const formData = new FormData();
         formData.append('title', uploadTitle);
-        formData.append('category', uploadCategory);
+        formData.append('category', uploadCategories.join(','));
         const authorName = typeof window !== 'undefined' ? localStorage.getItem('user_name') || 'Diver' : 'Diver';
         formData.append('author', authorName);
         formData.append('file', uploadFile);
@@ -74,8 +85,9 @@ export default function CommunityGallery() {
                 toast.success('Karya berhasil diunggah! Menunggu persetujuan admin.');
                 setIsModalOpen(false);
                 setUploadTitle('');
-                setUploadCategory('');
+                setUploadCategories([]);
                 setUploadFile(null);
+                setPreviewUrl(null);
             } else {
                 toast.error(data.message || 'Gagal mengunggah karya.');
             }
@@ -86,12 +98,40 @@ export default function CommunityGallery() {
         }
     };
 
+    const handleDeleteContent = async (id: number) => {
+        if (!confirm('Yakin ingin menghapus karya ini secara permanen dari Galeri?')) return;
+        const token = localStorage.getItem('auth_token');
+        try {
+            const res = await fetch(`http://localhost:8000/api/admin/gallery/${id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (res.ok) {
+                toast.success('Karya berhasil dihapus!');
+                setSelectedItem(null);
+                fetchGallery(); // Refresh the gallery
+            } else {
+                toast.error('Gagal menghapus karya (Mungkin sesi admin Anda sudah habis).');
+            }
+        } catch (e) {
+            toast.error('Terjadi kesalahan jaringan saat menghapus karya.');
+        }
+    };
+
     const filteredGallery = galleryData.filter((item) => {
         const titleMatch = item.title?.toLowerCase().includes(searchQuery.toLowerCase());
         const authorMatch = item.author?.toLowerCase().includes(searchQuery.toLowerCase());
         const matchesSearch = titleMatch || authorMatch;
-        const matchesCategory = selectedCategory === 'all' || item.category === selectedCategory;
-        return matchesSearch && matchesCategory;
+        const matchesCategory = selectedCategories.includes('all') || selectedCategories.every(cat => item.category && item.category.includes(cat));
+        
+        let matchesFormat = true;
+        if (selectedFormat === 'video') {
+            matchesFormat = !!item.image?.match(/\.(mp4|webm|ogg|mov)$/i);
+        } else if (selectedFormat === 'photo') {
+            matchesFormat = !item.image?.match(/\.(mp4|webm|ogg|mov)$/i);
+        }
+
+        return matchesSearch && matchesCategory && matchesFormat;
     });
 
     const navLinks = [
@@ -181,22 +221,56 @@ export default function CommunityGallery() {
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className={`flex-grow p-4 rounded-xl border-2 border-transparent focus:outline-none transition-colors font-medium ${isDark ? 'bg-white/5 text-white placeholder-gray-500 focus:border-blue-500/50 focus:bg-white/10' : 'bg-gray-50 text-gray-900 placeholder-gray-400 focus:border-blue-400 focus:bg-white'}`}
                     />
-                    <div className="flex items-center gap-2 flex-wrap">
-                        {CATEGORIES.map((cat) => (
-                            <button
-                                key={cat.value}
-                                onClick={() => setSelectedCategory(cat.value)}
-                                className={`px-4 py-2.5 rounded-full text-sm font-semibold transition-all duration-200 ${
-                                    selectedCategory === cat.value
-                                        ? 'bg-gradient-to-r from-blue-600 to-cyan-500 text-white shadow-lg shadow-blue-500/20'
-                                        : isDark
-                                            ? 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white border border-white/10'
-                                            : 'bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-800'
-                                }`}
-                            >
-                                {cat.label}
-                            </button>
-                        ))}
+                    <div className="flex flex-col gap-3">
+                        <div className="flex items-center gap-2 flex-wrap">
+                            {CATEGORIES.map((cat) => {
+                                const isSelected = selectedCategories.includes(cat.value);
+                                return (
+                                    <button
+                                        key={cat.value}
+                                        onClick={() => {
+                                            if (cat.value === 'all') {
+                                                setSelectedCategories(['all']);
+                                            } else {
+                                                const newSelection = selectedCategories.filter(c => c !== 'all');
+                                                if (newSelection.includes(cat.value)) {
+                                                    const removed = newSelection.filter(c => c !== cat.value);
+                                                    setSelectedCategories(removed.length === 0 ? ['all'] : removed);
+                                                } else {
+                                                    setSelectedCategories([...newSelection, cat.value]);
+                                                }
+                                            }
+                                        }}
+                                        className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                                            isSelected
+                                                ? 'bg-gradient-to-r from-blue-600 to-cyan-500 text-white shadow-lg shadow-blue-500/20'
+                                                : isDark
+                                                    ? 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white border border-white/10'
+                                                    : 'bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-800 border border-gray-200'
+                                        }`}
+                                    >
+                                        {cat.label}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                            {FORMATS.map((fmt) => (
+                                <button
+                                    key={fmt.value}
+                                    onClick={() => setSelectedFormat(fmt.value)}
+                                    className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                                        selectedFormat === fmt.value
+                                            ? 'bg-gradient-to-r from-purple-600 to-pink-500 text-white shadow-lg shadow-purple-500/20'
+                                            : isDark
+                                                ? 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white border border-white/10'
+                                                : 'bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-800 border border-gray-200'
+                                    }`}
+                                >
+                                    {fmt.label}
+                                </button>
+                            ))}
+                        </div>
                     </div>
                 </div>
 
@@ -206,6 +280,7 @@ export default function CommunityGallery() {
                         {filteredGallery.map((item) => (
                             <div
                                 key={item.id}
+                                onClick={() => setSelectedItem(item)}
                                 className={`group rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 hover:-translate-y-2 border ${isDark
                                     ? 'bg-white/[0.04] border-white/10 hover:border-blue-500/30 hover:shadow-[0_0_30px_rgba(59,130,246,0.1)]'
                                     : 'bg-white border-gray-100 shadow-sm hover:shadow-xl hover:border-blue-200'
@@ -213,7 +288,11 @@ export default function CommunityGallery() {
                             >
                                 <div className={`h-52 flex items-center justify-center relative overflow-hidden ${isDark ? 'bg-gradient-to-br from-blue-900/30 to-cyan-900/20' : 'bg-gradient-to-br from-blue-100 to-cyan-100'}`}>
                                     {item.image ? (
-                                        <img src={item.image} alt={item.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                        item.image.match(/\.(mp4|webm|ogg|mov)$/i) ? (
+                                            <video src={item.image.startsWith('http') ? item.image.replace('http://localhost/', 'http://localhost:8000/') : `http://localhost:8000${item.image}`} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 pointer-events-none" loop muted playsInline autoPlay />
+                                        ) : (
+                                            <img src={item.image.startsWith('http') ? item.image.replace('http://localhost/', 'http://localhost:8000/') : `http://localhost:8000${item.image}`} alt={item.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                        )
                                     ) : (
                                         <>
                                             <div className="absolute inset-0 bg-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -268,17 +347,32 @@ export default function CommunityGallery() {
                             >✕</button>
                         </div>
                         <div className="p-6 space-y-5">
-                            <div className={`border-2 border-dashed rounded-2xl p-10 flex flex-col items-center justify-center cursor-pointer group transition-colors relative overflow-hidden ${isDark ? 'border-blue-500/30 hover:border-blue-400/50 bg-blue-500/5' : 'border-blue-200 hover:border-blue-400 bg-blue-50/50'}`}>
-                                <input type="file" className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" onChange={(e) => setUploadFile(e.target.files?.[0] || null)} />
-                                {uploadFile ? (
-                                    <div className="text-center">
-                                        <p className="font-bold text-emerald-500 mb-1">✅ File Terpilih</p>
-                                        <p className="text-sm text-gray-400 truncate max-w-[200px]">{uploadFile.name}</p>
+                            <div className={`border-2 border-dashed rounded-2xl p-6 flex flex-col items-center justify-center cursor-pointer group transition-colors relative overflow-hidden min-h-[200px] ${isDark ? 'border-blue-500/30 hover:border-blue-400/50 bg-blue-500/5' : 'border-blue-200 hover:border-blue-400 bg-blue-50/50'}`}>
+                                <input type="file" className="absolute inset-0 opacity-0 cursor-pointer z-10" accept="image/*,video/*" onChange={(e) => {
+                                    const file = e.target.files?.[0] || null;
+                                    setUploadFile(file);
+                                    if (file) {
+                                        setPreviewUrl(URL.createObjectURL(file));
+                                    } else {
+                                        setPreviewUrl(null);
+                                    }
+                                }} />
+                                {previewUrl ? (
+                                    <div className="absolute inset-0 flex items-center justify-center bg-black">
+                                        {uploadFile?.type.startsWith('video/') ? (
+                                            <video src={previewUrl} className="w-full h-full object-contain" controls playsInline />
+                                        ) : (
+                                            <img src={previewUrl} alt="Preview" className="w-full h-full object-contain" />
+                                        )}
+                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+                                            <p className="font-bold text-white bg-black/50 px-4 py-2 rounded-lg">Ganti Media</p>
+                                        </div>
                                     </div>
                                 ) : (
                                     <>
                                         <div className={`w-16 h-16 rounded-full flex items-center justify-center text-3xl mb-3 group-hover:scale-110 transition-transform ${isDark ? 'bg-white/10' : 'bg-white shadow-sm'}`}>📥</div>
-                                        <p className={`font-bold ${isDark ? 'text-blue-300' : 'text-blue-700'}`}>Pilih gambar atau tarik ke sini</p>
+                                        <p className={`font-bold ${isDark ? 'text-blue-300' : 'text-blue-700'}`}>Pilih media atau tarik ke sini</p>
+                                        <p className="text-xs text-gray-500 mt-2">Semua format foto & video didukung (Tanpa Batas)</p>
                                     </>
                                 )}
                             </div>
@@ -289,26 +383,96 @@ export default function CommunityGallery() {
                                 />
                             </div>
                             <div>
-                                <label className={`block text-sm font-bold mb-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>Kategori Karya <span className="text-red-500">*</span></label>
-                                <select value={uploadCategory} onChange={(e) => setUploadCategory(e.target.value)}
-                                    className={`w-full p-3.5 rounded-xl border focus:outline-none transition-all font-medium cursor-pointer ${isDark ? 'bg-white/5 border-white/10 text-gray-300 focus:border-blue-500/50' : 'bg-gray-50 border-gray-200 text-gray-700 focus:border-blue-400 focus:bg-white'}`}
-                                >
-                                    <option value="" disabled>Pilih kategori yang sesuai...</option>
-                                    <option value="coral">Terumbu Karang</option>
-                                    <option value="fish">Ikan & Biota Laut</option>
-                                    <option value="environment">Lingkungan Laut</option>
-                                </select>
+                                <label className={`block text-sm font-bold mb-3 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>Kategori Karya (Bisa Pilih Lebih Dari Satu) <span className="text-red-500">*</span></label>
+                                <div className="flex flex-wrap gap-2">
+                                    {CATEGORIES.filter(c => c.value !== 'all').map((cat) => {
+                                        const isSelected = uploadCategories.includes(cat.value);
+                                        return (
+                                            <button
+                                                key={cat.value}
+                                                type="button"
+                                                onClick={() => {
+                                                    if (isSelected) {
+                                                        setUploadCategories(uploadCategories.filter(c => c !== cat.value));
+                                                    } else {
+                                                        setUploadCategories([...uploadCategories, cat.value]);
+                                                    }
+                                                }}
+                                                className={`px-4 py-2 rounded-xl text-sm font-bold transition-all duration-200 border ${
+                                                    isSelected
+                                                        ? 'bg-blue-500 text-white border-blue-500 shadow-lg shadow-blue-500/30'
+                                                        : isDark 
+                                                            ? 'bg-white/5 text-gray-400 border-white/10 hover:bg-white/10 hover:text-white' 
+                                                            : 'bg-gray-50 text-gray-500 border-gray-200 hover:bg-gray-100 hover:text-gray-800'
+                                                }`}
+                                            >
+                                                {cat.label}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
                             </div>
+                            <button onClick={handleUpload} disabled={isUploading} className={`w-full py-4 rounded-xl font-bold text-white transition-all shadow-lg hover:-translate-y-1 ${isUploading ? 'bg-gray-500 cursor-not-allowed' : 'bg-gradient-to-r from-blue-600 to-cyan-500 hover:shadow-blue-500/25'}`}>
+                                {isUploading ? '⏳ Mengunggah Karya...' : '🚀 Unggah Sekarang'}
+                            </button>
                         </div>
-                        <div className={`p-6 flex justify-end gap-3 border-t ${isDark ? 'bg-white/[0.02] border-white/10' : 'bg-gray-50 border-gray-100'}`}>
-                            <button onClick={() => setIsModalOpen(false)}
-                                className={`px-6 py-3 font-bold rounded-xl transition-colors ${isDark ? 'text-gray-300 hover:bg-white/10' : 'text-gray-600 hover:bg-gray-200'}`}
-                            >Batal</button>
-                            <button
-                                onClick={handleUpload}
-                                disabled={isUploading}
-                                className="px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-500 hover:opacity-90 text-white font-bold rounded-xl shadow-lg shadow-blue-500/20 transition-all disabled:opacity-50"
-                            >{isUploading ? 'Mengunggah...' : 'Kirim Karya'}</button>
+                    </div>
+                </div>
+            )}
+
+            {/* LIGHTBOX MODAL TIKTOK-STYLE */}
+            {selectedItem && (
+                <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 md:p-10">
+                    <div className="absolute inset-0 bg-black/90 backdrop-blur-md" onClick={() => setSelectedItem(null)} />
+                    <button onClick={() => setSelectedItem(null)} className="absolute top-4 right-4 md:top-8 md:right-8 w-12 h-12 flex items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors z-10 text-xl font-bold backdrop-blur-lg">✕</button>
+                    
+                    <div className="relative z-10 w-full max-w-6xl h-full max-h-[85vh] flex flex-col md:flex-row bg-[#000814] rounded-3xl overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-white/10">
+                        {/* Media Section (Object Contain to respect ratio) */}
+                        <div className="flex-1 flex items-center justify-center bg-black relative overflow-hidden h-[50vh] md:h-auto">
+                            {selectedItem.image ? (
+                                selectedItem.image.match(/\.(mp4|webm|ogg|mov)$/i) ? (
+                                    <video src={selectedItem.image.startsWith('http') ? selectedItem.image.replace('http://localhost/', 'http://localhost:8000/') : `http://localhost:8000${selectedItem.image}`} className="w-full h-full object-contain" controls autoPlay playsInline />
+                                ) : (
+                                    <img src={selectedItem.image.startsWith('http') ? selectedItem.image.replace('http://localhost/', 'http://localhost:8000/') : `http://localhost:8000${selectedItem.image}`} alt={selectedItem.title} className="w-full h-full object-contain" />
+                                )
+                            ) : null}
+                        </div>
+                        
+                        {/* Info Section */}
+                        <div className="w-full md:w-[350px] lg:w-[400px] p-8 flex flex-col bg-white/5 border-t md:border-t-0 md:border-l border-white/10 flex-shrink-0">
+                            <h2 className="text-3xl font-black text-white mb-6 leading-tight">{selectedItem.title}</h2>
+                            <div className="flex items-center gap-4 mb-8 pb-8 border-b border-white/10">
+                                <div className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg bg-gradient-to-br from-blue-600 to-cyan-500 text-white shadow-lg shadow-blue-500/20">
+                                    {selectedItem.author.charAt(0)}
+                                </div>
+                                <div>
+                                    <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-1">Penyelam</p>
+                                    <p className="font-bold text-white text-lg">{selectedItem.author}</p>
+                                </div>
+                            </div>
+                            <div className="mb-4">
+                                <p className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3">Kategori Karya</p>
+                                <div className="flex flex-wrap gap-2">
+                                    {(selectedItem.category || '').split(',').map((catVal: string) => {
+                                        const label = CATEGORIES.find(c => c.value === catVal)?.label || catVal;
+                                        return (
+                                            <span key={catVal} className="px-4 py-2 bg-white/10 rounded-xl text-sm font-bold text-cyan-300 inline-block border border-cyan-500/20">
+                                                {label}
+                                            </span>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                            <div className="mt-auto pt-8 space-y-3">
+                                {isAdmin && (
+                                    <button onClick={() => handleDeleteContent(selectedItem.id)} className="w-full py-4 rounded-xl font-bold text-red-500 bg-red-500/10 hover:bg-red-500 hover:text-white transition-colors border border-red-500/20">
+                                        🗑️ Hapus Karya (Admin Akses)
+                                    </button>
+                                )}
+                                <button onClick={() => setSelectedItem(null)} className="w-full py-4 rounded-xl font-bold text-white bg-white/10 hover:bg-white/20 transition-colors border border-white/10 hover:border-white/20">
+                                    Kembali
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>

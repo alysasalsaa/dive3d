@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTheme } from '../../lib/useTheme';
+import AdminDashboard from './AdminDashboard';
 
 export default function DashboardPage() {
     const pathname = usePathname();
@@ -13,8 +14,12 @@ export default function DashboardPage() {
     const [activeMenu, setActiveMenu] = useState(0);
     const [konservasiDone, setKonservasiDone] = useState(0);
     const [digitalDone, setDigitalDone] = useState(0);
+    const [userRole, setUserRole] = useState('user');
 
     useEffect(() => {
+        const role = localStorage.getItem('user_role') || 'user';
+        setUserRole(role);
+        
         const userEmail = (localStorage.getItem('user_email') || '').toLowerCase();
 
         // TEST: vinzcan11 langsung semua selesai
@@ -119,6 +124,7 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Menu */}
+                {userRole !== 'admin' && (
                 <ul className="flex-1 py-4 px-2 space-y-1 overflow-x-hidden">
                     {menuItems.map((item, idx) => (
                         <li
@@ -141,6 +147,7 @@ export default function DashboardPage() {
                         </li>
                     ))}
                 </ul>
+                )}
 
                 {/* Logout */}
                 <div className={`p-2 border-t ${isDark ? 'border-white/5' : 'border-gray-100'}`}>
@@ -166,8 +173,8 @@ export default function DashboardPage() {
                     <div className="flex items-center gap-4">
                         <div className="w-9 h-9 bg-gradient-to-br from-blue-400 to-cyan-400 rounded-full flex-shrink-0 shadow-lg shadow-blue-500/20" />
                         <div>
-                            <p className={`font-bold text-sm leading-none ${isDark ? "text-white" : "text-gray-900"}`}>{userName}</p>
-                            <p className="text-cyan-400 text-xs mt-0.5">Level {level} · {rankName}</p>
+                            <p className={`font-bold text-sm leading-none ${isDark ? "text-white" : "text-gray-900"}`}>{userName} {userRole === 'admin' && <span className="ml-2 px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-400 text-[10px] uppercase tracking-wider">Admin</span>}</p>
+                            {userRole !== 'admin' && <p className="text-cyan-400 text-xs mt-0.5">Level {level} · {rankName}</p>}
                         </div>
                     </div>
 
@@ -209,6 +216,9 @@ export default function DashboardPage() {
                 </header>
 
                 {/* DASHBOARD CONTENT */}
+                {userRole === 'admin' ? (
+                    <AdminDashboard />
+                ) : (
                 <div className="p-6 space-y-6 max-w-7xl mx-auto w-full">
                     {/* Profile & XP Row */}
                     <div className={`flex flex-col md:flex-row justify-between items-center rounded-2xl p-6 border ${isDark ? 'bg-[#0B1221] border-white/5' : 'bg-white border-gray-200 shadow-sm'}`}>
@@ -437,6 +447,7 @@ export default function DashboardPage() {
                         </div>
                     </div>
                 </div>
+                )}
 
                 {/* FOOTER */}
                 <footer className={`mt-auto px-6 py-6 border-t text-center ${isDark ? "border-white/5" : "border-gray-200"}`}>

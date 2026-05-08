@@ -42,6 +42,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/pending', [ContentController::class, 'pending']);
         Route::post('/approve/{id}', [ContentController::class, 'approve']);
         Route::post('/reject/{id}', [ContentController::class, 'reject']);
+        Route::delete('/gallery/{id}', [ContentController::class, 'destroy']);
+        
+        // Manajemen Modul
+        Route::post('/modules', [ModuleController::class, 'store']);
+        Route::put('/modules/{slug}', [ModuleController::class, 'update']);
+        Route::delete('/modules/{slug}', [ModuleController::class, 'destroy']);
     });
 
     // Dashboard (butuh auth agar dapat nama user asli)
