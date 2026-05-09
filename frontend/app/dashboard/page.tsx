@@ -6,7 +6,7 @@ import { useTheme } from '../../lib/useTheme';
 import AdminDashboard from './AdminDashboard';
 import dynamic from 'next/dynamic';
 
-
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 export default function DashboardPage() {
     const pathname = usePathname();
@@ -69,7 +69,7 @@ export default function DashboardPage() {
             window.location.href = '/login';
             return;
         }
-        fetch('http://localhost:8000/api/dashboard', {
+        fetch(`${API_URL}/api/dashboard`, {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Accept': 'application/json',
