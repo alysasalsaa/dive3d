@@ -338,12 +338,12 @@ export default function TutorialPage() {
                   {!watchedVideos.has(tutorial.id) ? (
                     <button
                       onClick={() => markWatched(tutorial.id)}
-                      className="mt-2 px-5 py-2.5 rounded-full text-sm font-bold bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500 hover:text-white transition-all self-start flex items-center gap-2"
+                      className={`mt-2 px-5 py-2.5 rounded-full text-sm font-bold bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500 hover:text-white transition-all flex items-center gap-2 self-center ${!isEven ? 'md:self-end' : 'md:self-start'}`}
                     >
                       <span>👁️</span> Tandai Sudah Ditonton
                     </button>
                   ) : (
-                    <div className="mt-2 px-5 py-2.5 rounded-full text-sm font-bold bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 self-start flex items-center gap-2">
+                    <div className={`mt-2 px-5 py-2.5 rounded-full text-sm font-bold bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center gap-2 self-center ${!isEven ? 'md:self-end' : 'md:self-start'}`}>
                       <span>🎬</span> Video Selesai Ditonton
                     </div>
                   )}
