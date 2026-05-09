@@ -21,7 +21,7 @@ function delay(ms: number) {
  * Ganti isi fungsi ini dengan fetch('/api/modules') saat backend siap.
  */
 export async function getModules(): Promise<ModuleData[]> {
-  const response = await fetch(`${API_URL}/api/modules', { cache: 'no-store' });
+  const response = await fetch(`${API_URL}/api/modules`, { cache: 'no-store' });
   const data = await response.json();
   return data.map((mod: any) => ({
     id: mod.slug,
