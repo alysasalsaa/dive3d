@@ -160,6 +160,7 @@ export default function LMSPage() {
            if (moduleSlug === 'all') {
               if (action === 'certificate') {
                 setHasCertificate(true);
+                setFromDashboard(true);
                 setView('user_certificate');
               } else {
                 setView('user_modules');
@@ -283,6 +284,7 @@ export default function LMSPage() {
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const [showBackConfirm, setShowBackConfirm] = useState(false);
   const [userName, setUserName] = useState<string | null>(null);
+  const [fromDashboard, setFromDashboard] = useState(false);
   // Simpan progress ke localStorage setiap kali berubah
   useEffect(() => {
     const userEmail = (localStorage.getItem('user_email') || '').toLowerCase();
@@ -1278,8 +1280,11 @@ export default function LMSPage() {
                 <h1 className="text-3xl font-black text-white">Sertifikat Penghargaan</h1>
                 <p className="text-gray-400">Selamat! Anda telah menyelesaikan seluruh modul <span className="text-cyan-400 font-semibold">{selectedTrack?.title}</span>.</p>
               </div>
-              <button onClick={() => setView('user_modules')} className="px-6 py-3 rounded-xl font-bold text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 transition-all border border-transparent hover:border-white/10">
-                ← Kembali
+              <button
+                onClick={() => fromDashboard ? window.location.href = '/dashboard' : setView('user_modules')}
+                className="px-6 py-3 rounded-xl font-bold text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 transition-all border border-transparent hover:border-white/10"
+              >
+                ← {fromDashboard ? 'Kembali ke Dashboard' : 'Kembali'}
               </button>
             </div>
 

@@ -10,6 +10,20 @@ export default function TutorialPage() {
   const { isDark, toggleTheme } = useTheme();
   const [activeTab, setActiveTab] = useState('Semua');
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
+  const [watchedVideos, setWatchedVideos] = useState<Set<number>>(() => {
+    if (typeof window === 'undefined') return new Set();
+    const saved = localStorage.getItem('tutorial_watched');
+    return saved ? new Set<number>(JSON.parse(saved)) : new Set<number>();
+  });
+
+  const markWatched = (id: number) => {
+    setWatchedVideos(prev => {
+      const next = new Set(prev);
+      next.add(id);
+      localStorage.setItem('tutorial_watched', JSON.stringify([...next]));
+      return next;
+    });
+  };
 
   const categories = ['Semua', 'Fotografi', 'Videografi', 'Storytelling', 'Editing', 'Etika'];
 
@@ -160,7 +174,27 @@ export default function TutorialPage() {
       {/* TUTORIAL CONTENT SECTION */}
       <section className="px-6 pb-32">
         <div className="max-w-7xl mx-auto">
-          
+
+          {/* Progress Bar Tutorial */}
+          <div className={`flex items-center gap-4 p-4 rounded-2xl border mb-8 ${isDark ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200 shadow-sm'}`}>
+            <span className="text-2xl">▶️</span>
+            <div className="flex-1">
+              <div className="flex justify-between text-xs font-bold mb-1.5">
+                <span className={isDark ? 'text-gray-300' : 'text-gray-700'}>Progress Tutorial</span>
+                <span className="text-cyan-400">{watchedVideos.size} / 5 Video Selesai</span>
+              </div>
+              <div className={`h-2 rounded-full w-full ${isDark ? 'bg-gray-800' : 'bg-gray-200'}`}>
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 transition-all duration-500"
+                  style={{ width: `${(watchedVideos.size / 5) * 100}%` }}
+                />
+              </div>
+            </div>
+            {watchedVideos.size === 5 && (
+              <span className="text-emerald-400 font-black text-xs whitespace-nowrap">✅ Semua Selesai!</span>
+            )}
+          </div>
+
           {/* Category Filter */}
           <div className="flex flex-wrap items-center gap-3 mb-12">
             {categories.map((cat) => (
@@ -224,8 +258,8 @@ export default function TutorialPage() {
                     <span className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider backdrop-blur-sm border ${isDark ? 'bg-cyan-500/10 border-cyan-500/20 text-cyan-400' : 'bg-blue-100 border-blue-200 text-blue-700'}`}>
                       {tutorial.category}
                     </span>
-                    <span className={`flex items-center gap-1.5 text-xs font-bold px-4 py-1.5 rounded-full border ${tutorial.progress === 100 ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' : isDark ? 'bg-white/5 border-white/10 text-gray-400' : 'bg-white border-gray-200 text-gray-500'}`}>
-                      {tutorial.progress === 100 ? (
+                    <span className={`flex items-center gap-1.5 text-xs font-bold px-4 py-1.5 rounded-full border ${watchedVideos.has(tutorial.id) ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' : isDark ? 'bg-white/5 border-white/10 text-gray-400' : 'bg-white border-gray-200 text-gray-500'}`}>
+                      {watchedVideos.has(tutorial.id) ? (
                         <>✅ Selesai</>
                       ) : (
                         <>🕒 Belum Ditonton</>
@@ -240,6 +274,20 @@ export default function TutorialPage() {
                   <p className={`text-base md:text-lg leading-relaxed mb-6 ${!isEven ? 'md:ml-auto' : ''} max-w-md ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                     {tutorial.description}
                   </p>
+
+                  {/* Tombol Tandai Selesai */}
+                  {!watchedVideos.has(tutorial.id) ? (
+                    <button
+                      onClick={() => markWatched(tutorial.id)}
+                      className="mt-2 px-5 py-2.5 rounded-full text-sm font-bold bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500 hover:text-white transition-all self-start"
+                    >
+                      ✔ Tandai Selesai Ditonton
+                    </button>
+                  ) : (
+                    <div className="mt-2 px-5 py-2.5 rounded-full text-sm font-bold bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 self-start">
+                      ✅ Video Selesai Ditonton
+                    </div>
+                  )}
 
                   {/* Decorative Elements */}
                   <div className={`hidden md:flex items-center gap-4 text-2xl opacity-40 animate-pulse mt-2 ${!isEven ? 'flex-row-reverse' : ''}`}>
