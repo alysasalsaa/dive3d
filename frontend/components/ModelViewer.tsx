@@ -1,11 +1,41 @@
 "use client";
 
-import React, { Suspense, useRef, useState } from "react";
+import React, { Suspense, useRef, useState, Component, ReactNode } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, useGLTF, Stage, Html } from "@react-three/drei";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 
-// Komponen penampil Loading
+class ModelErrorBoundary extends Component<
+  { children: ReactNode; url: string },
+  { hasError: boolean }
+> {
+  constructor(props: { children: ReactNode; url: string }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  componentDidUpdate(prevProps: { url: string }) {
+    if (prevProps.url !== this.props.url) {
+      this.setState({ hasError: false });
+    }
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <Html center>
+          <div className="text-white font-bold bg-red-900/70 px-4 py-3 rounded-xl backdrop-blur-md whitespace-nowrap text-center">
+            <div className="text-2xl mb-1">⚠️</div>
+            Gagal memuat model 3D
+          </div>
+        </Html>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 function Loader() {
   return (
     <Html center>
@@ -16,14 +46,11 @@ function Loader() {
   );
 }
 
-// Komponen Pembaca File GLTF
 function GLTFModel({ url }: { url: string }) {
-  // useGLTF otomatis membaca file .gltf dan texture-texture (.jpg, .bin) pendampingnya
   const { scene } = useGLTF(url);
   return <primitive object={scene} />;
 }
 
-// Komponen Utama (Yang dipanggil ke Halaman)
 export default function ModelViewer({
   url,
   className = "w-full h-[400px]",
@@ -48,7 +75,6 @@ export default function ModelViewer({
     <div
       className={`${className} relative bg-[#00040a]/50 rounded-[32px] overflow-hidden border border-white/10 shadow-2xl`}
     >
-      {/* Tombol kontrol */}
       <div className="absolute top-4 right-4 z-20 flex flex-col gap-2">
         <button
           onClick={() => setShowGuide(!showGuide)}
@@ -56,14 +82,12 @@ export default function ModelViewer({
         >
           {showGuide ? "Sembunyikan Panduan" : "Lihat Panduan"}
         </button>
-
         <button
           onClick={handleResetView}
           className="px-4 py-2 text-sm font-semibold bg-black/60 text-white rounded-xl border border-white/10 backdrop-blur-md hover:bg-black/80 transition"
         >
           Reset View
         </button>
-
         <button
           onClick={() => setAutoRotate(!autoRotate)}
           className="px-4 py-2 text-sm font-semibold bg-black/60 text-white rounded-xl border border-white/10 backdrop-blur-md hover:bg-black/80 transition"
@@ -72,7 +96,6 @@ export default function ModelViewer({
         </button>
       </div>
 
-      {/* Panduan Navigasi */}
       {showGuide && (
         <div className="absolute bottom-4 left-4 z-20 max-w-xs bg-black/60 text-white p-4 rounded-2xl border border-white/10 backdrop-blur-md shadow-lg">
           <h3 className="font-bold mb-2">Panduan Navigasi</h3>
@@ -88,12 +111,12 @@ export default function ModelViewer({
 
       <Canvas shadows dpr={[1, 2]} camera={{ fov: 40, position: [0, 0, 1.2] }}>
         <Suspense fallback={<Loader />}>
-          <Stage environment="city" intensity={0.5}>
-            <GLTFModel url={url} />
-          </Stage>
+          <ModelErrorBoundary url={url}>
+            <Stage environment="city" intensity={0.5}>
+              <GLTFModel url={url} />
+            </Stage>
+          </ModelErrorBoundary>
         </Suspense>
-
-        {/* Kontrol agar user bisa memutar dan melakukan zoom model */}
         <OrbitControls
           ref={controlsRef}
           autoRotate={autoRotate}
