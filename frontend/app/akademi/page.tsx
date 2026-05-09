@@ -12,7 +12,6 @@ const getModelUrl = (tab: string) => {
     switch(tab) {
         case 'ikan': return '/models/ClownFish3D/ClownFish3d.glb';
         case 'karang': return '/models/usnm_74016-100k-2048-gltf_std/usnm_74016-100k-2048.gltf';
-        case 'ekosistem': return 'https://github.com/vinzyid/dive3d/releases/download/v1.0-models/ekosistem3d.glb';
         case 'tridacna': return '/models/Tridacna/TridacnaAhnaf3D.glb';
         case 'tridacna-gigas': return '/models/Tridacna Gigas/Tridacna Gigas.glb';
         case 'zooplankton': return '/models/Zooplankton Daphnia/Zooplankton daphnia.glb';
@@ -367,7 +366,6 @@ export default function AkademiPage() {
                                         { id: 'coral1', label: 'Coral 1', icon: '🐚' },
                                         { id: 'coral2', label: 'Coral 2', icon: '🐚' },
                                         { id: 'coral3', label: 'Coral 3', icon: '🐚' },
-                                        { id: 'ekosistem', label: 'Ekosistem', icon: '🌊' },
                                         { id: 'tridacna', label: 'Tridacna', icon: '🐚' },
                                         { id: 'tridacna-gigas', label: 'Tridacna Gigas', icon: '🦪' },
                                         { id: 'zooplankton', label: 'Zooplankton', icon: '🦠' },
