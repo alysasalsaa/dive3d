@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
@@ -128,6 +129,7 @@ type ModuleData = {
 };
 
 export default function LMSPage() {
+  const router = useRouter();
   const [view, setView] = useState<ViewState | null>(null);
 
   useEffect(() => {
@@ -537,7 +539,7 @@ export default function LMSPage() {
       {/* NAVBAR */}
       <nav className="w-full px-8 py-5 flex justify-between items-center border-b border-white/10 bg-white/5 backdrop-blur-md sticky top-0 z-50">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg bg-white/5 border border-white/10 overflow-hidden cursor-pointer">
+          <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-lg bg-white/5 border border-white/10 overflow-hidden cursor-pointer">
             <img src="/images/logo.png" alt="Dive3D Logo" className="w-full h-full object-cover" />
           </div>
           <span className="text-xl font-black tracking-widest">DIVEXPLORE LMS</span>
@@ -792,6 +794,11 @@ export default function LMSPage() {
         {/* ========================================= */}
         {view === 'user_track_select' && (
           <div className="w-full max-w-4xl relative z-10 animate-in fade-in zoom-in-95 duration-500">
+            <div className="mb-6">
+              <button onClick={() => router.back()} className="px-6 py-2.5 rounded-xl font-bold text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 transition-all border border-transparent hover:border-white/10 flex items-center gap-2">
+                ← Kembali
+              </button>
+            </div>
             <div className="text-center mb-10">
               <h1 className="text-4xl font-black text-white mb-3">Pilih Jalur Pembelajaran</h1>
               <p className="text-gray-400">Pilih salah satu jalur untuk memulai dan mendapatkan sertifikat.</p>

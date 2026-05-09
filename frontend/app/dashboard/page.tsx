@@ -154,7 +154,7 @@ export default function DashboardPage() {
                 {/* Logo */}
                 <div className={`h-20 flex items-center px-4 border-b ${isDark ? 'border-white/5' : 'border-gray-100'}`}>
                     <div
-                        className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 cursor-pointer overflow-hidden bg-white/5 border border-white/10`}
+                        className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 cursor-pointer overflow-hidden bg-white/5 border border-white/10`}
                         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
                     >
                         {/* Ganti '/logo.png' dengan nama file logo Anda jika berbeda */}

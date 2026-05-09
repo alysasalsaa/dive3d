@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTheme } from '../../lib/useTheme';
@@ -10,6 +10,26 @@ const getModelUrl = (tab: string) => {
     switch(tab) {
         case 'ikan': return '/models/ClownFish3D/ClownFish3d.glb';
         case 'karang': return '/models/usnm_74016-100k-2048-gltf_std/usnm_74016-100k-2048.gltf';
+        case 'ekosistem': return '/models/Ekosistem3D/ekosistem3d.glb';
+        case 'tridacna': return '/models/Tridacna/TridacnaAhnaf3D.glb';
+        case 'tridacna-gigas': return '/models/Tridacna Gigas/Tridacna Gigas.glb';
+        case 'zooplankton': return '/models/Zooplankton Daphnia/Zooplankton daphnia.glb';
+        case 'penyu': return '/models/Penyu Hijau/PenyuHijau3D_Textured_00001.glb';
+        case 'lumba-lumba': return '/models/Lumba-Lumba/Lumba_Lumba.glb';
+        case 'dugong': return '/models/Dugong/Dugong.glb';
+        case 'butterfly': return '/models/Butterfly Fish/Butterflyfish3D-compressed.glb';
+        case 'parrot': return '/models/Parrot Fish/ParrotFish3D-compressed.glb';
+        case 'fitoplankton': return '/models/Fitoplankton/FitoplanktonfromAhnaf3d.glb';
+        case 'botol': return '/models/Botol Plastik/botol plastik.glb';
+        case 'botol2': return '/models/Botol Plastik/botol plastik banyak.glb';
+        case 'coral1': return '/models/Coral/Coral3_3D.glb';
+        case 'coral2': return '/models/Coral/CoralfromAhnaf2_3D.glb';
+        case 'coral3': return '/models/Coral/CoralsExtraAhn3D.glb';
+        case 'karang-acro': return '/models/Karang/Karang Acropora (bercabang)3D.glb';
+        case 'rumput': return '/models/Rumput Laut/Seaweed3D.glb';
+        case 'rumput2': return '/models/Rumput Laut/SeaweedAgain3D.glb';
+        case 'rumput3': return '/models/Rumput Laut/rumputlautExtra3D.glb';
+        case 'rumput4': return '/models/Rumput Laut/rumputlautLagi3D.glb';
         default: return null;
     }
 };
@@ -20,6 +40,27 @@ export default function AkademiPage() {
     const [activeTab, setActiveTab] = useState('lms');
     const [active3DTab, setActive3DTab] = useState('ikan');
     const [currentLMSIndex, setCurrentLMSIndex] = useState(0);
+    const scrollRef = useRef<HTMLDivElement>(null);
+
+    // Drag to scroll logic
+    const isDragging = useRef(false);
+    const startX = useRef(0);
+    const scrollLeft = useRef(0);
+
+    const onMouseDown = (e: React.MouseEvent) => {
+        isDragging.current = true;
+        startX.current = e.pageX - (scrollRef.current?.offsetLeft || 0);
+        scrollLeft.current = scrollRef.current?.scrollLeft || 0;
+    };
+    const onMouseLeave = () => { isDragging.current = false; };
+    const onMouseUp = () => { isDragging.current = false; };
+    const onMouseMove = (e: React.MouseEvent) => {
+        if (!isDragging.current || !scrollRef.current) return;
+        e.preventDefault();
+        const x = e.pageX - scrollRef.current.offsetLeft;
+        const walk = (x - startX.current) * 1.5;
+        scrollRef.current.scrollLeft = scrollLeft.current - walk;
+    };
 
     const nextModule = () => setCurrentLMSIndex((prev) => (prev + 1) % lmsModules.length);
     const prevModule = () => setCurrentLMSIndex((prev) => (prev - 1 + lmsModules.length) % lmsModules.length);
@@ -64,7 +105,7 @@ export default function AkademiPage() {
             {/* NAVBAR */}
             <nav className="fixed top-0 w-full z-50 px-6 py-5 flex justify-between items-center pointer-events-none">
                 <div className={`pointer-events-auto flex items-center gap-3 backdrop-blur-xl py-2 px-5 rounded-full border shadow-xl transition-colors ${isDark ? 'bg-white/10 border-white/10' : 'bg-white/80 border-blue-100 shadow-sm'}`}>
-                  <div className="w-9 h-9 rounded-full flex items-center justify-center shadow-lg bg-white/5 border border-blue-500/20 overflow-hidden">
+                  <div className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg bg-white/5 border border-blue-500/20 overflow-hidden">
                     <img src="/images/logo.png" alt="Dive3D Logo" className="w-full h-full object-cover" />
                   </div>
                   <span className={`text-lg font-black tracking-widest pr-1 ${isDark ? 'text-white' : 'text-blue-900'}`}>
@@ -306,13 +347,38 @@ export default function AkademiPage() {
                                 </div>
                                 
                                 {/* Bottom Categories (Filter) */}
-                                <div className={`mt-6 p-2 rounded-3xl flex items-center justify-center overflow-x-auto gap-3 max-w-full w-full mx-auto border ${isDark ? 'bg-[#001020] border-white/10 shadow-lg' : 'bg-white border-gray-200 shadow-sm'}`}>
+                                <div
+                                    ref={scrollRef}
+                                    onMouseDown={onMouseDown}
+                                    onMouseLeave={onMouseLeave}
+                                    onMouseUp={onMouseUp}
+                                    onMouseMove={onMouseMove}
+                                    style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', cursor: isDragging.current ? 'grabbing' : 'grab' }}
+                                    className={`mt-6 p-2 rounded-3xl flex items-center justify-start overflow-x-auto gap-3 w-full mx-auto border select-none ${isDark ? 'bg-[#001020] border-white/10 shadow-lg' : 'bg-white border-gray-200 shadow-sm'}`}
+                                >
                                     {[
                                         { id: 'ikan', label: 'Ikan', icon: '🐟' },
+                                        { id: 'butterfly', label: 'Butterfly Fish', icon: '🐠' },
+                                        { id: 'parrot', label: 'Parrot Fish', icon: '🐡' },
                                         { id: 'karang', label: 'Karang', icon: '🪸' },
-                                        { id: 'penyu', label: 'Penyu', icon: '🐢' },
-                                        { id: 'bintang', label: 'Bintang Laut', icon: '⭐' },
-                                        { id: 'rumput', label: 'Rumput Laut', icon: '🌿' },
+                                        { id: 'karang-acro', label: 'Karang Acropora', icon: '🪸' },
+                                        { id: 'coral1', label: 'Coral 1', icon: '🐚' },
+                                        { id: 'coral2', label: 'Coral 2', icon: '🐚' },
+                                        { id: 'coral3', label: 'Coral 3', icon: '🐚' },
+                                        { id: 'ekosistem', label: 'Ekosistem', icon: '🌊' },
+                                        { id: 'tridacna', label: 'Tridacna', icon: '🐚' },
+                                        { id: 'tridacna-gigas', label: 'Tridacna Gigas', icon: '🦪' },
+                                        { id: 'zooplankton', label: 'Zooplankton', icon: '🦠' },
+                                        { id: 'fitoplankton', label: 'Fitoplankton', icon: '🦠' },
+                                        { id: 'penyu', label: 'Penyu Hijau', icon: '🐢' },
+                                        { id: 'lumba-lumba', label: 'Lumba-Lumba', icon: '🐬' },
+                                        { id: 'dugong', label: 'Dugong', icon: '🦭' },
+                                        { id: 'rumput', label: 'Rumput Laut 1', icon: '🌿' },
+                                        { id: 'rumput2', label: 'Rumput Laut 2', icon: '🌱' },
+                                        { id: 'rumput3', label: 'Rumput Laut 3', icon: '🌾' },
+                                        { id: 'rumput4', label: 'Rumput Laut 4', icon: '🍃' },
+                                        { id: 'botol', label: 'Botol Plastik', icon: '🥤' },
+                                        { id: 'botol2', label: 'Botol Plastik Banyak', icon: '🗑️' },
                                     ].map(cat => (
                                         <button 
                                             key={cat.id} 
