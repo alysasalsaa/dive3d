@@ -5,6 +5,8 @@ import { usePathname } from 'next/navigation';
 import { useTheme } from '../../lib/useTheme';
 import AdminDashboard from './AdminDashboard';
 import dynamic from 'next/dynamic';
+import OnboardingTour from '../../components/OnboardingTour';
+import { Step } from 'react-joyride';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -21,9 +23,16 @@ export default function DashboardPage() {
     const [topScore, setTopScore] = useState(0);
     const [watchedTutorialCount, setWatchedTutorialCount] = useState(0);
     const [claimedCertificates, setClaimedCertificates] = useState<{type: string; label: string; track: string; date: string}[]>([]);
+    const [forceTour, setForceTour] = useState(false);
 
     useEffect(() => {
-        const role = localStorage.getItem('user_role') || 'user';
+        if (forceTour) {
+            setActiveMenu(0);
+        }
+    }, [forceTour]);
+
+    useEffect(() => {
+        const role = (localStorage.getItem('user_role') || 'user').toLowerCase();
         setUserRole(role);
 
         const userEmail = (localStorage.getItem('user_email') || '').toLowerCase();
@@ -139,8 +148,45 @@ export default function DashboardPage() {
     const totalVideos = 5;
     const totalKuis = 4;
 
+    const dashboardTourSteps: Step[] = [
+        {
+            target: '.tour-sidebar',
+            content: 'Ini menu navigasi kamu! Dari sini kamu bisa loncat ke Akademi, lihat klasemen Leaderboard, atau Klaim Hadiah.',
+            placement: 'right',
+        },
+        {
+            target: '.tour-profile',
+            content: 'Profil kamu ada di sini. Kumpulin XP terus biar level dan pangkat kamu naik terus! 🚀',
+            placement: 'bottom',
+        },
+        {
+            target: '.tour-academic',
+            content: 'Pantau seberapa rajin kamu belajar dari ringkasan akademik ini.',
+            placement: 'bottom',
+        },
+        {
+            target: '.tour-trophy',
+            content: 'Setiap nilai sempurna di kuis bakal ngebuka trofi 3D eksklusif. Ayo kumpulin semuanya! 🏆',
+            placement: 'top',
+        },
+        {
+            target: '.tour-certificates',
+            content: 'Kalau semua modul udah beres, kamu bisa klaim dan download sertifikat resmi kamu di sini. Keren kan? 📜',
+            placement: 'top',
+            skipScroll: true,
+        }
+    ];
+
     return (
         <div className={`flex h-screen font-sans overflow-hidden transition-colors duration-300 ${isDark ? 'bg-[#00040a] text-white' : 'bg-sky-50 text-gray-900'}`}>
+            {userRole !== 'admin' && (
+                <OnboardingTour 
+                    steps={dashboardTourSteps} 
+                    tourKey="userDashboard" 
+                    forceRun={forceTour} 
+                    onFinish={() => setForceTour(false)} 
+                />
+            )}
 
             {/* Ambient glow background */}
             <div className="fixed inset-0 pointer-events-none z-0">
@@ -167,7 +213,7 @@ export default function DashboardPage() {
 
                 {/* Menu */}
                 {userRole !== 'admin' && (
-                <ul className="flex-1 py-4 px-2 space-y-1 overflow-x-hidden">
+                <ul className="tour-sidebar flex-1 py-4 px-2 space-y-1 overflow-x-hidden">
                     {menuItems.map((item, idx) => (
                         <li
                             key={idx}
@@ -265,7 +311,7 @@ export default function DashboardPage() {
                 {activeMenu === 0 && (
                 <div className="p-6 space-y-6 max-w-7xl mx-auto w-full">
                     {/* Profile & XP Row */}
-                    <div className={`flex flex-col md:flex-row justify-between items-center rounded-2xl p-6 border ${isDark ? 'bg-[#0B1221] border-white/5' : 'bg-white border-gray-200 shadow-sm'}`}>
+                    <div className={`tour-profile flex flex-col md:flex-row justify-between items-center rounded-2xl p-6 border ${isDark ? 'bg-[#0B1221] border-white/5' : 'bg-white border-gray-200 shadow-sm'}`}>
                         <div className="flex items-center gap-5">
                             <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-400 to-cyan-400 flex items-center justify-center text-3xl shadow-lg shadow-cyan-500/20">
                                 🤿
@@ -297,7 +343,7 @@ export default function DashboardPage() {
                     {/* Grid 3 Cols (Row 1) */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         {/* Akademik */}
-                        <div className={`rounded-2xl p-6 border flex flex-col justify-between ${isDark ? 'bg-[#0B1221] border-white/5' : 'bg-white border-gray-200 shadow-sm'}`}>
+                        <div className={`tour-academic rounded-2xl p-6 border flex flex-col justify-between ${isDark ? 'bg-[#0B1221] border-white/5' : 'bg-white border-gray-200 shadow-sm'}`}>
                             <div className="flex items-start gap-3 mb-6">
                                 <div className="text-xl text-gray-400">📖</div>
                                 <div>
@@ -394,7 +440,7 @@ export default function DashboardPage() {
                         </div>
 
                         {/* Koleksi Lencana */}
-                        <div className={`rounded-2xl p-6 border flex flex-col justify-between ${isDark ? 'bg-[#0B1221] border-amber-500/30' : 'bg-amber-50 border-amber-300 shadow-sm'}`}>
+                        <div className={`tour-trophy rounded-2xl p-6 border flex flex-col justify-between ${isDark ? 'bg-[#0B1221] border-amber-500/30' : 'bg-amber-50 border-amber-300 shadow-sm'}`}>
                             <div className="flex items-start gap-3 mb-6">
                                 <div className="text-xl text-orange-400">🏅</div>
                                 <div>
@@ -427,7 +473,7 @@ export default function DashboardPage() {
                         </div>
 
                         {/* Claim Sertifikat */}
-                        <div className={`rounded-2xl p-6 border ${isDark ? 'bg-[#0B1221] border-yellow-500/30' : 'bg-yellow-50 border-yellow-300 shadow-sm'}`}>
+                        <div className={`tour-certificates rounded-2xl p-6 border ${isDark ? 'bg-[#0B1221] border-yellow-500/30' : 'bg-yellow-50 border-yellow-300 shadow-sm'}`}>
                             <div className="flex items-start gap-3 mb-5">
                                 <div className="text-xl text-yellow-400">📜</div>
                                 <div>
@@ -701,12 +747,24 @@ export default function DashboardPage() {
                 )}
 
                 {/* FOOTER */}
-                <footer className={`mt-auto px-6 py-6 border-t text-center ${isDark ? "border-white/5" : "border-gray-200"}`}>
+                <footer className={`mt-auto px-6 py-4 border-t text-center ${isDark ? "border-white/5" : "border-gray-200"}`}>
                     <p className={`text-[10px] tracking-[0.4em] font-bold uppercase ${isDark ? "text-gray-600" : "text-gray-400"}`}>
                         © 2026 Tim DiveXplore-3D · Teknologi Informasi UNY
                     </p>
                 </footer>
             </main>
+
+            {/* Floating Bantuan Button - hanya untuk user biasa */}
+            {userRole !== 'admin' && (
+                <button
+                    onClick={() => setForceTour(true)}
+                    title="Tampilkan panduan tour"
+                    className="fixed bottom-6 right-6 z-[9999] flex items-center gap-2 px-4 py-3 rounded-full bg-cyan-500 hover:bg-cyan-400 text-black font-black text-sm shadow-2xl shadow-cyan-500/40 transition-all hover:-translate-y-1 hover:scale-105 active:scale-95"
+                >
+                    <span className="text-base">💡</span>
+                    <span className="hidden sm:inline">Bantuan</span>
+                </button>
+            )}
         </div>
     );
 }

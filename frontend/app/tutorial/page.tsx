@@ -4,12 +4,16 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTheme } from '../../lib/useTheme';
+import OnboardingTour from '../../components/OnboardingTour';
+import { Step } from 'react-joyride';
 
 export default function TutorialPage() {
   const pathname = usePathname();
   const { isDark, toggleTheme } = useTheme();
   const [activeTab, setActiveTab] = useState('Semua');
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
+  const [forceTour, setForceTour] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [watchedVideos, setWatchedVideos] = useState<Set<number>>(() => {
     if (typeof window === 'undefined') return new Set();
     const saved = localStorage.getItem('tutorial_watched');
@@ -24,6 +28,17 @@ export default function TutorialPage() {
       return next;
     });
   };
+
+  React.useEffect(() => {
+    if (forceTour) {
+      setActiveTab('Semua');
+    }
+  }, [forceTour]);
+
+  React.useEffect(() => {
+    const role = (localStorage.getItem('user_role') || '').toLowerCase();
+    setIsAdmin(role === 'admin');
+  }, []);
 
   const categories = ['Semua', 'Fotografi', 'Videografi', 'Storytelling', 'Editing', 'Etika'];
 
@@ -97,8 +112,32 @@ export default function TutorialPage() {
     { href: '/dashboard', label: 'Dashboard' },
   ];
 
+  const tutorialTourSteps: Step[] = [
+    {
+      target: '.tour-tutorial-progress',
+      content: 'Di sini kamu bisa pantau seberapa banyak video yang udah kamu tonton. Tonton semua biar progresnya 100%! 🎬',
+      placement: 'bottom',
+    },
+    {
+      target: '.tour-tutorial-filter',
+      content: 'Mau nyari video berdasarkan topik? Filter di sini buat langsung lompat ke kategori yang kamu mau.',
+    },
+    {
+      target: '.tour-tutorial-card',
+      content: 'Semua video tutorialnya ada di sini. Tonton, lalu klik tombol "Tandai Sudah Ditonton" buat update progresmu!',
+    }
+  ];
+
   return (
     <div className={`min-h-screen font-sans selection:bg-cyan-500/30 transition-colors duration-300 ${isDark ? 'bg-[#00040a] text-white' : 'bg-sky-50 text-gray-900'}`}>
+      {!isAdmin && (
+        <OnboardingTour 
+          steps={tutorialTourSteps} 
+          tourKey="tutorialPage" 
+          forceRun={forceTour} 
+          onFinish={() => setForceTour(false)} 
+        />
+      )}
       {/* NAVBAR */}
       <nav className="fixed top-0 w-full z-50 px-6 py-5 flex justify-between items-center">
         <div className={`flex items-center gap-3 backdrop-blur-xl py-2 px-5 rounded-full border shadow-xl transition-colors ${isDark ? 'bg-white/10 border-white/10' : 'bg-white/80 border-blue-100 shadow-sm'}`}>
@@ -176,7 +215,7 @@ export default function TutorialPage() {
         <div className="max-w-7xl mx-auto">
 
           {/* Progress Tutorial Card */}
-          <div className={`relative overflow-hidden rounded-[28px] border mb-10 p-6 ${isDark ? 'bg-gradient-to-br from-cyan-950/50 to-blue-950/50 border-cyan-500/20' : 'bg-gradient-to-br from-cyan-50 to-blue-50 border-cyan-200'}`}>
+          <div className={`tour-tutorial-progress relative overflow-hidden rounded-[28px] border mb-10 p-6 ${isDark ? 'bg-gradient-to-br from-cyan-950/50 to-blue-950/50 border-cyan-500/20' : 'bg-gradient-to-br from-cyan-50 to-blue-50 border-cyan-200'}`}>
             {/* Glow background */}
             <div className="absolute -top-10 -right-10 w-40 h-40 bg-cyan-500/10 blur-3xl rounded-full pointer-events-none" />
 
@@ -216,7 +255,7 @@ export default function TutorialPage() {
           </div>
 
           {/* Category Filter */}
-          <div className="flex flex-wrap items-center gap-3 mb-12">
+          <div className="tour-tutorial-filter flex flex-wrap items-center gap-3 mb-12">
             {categories.map((cat) => (
               <button
                 key={cat}
@@ -237,7 +276,7 @@ export default function TutorialPage() {
           </div>
 
           {/* Tutorial Timeline */}
-          <div className="relative flex flex-col gap-12 md:gap-24 py-10">
+          <div className="tour-tutorial-list relative flex flex-col gap-12 md:gap-24 py-10">
             {/* Timeline vertical line */}
             <div className={`absolute left-[40px] md:left-1/2 md:-translate-x-1/2 top-10 bottom-10 w-1 border-l-2 border-dashed ${isDark ? 'border-cyan-900/50' : 'border-blue-200'} z-0 hidden sm:block`} />
 
@@ -246,7 +285,7 @@ export default function TutorialPage() {
               return (
               <div
                 key={tutorial.id}
-                className={`relative z-10 flex flex-col md:flex-row items-center gap-8 md:gap-16 ${!isEven ? 'md:flex-row-reverse' : ''}`}
+                className={`relative z-10 flex flex-col md:flex-row items-center gap-8 md:gap-16 ${!isEven ? 'md:flex-row-reverse' : ''} ${index === 0 ? 'tour-tutorial-card' : ''}`}
               >
                 {/* Number Badge on Timeline */}
                 <div className={`absolute left-[40px] md:left-1/2 -translate-x-1/2 w-14 h-14 rounded-full bg-gradient-to-br from-blue-600 to-cyan-500 border-4 ${isDark ? 'border-[#00040a]' : 'border-sky-50'} text-white font-black text-2xl flex items-center justify-center z-20 shadow-[0_0_20px_rgba(6,182,212,0.5)] hidden sm:flex`}>
@@ -330,6 +369,18 @@ export default function TutorialPage() {
           © 2026 TIM DIVEXPLORE-3D • TEKNOLOGI INFORMASI UNY
         </p>
       </footer>
+
+      {/* Floating Bantuan Button - hanya untuk user biasa */}
+      {!isAdmin && (
+        <button
+          onClick={() => setForceTour(true)}
+          title="Tampilkan panduan tour"
+          className="fixed bottom-6 right-6 z-[9999] flex items-center gap-2 px-4 py-3 rounded-full bg-cyan-500 hover:bg-cyan-400 text-black font-black text-sm shadow-2xl shadow-cyan-500/40 transition-all hover:-translate-y-1 hover:scale-105 active:scale-95"
+        >
+          <span className="text-base">💡</span>
+          <span className="hidden sm:inline">Bantuan</span>
+        </button>
+      )}
     </div>
   );
 }

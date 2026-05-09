@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTheme } from '../lib/useTheme';
 import toast from 'react-hot-toast';
+import OnboardingTour from '../components/OnboardingTour';
+import { Step } from 'react-joyride';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -43,7 +45,9 @@ export default function HomePage() {
   const [userName, setUserName] = useState<string | null>(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showTrailer, setShowTrailer] = useState(false);
+  const [forceTour, setForceTour] = useState(false);
   const [isLoginProcessing, setIsLoginProcessing] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -173,14 +177,49 @@ export default function HomePage() {
     { href: '/dashboard', label: 'Dashboard' },
   ];
 
+  const homeTourSteps: Step[] = [
+    {
+      target: '.tour-logo',
+      content: 'Halo! 👋 Selamat datang di DIVEXPLORE. Ini platform keren buat kamu menjelajahi keindahan laut Raja Ampat secara virtual.',
+      placement: 'bottom',
+    },
+    {
+      target: '.tour-nav',
+      content: 'Di menu ini kamu bisa meluncur ke berbagai fitur seru kayak Galeri, Akademi, Tutorial, dan Dashboard pribadi kamu.',
+      placement: 'bottom',
+    },
+    {
+      target: '.tour-auth',
+      content: 'Belum punya akun? Daftar atau masuk dulu yuk, biar kamu bisa akses semua materi dan bikin karyamu sendiri!',
+    },
+    {
+      target: '.tour-theme',
+      content: 'Lebih suka gelap atau terang? Kamu bebas atur tema website di sini sesuai selera matamu.',
+    },
+    {
+      target: '.tour-explore',
+      content: 'Udah siap? Klik tombol ini buat mulai petualangan seru kamu ke dunia bawah laut! 🌊',
+      skipScroll: true,
+    }
+  ];
+
   return (
     <div className={`min-h-screen font-sans overflow-x-hidden animate-in fade-in duration-1000 transition-colors ${isDark ? 'bg-[#00040a] text-white' : 'bg-sky-50 text-gray-900'}`}>
+      
+      {!isAdmin && (
+        <OnboardingTour 
+          steps={homeTourSteps} 
+          tourKey="homePage" 
+          forceRun={forceTour} 
+          onFinish={() => setForceTour(false)} 
+        />
+      )}
 
       {/* NAVBAR */}
       <nav className="fixed top-0 w-full z-50 px-6 py-5 flex justify-between items-center transition-all">
 
         {/* Logo */}
-        <div className={`flex items-center gap-3 backdrop-blur-xl py-2 px-5 rounded-full border shadow-xl transition-colors ${isDark ? 'bg-white/10 border-white/10' : 'bg-white/80 border-blue-100 shadow-sm'}`}>
+        <div className={`tour-logo flex items-center gap-3 backdrop-blur-xl py-2 px-5 rounded-full border shadow-xl transition-colors ${isDark ? 'bg-white/10 border-white/10' : 'bg-white/80 border-blue-100 shadow-sm'}`}>
           <div className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg bg-white/5 border border-blue-500/20 overflow-hidden">
             <img src="/images/logo.png" alt="Dive3D Logo" className="w-full h-full object-cover" />
           </div>
@@ -188,7 +227,7 @@ export default function HomePage() {
         </div>
 
         {/* Nav links */}
-        <div className={`hidden md:flex items-center gap-1 backdrop-blur-2xl p-1.5 rounded-full border shadow-2xl transition-colors ${isDark ? 'bg-white/5 border-white/10' : 'bg-white/80 border-gray-200 shadow-sm'}`}>
+        <div className={`tour-nav hidden md:flex items-center gap-1 backdrop-blur-2xl p-1.5 rounded-full border shadow-2xl transition-colors ${isDark ? 'bg-white/5 border-white/10' : 'bg-white/80 border-gray-200 shadow-sm'}`}>
           {navLinks.map(({ href, label }) => {
             const isActive = pathname === href;
             return (
@@ -209,7 +248,7 @@ export default function HomePage() {
         </div>
 
         {/* Auth + Toggle */}
-        <div className="hidden md:flex items-center gap-2">
+        <div className="tour-auth hidden md:flex items-center gap-2">
           {isLoggedIn ? (
             <div className="flex items-center gap-4 px-2">
               <span className={`text-sm font-bold ${isDark ? 'text-white' : 'text-blue-900'}`}>
@@ -249,7 +288,7 @@ export default function HomePage() {
           <button
             onClick={toggleTheme}
             title={isDark ? 'Mode Gelap' : 'Mode Terang'}
-            className={`w-10 h-10 rounded-full flex items-center justify-center transition-all text-base ${isDark ? 'bg-white/10 hover:bg-white/20 border border-white/10' : 'bg-white hover:bg-gray-100 border border-gray-200 shadow-sm'}`}
+            className={`tour-theme w-10 h-10 rounded-full flex items-center justify-center transition-all text-base ${isDark ? 'bg-white/10 hover:bg-white/20 border border-white/10' : 'bg-white hover:bg-gray-100 border border-gray-200 shadow-sm'}`}
           >
             {isDark ? '🌙' : '☀️'}
           </button>
@@ -291,7 +330,7 @@ export default function HomePage() {
                   e.preventDefault();
                   document.getElementById('info-raja-ampat')?.scrollIntoView({ behavior: 'smooth' });
                 }}
-                className="group btn-interactive-wave flex items-center gap-4 px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white text-base font-black rounded-full transition-all duration-300 shadow-[0_0_40px_-10px_rgba(0,168,255,0.5)] hover:shadow-[0_0_60px_-15px_rgba(0,168,255,0.7)] hover:-translate-y-1 cursor-pointer"
+                className="tour-explore group btn-interactive-wave flex items-center gap-4 px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white text-base font-black rounded-full transition-all duration-300 shadow-[0_0_40px_-10px_rgba(0,168,255,0.5)] hover:shadow-[0_0_60px_-15px_rgba(0,168,255,0.7)] hover:-translate-y-1 cursor-pointer"
               >
                 <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white group-hover:bg-white group-hover:text-blue-600 transition-all duration-300">
                   <span className="text-[14px] transform -rotate-45 group-hover:rotate-0 transition-transform duration-300">➤</span>
@@ -446,7 +485,13 @@ export default function HomePage() {
       )}
 
       {/* FOOTER */}
-      <footer className={`py-20 border-t text-center px-6 ${isDark ? 'border-white/5' : 'border-gray-200'}`}>
+      <footer className={`py-12 border-t px-6 flex flex-col items-center justify-center gap-6 ${isDark ? 'border-white/5' : 'border-gray-200'}`}>
+        <button 
+          onClick={() => setForceTour(true)}
+          className="px-6 py-2 rounded-full border border-cyan-500/30 text-cyan-500 font-bold hover:bg-cyan-500/10 transition-colors text-sm flex items-center gap-2"
+        >
+          <span>💡</span> Lihat Panduan Lagi
+        </button>
         <p className={`text-[10px] tracking-[0.4em] font-bold uppercase ${isDark ? 'text-gray-600' : 'text-gray-400'}`}>
           © 2026 TIM DIVEXPLORE-3D • TEKNOLOGI INFORMASI UNY
         </p>
@@ -511,6 +556,17 @@ export default function HomePage() {
             </form>
           </div>
         </div>
+      )}
+      {/* Floating Bantuan Button - hanya untuk user biasa */}
+      {!isAdmin && (
+        <button
+          onClick={() => setForceTour(true)}
+          title="Tampilkan panduan tour"
+          className="fixed bottom-6 right-6 z-[9999] flex items-center gap-2 px-4 py-3 rounded-full bg-cyan-500 hover:bg-cyan-400 text-black font-black text-sm shadow-2xl shadow-cyan-500/40 transition-all hover:-translate-y-1 hover:scale-105 active:scale-95"
+        >
+          <span className="text-base">💡</span>
+          <span className="hidden sm:inline">Bantuan</span>
+        </button>
       )}
     </div>
   );

@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { useTheme } from '../../lib/useTheme';
+import OnboardingTour from '../../components/OnboardingTour';
+import { Step } from 'react-joyride';
 
 const ModelViewer = dynamic(() => import('../../components/ModelViewer'), { ssr: false });
 
@@ -62,6 +64,8 @@ export default function AkademiPage() {
         const walk = (x - startX.current) * 1.5;
         scrollRef.current.scrollLeft = scrollLeft.current - walk;
     };
+    const [forceTour, setForceTour] = useState(false);
+    const [isAdmin, setIsAdmin] = useState(false);
 
     const nextModule = () => setCurrentLMSIndex((prev) => (prev + 1) % lmsModules.length);
     const prevModule = () => setCurrentLMSIndex((prev) => (prev - 1 + lmsModules.length) % lmsModules.length);
@@ -81,6 +85,7 @@ export default function AkademiPage() {
         const saved = localStorage.getItem(`completed_quizzes_${userEmail}_konservasi-laut`);
         const done = saved ? JSON.parse(saved) : [];
         setCompletedQuizTitles(Array.isArray(done) ? done : []);
+        setIsAdmin((localStorage.getItem('user_role') || '').toLowerCase() === 'admin');
     }, []);
 
     const completedModules = completedQuizTitles.length;
@@ -93,8 +98,53 @@ export default function AkademiPage() {
         { href: '/dashboard', label: 'Dashboard' },
     ];
 
+    const lmsTourSteps: Step[] = [
+        {
+            target: '.tour-akademi-tabs',
+            content: 'Di Akademi ini, kamu bisa pilih cara belajarmu! Mau baca Modul lengkap di LMS atau langsung interaksi sama biota pakai 3D Interaktif.',
+            placement: 'bottom',
+        },
+        {
+            target: '.tour-lms-module',
+            content: 'Ini dia daftar modulnya. Geser panahnya buat lihat modul lain, dan klik tombolnya buat mulai belajar!',
+        },
+        {
+            target: '.tour-lms-progress',
+            content: 'Pantau terus progres belajarmu di sini ya, pastikan kamu lulus semua kuis evaluasinya. 💪',
+        }
+    ];
+
+    const threeDTourSteps: Step[] = [
+        {
+            target: '.tour-3d-header',
+            content: 'Selamat datang di Ruang 3D! Di sini kamu bisa berinteraksi langsung dengan model biota laut.',
+            placement: 'bottom',
+        },
+        {
+            target: '.tour-3d-viewer',
+            content: 'Ini adalah area utama. Kamu bisa putar objeknya dengan mouse, zoom in/out, dan geser-geser sepuasnya.',
+            placement: 'top',
+        },
+        {
+            target: '.tour-3d-tabs',
+            content: 'Gunakan filter ini buat milih biota mana yang mau kamu lihat secara 3D. Seru banget kan?',
+            placement: 'top',
+        }
+    ];
+
+    const currentSteps = activeTab === '3d' ? threeDTourSteps : lmsTourSteps;
+    const currentTourKey = activeTab === '3d' ? 'akademi3DPage' : 'akademiPage';
+
     return (
         <div className={`min-h-screen font-sans selection:bg-blue-500/30 transition-colors duration-300 ${isDark ? 'bg-[#00040a] text-white' : 'bg-[#f4f9ff] text-gray-900'} relative`}>
+            {!isAdmin && (
+                <OnboardingTour 
+                    steps={currentSteps} 
+                    tourKey={currentTourKey} 
+                    forceRun={forceTour} 
+                    onFinish={() => setForceTour(false)} 
+                />
+            )}
             
             {/* Background elements for light theme */}
             {!isDark && (
@@ -177,7 +227,7 @@ export default function AkademiPage() {
                 <div className={`rounded-[32px] p-6 md:p-8 border min-h-[70vh] flex flex-col ${isDark ? 'bg-[#000814] border-white/10 shadow-2xl' : 'bg-white border-blue-100 shadow-[0_10px_40px_-15px_rgba(59,130,246,0.15)]'}`}>
                     
                     {/* Tabs Centered */}
-                    <div className={`flex items-center rounded-2xl p-1.5 mb-8 max-w-md mx-auto w-full shadow-sm ${isDark ? 'bg-white/5 border border-white/10' : 'bg-gray-50 border border-gray-200'}`}>
+                    <div className={`tour-akademi-tabs flex items-center rounded-2xl p-1.5 mb-8 max-w-md mx-auto w-full shadow-sm ${isDark ? 'bg-white/5 border border-white/10' : 'bg-gray-50 border border-gray-200'}`}>
                         <button
                             onClick={() => setActiveTab('lms')}
                             className={`flex-1 flex justify-center items-center gap-2 py-3 px-4 rounded-xl font-bold text-sm transition-all ${activeTab === 'lms' ? 'bg-white text-blue-600 shadow-md border-b-2 border-blue-600' : isDark ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-800'}`}
@@ -201,7 +251,7 @@ export default function AkademiPage() {
                                 <h2 className={`text-2xl font-bold mb-6 ${isDark ? 'text-white' : 'text-[#0a1e3f]'}`}>Modul Pembelajaran (LMS)</h2>
                                 
                                 {/* Modul Carousel - FULL WIDTH */}
-                                <div className="relative mb-8 w-full group px-2 md:px-6">
+                                <div className="tour-lms-module relative mb-8 w-full group px-2 md:px-6">
                                     
                                     {/* Left Arrow */}
                                     <button onClick={prevModule} className={`absolute left-0 md:-left-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-110 opacity-0 group-hover:opacity-100 focus:opacity-100 ${isDark ? 'bg-[#001020] text-white border border-white/10 hover:bg-blue-600' : 'bg-white text-blue-900 border border-blue-100 hover:bg-blue-50'}`}>
@@ -280,7 +330,7 @@ export default function AkademiPage() {
                                         </div>
                                     </div>
 
-                                    <div className={`p-8 rounded-3xl border flex items-center gap-8 ${isDark ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200 shadow-sm'}`}>
+                                    <div className={`tour-lms-progress p-8 rounded-3xl border flex items-center gap-8 ${isDark ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200 shadow-sm'}`}>
                                         <div className="w-[120px] h-[120px] shrink-0 relative flex items-center justify-center">
                                             <svg className="w-full h-full -rotate-90 drop-shadow-md" viewBox="0 0 36 36">
                                                 <path className={isDark ? 'text-white/10' : 'text-gray-100'} stroke="currentColor" strokeWidth="4" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
@@ -317,7 +367,7 @@ export default function AkademiPage() {
                         {/* --- VIEW: 3D INTERAKTIF --- */}
                         {activeTab === '3d' && (
                             <div className="flex flex-col flex-grow animate-in fade-in slide-in-from-bottom-4 duration-500 min-h-[800px]">
-                                <div className="mb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
+                                <div className="tour-3d-header mb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
                                     <div>
                                         <h2 className={`text-2xl font-bold mb-2 ${isDark ? 'text-white' : 'text-[#0a1e3f]'}`}>Eksplorasi 3D Interaktif</h2>
                                         <p className={`text-[15px] font-medium ${isDark ? 'text-gray-400' : 'text-[#3b5275]'}`}>Putar, perbesar, dan jelajahi objek laut secara interaktif dalam resolusi tinggi.</p>
@@ -329,7 +379,7 @@ export default function AkademiPage() {
                                     </div>
                                 </div>
                                 
-                                <div className="relative w-full flex-grow bg-[#001020] rounded-[32px] overflow-hidden group border-2 border-[#0a1e3f] shadow-2xl min-h-[700px] md:min-h-[800px]">
+                                <div className="tour-3d-viewer relative w-full flex-grow bg-[#001020] rounded-[32px] overflow-hidden group border-2 border-[#0a1e3f] shadow-2xl min-h-[700px] md:min-h-[800px]">
                                     
                                     {/* 3D Model Viewer */}
                                     <div className="absolute inset-0 w-full h-full z-0">
@@ -355,7 +405,7 @@ export default function AkademiPage() {
                                     onMouseUp={onMouseUp}
                                     onMouseMove={onMouseMove}
                                     style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', cursor: isDragging.current ? 'grabbing' : 'grab' }}
-                                    className={`mt-6 p-2 rounded-3xl flex items-center justify-start overflow-x-auto gap-3 w-full mx-auto border select-none ${isDark ? 'bg-[#001020] border-white/10 shadow-lg' : 'bg-white border-gray-200 shadow-sm'}`}
+                                    className={`tour-3d-tabs mt-6 p-2 rounded-3xl flex items-center justify-start overflow-x-auto gap-3 w-full mx-auto border select-none ${isDark ? 'bg-[#001020] border-white/10 shadow-lg' : 'bg-white border-gray-200 shadow-sm'}`}
                                 >
                                     {[
                                         { id: 'ikan', label: 'Ikan', icon: '🐟' },
@@ -401,6 +451,25 @@ export default function AkademiPage() {
                     </div>
                 </div>
             </main>
+
+            {/* FOOTER */}
+            <footer className={`relative z-10 mt-auto py-6 border-t text-center ${isDark ? 'border-white/5' : 'border-gray-200'}`}>
+                <p className={`text-[10px] tracking-[0.4em] font-bold uppercase ${isDark ? 'text-gray-600' : 'text-gray-400'}`}>
+                    © 2026 TIM DIVEXPLORE-3D • TEKNOLOGI INFORMASI UNY
+                </p>
+            </footer>
+
+            {/* Floating Bantuan Button - hanya untuk user biasa */}
+            {!isAdmin && (
+                <button
+                    onClick={() => setForceTour(true)}
+                    title="Tampilkan panduan tour"
+                    className="fixed bottom-6 right-6 z-[9999] flex items-center gap-2 px-4 py-3 rounded-full bg-cyan-500 hover:bg-cyan-400 text-black font-black text-sm shadow-2xl shadow-cyan-500/40 transition-all hover:-translate-y-1 hover:scale-105 active:scale-95"
+                >
+                    <span className="text-base">💡</span>
+                    <span className="hidden sm:inline">Bantuan</span>
+                </button>
+            )}
 
         </div>
     );
