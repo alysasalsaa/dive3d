@@ -20,7 +20,6 @@ export default function AkademiPage() {
     const [activeTab, setActiveTab] = useState('lms');
     const [active3DTab, setActive3DTab] = useState('ikan');
     const [currentLMSIndex, setCurrentLMSIndex] = useState(0);
-    const [showQuizConfirm, setShowQuizConfirm] = useState(false);
 
     const nextModule = () => setCurrentLMSIndex((prev) => (prev + 1) % lmsModules.length);
     const prevModule = () => setCurrentLMSIndex((prev) => (prev - 1 + lmsModules.length) % lmsModules.length);
@@ -227,16 +226,16 @@ export default function AkademiPage() {
                                     </div>
                                 </div>
 
-                                {/* Bottom Area: Kuis & Progres - FULL WIDTH */}
+                                {/* Bottom Area: Informasi Kuis & Progres */}
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-auto">
                                     <div className={`p-8 rounded-3xl border flex flex-col justify-between ${isDark ? 'bg-white/5 border-white/10' : 'bg-[#f4f9ff] border-blue-100'}`}>
                                         <div>
-                                            <h3 className={`font-bold text-xl mb-3 ${isDark ? 'text-white' : 'text-[#0a1e3f]'}`}>Tahap Selanjutnya: Kuis & Evaluasi</h3>
-                                            <p className={`text-sm mb-6 font-medium leading-relaxed max-w-md ${isDark ? 'text-gray-400' : 'text-[#3b5275]'}`}>Setelah mempelajari semua modul dengan saksama, kerjakan kuis evaluasi untuk menguji pemahaman Anda dan mengklaim sertifikat.</p>
+                                            <h3 className={`font-bold text-xl mb-3 ${isDark ? 'text-white' : 'text-[#0a1e3f]'}`}>Informasi Kuis & Evaluasi</h3>
+                                            <p className={`text-sm mb-6 font-medium leading-relaxed max-w-md ${isDark ? 'text-gray-400' : 'text-[#3b5275]'}`}>Kuis evaluasi telah terintegrasi di dalam setiap modul. Silakan klik "Mulai Belajar Modul Ini" di atas, pelajari materinya, dan kerjakan kuis di akhir modul tersebut untuk mendapatkan sertifikat kelulusan.</p>
                                         </div>
-                                        <button onClick={() => setShowQuizConfirm(true)} className="self-start px-8 py-3.5 bg-blue-600 text-white text-sm font-bold rounded-full flex items-center gap-3 hover:bg-blue-700 shadow-lg shadow-blue-500/30 transition-all hover:-translate-y-0.5">
-                                            Mulai Kuis Sekarang <span className="text-xl">📝</span>
-                                        </button>
+                                        <div className={`self-start px-5 py-2.5 rounded-xl flex items-center gap-3 font-bold text-sm border shadow-sm ${isDark ? 'bg-blue-500/10 border-blue-500/30 text-blue-400' : 'bg-blue-50 border-blue-200 text-blue-700'}`}>
+                                            <span className="text-lg">💡</span> Kuis tersedia di dalam Modul
+                                        </div>
                                     </div>
 
                                     <div className={`p-8 rounded-3xl border flex items-center gap-8 ${isDark ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200 shadow-sm'}`}>
@@ -337,35 +336,6 @@ export default function AkademiPage() {
                 </div>
             </main>
 
-            {/* QUIZ CONFIRMATION MODAL */}
-            {showQuizConfirm && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowQuizConfirm(false)} />
-                    <div className={`border rounded-[32px] p-8 max-w-md w-full relative z-10 animate-in fade-in zoom-in-95 duration-200 shadow-2xl ${isDark ? 'bg-[#001020] border-white/10' : 'bg-white border-blue-100'}`}>
-                        <div className="w-20 h-20 bg-blue-500/10 text-blue-500 rounded-full flex items-center justify-center text-4xl mb-6 mx-auto">
-                            📝
-                        </div>
-                        <h3 className={`text-2xl font-black text-center mb-2 ${isDark ? 'text-white' : 'text-[#0a1e3f]'}`}>Konfirmasi Kuis</h3>
-                        <p className={`text-center mb-8 text-sm font-bold leading-relaxed ${isDark ? 'text-gray-300' : 'text-[#3b5275]'}`}>
-                            Kerjakan Kuis {lmsModules[currentLMSIndex].title} Sekarang?
-                        </p>
-                        <div className="flex gap-4">
-                            <button
-                                onClick={() => setShowQuizConfirm(false)}
-                                className={`flex-1 px-6 py-3.5 rounded-xl font-bold transition-colors border ${isDark ? 'text-gray-300 bg-white/5 hover:bg-white/10 border-white/10' : 'text-gray-600 bg-gray-50 hover:bg-gray-100 border-gray-200'}`}
-                            >
-                                Batal
-                            </button>
-                            <button
-                                onClick={() => window.location.href = `/lms?track=konservasi-laut&module=${lmsModules[currentLMSIndex].slug}&action=quiz`}
-                                className="flex-1 px-6 py-3.5 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-700 transition-colors shadow-lg shadow-blue-600/20"
-                            >
-                                Ya, Kerjakan
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
         </div>
     );
 }
