@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Joyride, { Step, EventData, STATUS } from 'react-joyride';
+import { Joyride, Step, EventData, STATUS } from 'react-joyride';
 
 interface OnboardingTourProps {
   steps: Step[];
