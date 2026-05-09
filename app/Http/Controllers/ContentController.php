@@ -20,19 +20,48 @@ class ContentController extends Controller
             'author' => 'required|string'
         ]);
 
-        $path = $request->file('file')->store('uploads', 'public');
-        $url = asset('storage/' . $path);
+        $file = $request->file('file');
+        $fileName = time() . '_' . preg_replace('/\s+/', '_', $file->getClientOriginalName());
+        $fileContent = file_get_contents($file->getRealPath());
+        $mimeType = $file->getMimeType();
+
+        $supabaseUrl = env('SUPABASE_URL');
+        $supabaseKey = env('SUPABASE_SERVICE_ROLE_KEY');
+        $bucket = env('SUPABASE_BUCKET', 'gallery');
+
+        $uploadUrl = "{$supabaseUrl}/storage/v1/object/{$bucket}/{$fileName}";
+
+        $ch = curl_init($uploadUrl);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $fileContent);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            "Authorization: Bearer {$supabaseKey}",
+            "Content-Type: {$mimeType}",
+            "x-upsert: true",
+        ]);
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($httpCode !== 200) {
+            return response()->json(['message' => 'Gagal mengunggah ke Supabase Storage', 'detail' => $response], 500);
+        }
+
+        $publicUrl = "{$supabaseUrl}/storage/v1/object/public/{$bucket}/{$fileName}";
+
         Content::create([
-            'user_id' => Auth::id(), // simpan siapa yang upload
+            'user_id' => Auth::id(),
             'title' => $request->title,
             'category' => $request->category,
             'author' => $request->author,
-            'file_path' => $url,
+            'file_path' => $publicUrl,
             'status' => 'pending'
         ]);
+
         return response()->json([
             'message' => 'File uploaded successfully',
-            'file' => $url,
+            'file' => $publicUrl,
         ]);
     }
 
