@@ -57,7 +57,6 @@ export default function OnboardingTour({ steps, tourKey, forceRun = false, onFin
       continuous
       run={run}
       scrollToFirstStep
-      scrollOffset={150}
       steps={steps}
       locale={{
         back: 'Kembali',
@@ -76,6 +75,7 @@ export default function OnboardingTour({ steps, tourKey, forceRun = false, onFin
         showProgress: true,
         buttons: ['back', 'primary', 'skip'],
         skipBeacon: true,
+        scrollOffset: 150,
       }}
       floatingOptions={{
         autoUpdate: {
