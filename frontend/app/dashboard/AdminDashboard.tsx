@@ -36,6 +36,8 @@ export default function AdminDashboard() {
 
   // STATE ADMIN GALLERY
   const [pendingGallery, setPendingGallery] = useState<any[]>([]);
+  const [galleryError, setGalleryError] = useState<string | null>(null);
+  const [galleryLoading, setGalleryLoading] = useState(false);
 
   useEffect(() => {
     getModules().then(data => setModules(data));
@@ -43,27 +45,45 @@ export default function AdminDashboard() {
 
   const loadPendingGallery = async () => {
     const token = localStorage.getItem('auth_token');
+    setGalleryLoading(true);
+    setGalleryError(null);
     try {
       const res = await fetch('http://localhost:8000/api/admin/pending', { headers: { 'Authorization': `Bearer ${token}` } });
+      if (!res.ok) {
+        setGalleryError(`Error ${res.status}: ${res.statusText}`);
+        setPendingGallery([]);
+        return;
+      }
       const data = await res.json();
-      setPendingGallery(data);
-    } catch (e) { console.error(e); }
+      setPendingGallery(Array.isArray(data) ? data : []);
+    } catch (e) {
+      setGalleryError('Gagal terhubung ke server. Pastikan backend berjalan.');
+      console.error(e);
+    } finally {
+      setGalleryLoading(false);
+    }
   };
 
   const handleApprove = async (id: number) => {
     const token = localStorage.getItem('auth_token');
+    setPendingGallery(prev => prev.filter(item => item.id !== id));
     try {
       await fetch(`http://localhost:8000/api/admin/approve/${id}`, { method: 'POST', headers: { 'Authorization': `Bearer ${token}` } });
+    } catch (e) {
+      console.error(e);
       loadPendingGallery();
-    } catch (e) { console.error(e); }
+    }
   };
 
   const handleReject = async (id: number) => {
     const token = localStorage.getItem('auth_token');
+    setPendingGallery(prev => prev.filter(item => item.id !== id));
     try {
       await fetch(`http://localhost:8000/api/admin/reject/${id}`, { method: 'POST', headers: { 'Authorization': `Bearer ${token}` } });
+    } catch (e) {
+      console.error(e);
       loadPendingGallery();
-    } catch (e) { console.error(e); }
+    }
   };
 
   const handleSaveAdminData = async () => {
@@ -397,11 +417,21 @@ export default function AdminDashboard() {
                 ← Kembali
               </button>
             </div>
-            {pendingGallery.length === 0 ? (
+            {galleryError && (
+              <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm font-bold">
+                ⚠️ {galleryError}
+              </div>
+            )}
+            {galleryLoading ? (
+              <div className="py-20 text-center text-gray-400">Memuat data...</div>
+            ) : pendingGallery.length === 0 ? (
               <div className="py-20 text-center">
                 <div className="text-6xl mb-4">✨</div>
                 <h3 className="text-xl font-bold text-white mb-2">Semua Bersih!</h3>
                 <p className="text-gray-500">Tidak ada karya yang menunggu persetujuan saat ini.</p>
+                <button onClick={loadPendingGallery} className="mt-6 px-5 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 text-sm font-bold transition-all">
+                  🔄 Muat Ulang
+                </button>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
