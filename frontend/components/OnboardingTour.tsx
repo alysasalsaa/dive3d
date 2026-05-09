@@ -57,6 +57,7 @@ export default function OnboardingTour({ steps, tourKey, forceRun = false, onFin
       continuous
       run={run}
       scrollToFirstStep
+      scrollOffset={150}
       steps={steps}
       locale={{
         back: 'Kembali',
