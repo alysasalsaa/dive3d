@@ -23,14 +23,16 @@ export async function getModules(): Promise<ModuleData[]> {
   const data = await response.json();
   return data.map((mod: any) => ({
     id: mod.slug,
+    slug: mod.slug,
     title: mod.title,
-    longDescription: mod.long_description,
-    icon: mod.icon,
-    difficulty: mod.difficulty,
-    estimatedTime: mod.estimated_time,
-    gradientFrom: mod.gradient_from,
-    gradientTo: mod.gradient_to,
-    modelUrl: mod.model_url,
+    desc: mod.desc ?? mod.description ?? '',
+    longDescription: mod.long_description ?? '',
+    icon: mod.icon ?? '',
+    difficulty: mod.difficulty ?? '',
+    estimatedTime: mod.estimated_time ?? '',
+    gradientFrom: mod.gradient_from ?? '',
+    gradientTo: mod.gradient_to ?? '',
+    modelUrl: mod.model_url ?? '',
     pois: []
   }));
 }
