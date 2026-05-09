@@ -57,8 +57,8 @@ export default function AkademiPage() {
             {/* NAVBAR */}
             <nav className="fixed top-0 w-full z-50 px-6 py-5 flex justify-between items-center pointer-events-none">
                 <div className={`pointer-events-auto flex items-center gap-3 backdrop-blur-xl py-2 px-5 rounded-full border shadow-xl transition-colors ${isDark ? 'bg-white/10 border-white/10' : 'bg-white/80 border-blue-100 shadow-sm'}`}>
-                  <div className="w-9 h-9 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-full flex items-center justify-center shadow-lg shadow-blue-500/20">
-                    <span className="text-base">🌊</span>
+                  <div className="w-9 h-9 rounded-full flex items-center justify-center shadow-lg bg-white/5 border border-blue-500/20 overflow-hidden">
+                    <img src="/images/logo.png" alt="Dive3D Logo" className="w-full h-full object-cover" />
                   </div>
                   <span className={`text-lg font-black tracking-widest pr-1 ${isDark ? 'text-white' : 'text-blue-900'}`}>
                     DIVEXPLORE

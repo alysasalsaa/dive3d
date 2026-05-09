@@ -29,6 +29,54 @@ type TrackData = {
   modules: ModuleData[];
 };
 
+const FUN_FACTS: Record<string, string[]> = {
+  'ekosistem-laut': [
+    'Laut menyerap sekitar 25–30% karbon dioksida (CO₂) yang dihasilkan manusia, sehingga berperan penting dalam mengurangi dampak perubahan iklim.',
+    'Sekitar 71% permukaan bumi ditutupi oleh lautan, dan lautan menyimpan sekitar 96,5% dari seluruh air di Bumi — menjadikannya ekosistem terbesar di planet ini.',
+    'Di kedalaman lebih dari 1.000 meter, cahaya matahari sama sekali tidak bisa menembus air. Hewan-hewan di sini menciptakan cahaya sendiri melalui bioluminesensi untuk menarik mangsa atau pasangan.',
+  ],
+  'biota-laut': [
+    'Ikan badut (clownfish) hidup berdampingan dengan anemon laut dalam hubungan simbiosis mutualisme — ikan badut mendapat perlindungan dari predator, sementara anemon mendapat sisa makanan.',
+    'Butterflyfish sering hidup berpasangan dan sangat bergantung pada terumbu karang sebagai sumber makanan, sehingga keberadaannya sering digunakan sebagai indikator kesehatan ekosistem laut.',
+    'Paus biru adalah hewan terbesar yang pernah ada. Jantungnya seukuran mobil kecil, dan detak jantungnya bisa terdengar dari jarak 3 kilometer!',
+  ],
+  'terumbu-karang': [
+    'Terumbu karang sering disebut sebagai "hutan hujan laut" karena menjadi habitat bagi sekitar 25% spesies laut, meskipun hanya menutupi sebagian kecil dasar laut.',
+    'Terumbu karang mendapatkan warna cerahnya dari organisme kecil bernama zooxanthellae yang hidup di dalam jaringan karang dan membantu menghasilkan energi melalui fotosintesis.',
+    'Terumbu karang tumbuh sangat lambat — rata-rata hanya 1–3 cm per tahun — sehingga membutuhkan waktu puluhan hingga ratusan tahun untuk membentuk struktur yang besar.',
+  ],
+  'sampah-laut': [
+    'Di Samudra Pasifik terdapat kumpulan sampah besar yang dikenal sebagai Great Pacific Garbage Patch — area dengan konsentrasi sampah plastik yang sangat tinggi akibat arus laut.',
+    'Mikroplastik tidak hanya ditemukan di laut, tetapi juga telah terdeteksi dalam garam laut dan air minum yang dikonsumsi manusia sehari-hari.',
+    'Indonesia merupakan penyumbang sampah plastik ke lautan terbesar kedua di dunia setelah Tiongkok — diperkirakan 0,48–1,29 juta metrik ton masuk ke laut setiap tahunnya.',
+  ],
+  'fotografi-bawah-laut': [
+    'Cahaya merah terserap pada kedalaman sekitar 5 meter, sehingga foto bawah laut sering tampak kebiruan. Filter atau lampu khusus digunakan untuk mengembalikan warna aslinya.',
+    'Kamera underwater pertama dibuat pada tahun 1856 oleh William Thompson, yang menenggelamkan kamera kayu dalam boks kedap air ke dasar laut Inggris.',
+    'Mata manusia dapat beradaptasi melihat dengan jelas di bawah air, namun butuh waktu sekitar 20 menit bagi pupil untuk fully adjust di kedalaman tertentu.',
+  ],
+  'teknik-videografi': [
+    'Video bawah laut pertama kali direkam oleh Jacques Cousteau pada 1956 untuk dokumenter "The Silent World" yang memenangkan Oscar.',
+    'Suara merambat 4x lebih cepat di air dibanding di udara — itulah mengapa perekaman suara bawah air memerlukan mikrofon khusus hidrofonik.',
+    'Plankton bioluminesensi dapat membuat footage underwater tampak magis di malam hari — banyak videografer sengaja menyelam malam untuk menangkap fenomena ini.',
+  ],
+  'storytelling-digital': [
+    'Konten bertema lingkungan yang menggunakan storytelling emosional terbukti meningkatkan engagement hingga 70% dibandingkan konten informatif biasa.',
+    'Otak manusia memproses cerita visual 60.000 kali lebih cepat daripada teks — itulah mengapa visual storytelling sangat efektif untuk pesan konservasi laut.',
+    'Kampanye #TrashTag Challenge menjadi viral karena menggunakan before-after storytelling yang simpel namun powerful, menginspirasi jutaan orang untuk membersihkan pantai.',
+  ],
+  'editing-publishing': [
+    'Color grading footage bawah laut memerlukan teknik khusus "white balance adjustment" untuk mengkompensasi dominasi warna biru di lingkungan bawah air.',
+    'Algoritma YouTube memprioritaskan video yang ditonton minimal 70% durasinya — itulah mengapa hook yang kuat di 3 detik pertama sangat krusial.',
+    'Konten bertema ocean conservation dengan waktu posting antara pukul 11.00–13.00 atau 19.00–21.00 cenderung mendapat jangkauan organik lebih tinggi.',
+  ],
+  'etika-konten': [
+    'Menyentuh atau menginjak terumbu karang untuk mengambil foto dapat merusak organisme yang butuh ratusan tahun untuk tumbuh — setiap sentuhan bisa membunuh koloni karang.',
+    'Memberi makan ikan liar untuk konten viral sebenarnya berbahaya — ini mengubah perilaku alami ikan dan dapat menyebabkan ketergantungan pada manusia.',
+    'Drone di atas area konservasi laut dapat mengganggu mamalia laut yang sangat sensitif terhadap gelombang suara — selalu cek regulasi setempat sebelum terbang.',
+  ],
+};
+
 const TRACKS: TrackData[] = [
   {
     id: 'konservasi-laut',
@@ -110,7 +158,12 @@ export default function LMSPage() {
            setCompletedQuizzes(loadedQuizzes);
 
            if (moduleSlug === 'all') {
-              setView('user_modules');
+              if (action === 'certificate') {
+                setHasCertificate(true);
+                setView('user_certificate');
+              } else {
+                setView('user_modules');
+              }
               return;
            }
 
@@ -230,7 +283,6 @@ export default function LMSPage() {
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const [showBackConfirm, setShowBackConfirm] = useState(false);
   const [userName, setUserName] = useState<string | null>(null);
-
   // Simpan progress ke localStorage setiap kali berubah
   useEffect(() => {
     const userEmail = (localStorage.getItem('user_email') || '').toLowerCase();
@@ -416,6 +468,11 @@ export default function LMSPage() {
     setIsProcessing(true);
     setView('user_quiz_result');
 
+    if (calculatedScore >= 50 && selectedModule) {
+      // Simpan skor ke localStorage agar Dashboard bisa membaca topScore dan membuka lencana 3D
+      localStorage.setItem(`quiz_score_${selectedModule.slug}_${Date.now()}`, calculatedScore.toString());
+    }
+
     if (calculatedScore === 100 && selectedModule) {
       setCompletedQuizzes(prev => [...prev, `Kuis: ${selectedModule.title}`]);
     }
@@ -476,8 +533,8 @@ export default function LMSPage() {
       {/* NAVBAR */}
       <nav className="w-full px-8 py-5 flex justify-between items-center border-b border-white/10 bg-white/5 backdrop-blur-md sticky top-0 z-50">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-lg flex items-center justify-center font-bold text-lg shadow-lg shadow-blue-500/20">
-            🎓
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg bg-white/5 border border-white/10 overflow-hidden cursor-pointer">
+            <img src="/images/logo.png" alt="Dive3D Logo" className="w-full h-full object-cover" />
           </div>
           <span className="text-xl font-black tracking-widest">DIVEXPLORE LMS</span>
         </div>
@@ -855,82 +912,138 @@ export default function LMSPage() {
         {/* VIEW: BACA MATERI */}
         {/* ========================================= */}
         {view === 'user_read_module' && (
-          <div className="w-full max-w-3xl p-8 rounded-[32px] bg-[#000814] border border-white/10 shadow-2xl relative z-10 animate-in slide-in-from-right-8 duration-500">
-            <h1 className="text-3xl font-black text-white mb-4 flex items-center gap-3">
-              <span className="text-4xl">{selectedModule?.icon}</span>
-              Materi: {selectedModule?.title}
-            </h1>
+          <div className="w-full max-w-5xl relative z-10 animate-in slide-in-from-right-8 duration-500">
+            <div className="grid grid-cols-3 gap-6 items-start">
 
-            <div className="mb-6">
-              <div className="flex justify-between text-xs text-cyan-400 font-bold mb-2 uppercase tracking-wider">
-                <span>Progres Membaca</span>
-                <span>{readProgress}%</span>
-              </div>
-              <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-gradient-to-r from-blue-500 to-cyan-400 transition-all duration-500"
-                  style={{ width: `${readProgress}%` }}
-                />
-              </div>
-            </div>
+              {/* KOLOM KIRI: Materi (2/3) */}
+              <div className="col-span-2 p-8 rounded-[32px] bg-[#000814] border border-white/10 shadow-2xl">
+                <h1 className="text-3xl font-black text-white mb-4 flex items-center gap-3">
+                  <span className="text-4xl">{selectedModule?.icon}</span>
+                  Materi: {selectedModule?.title}
+                </h1>
 
-            <div className="prose prose-invert max-w-none text-gray-300 space-y-4 mb-8 min-h-[200px]">
-              <p>Ini adalah konten pengantar untuk modul <strong>{selectedModule?.title}</strong>. Pelajari dengan saksama karena evaluasi quiz akan berdasarkan materi ini.</p>
-
-              {readProgress >= 25 && (
-                <p className="animate-in fade-in duration-500">Materi Bagian 1: {selectedModule?.desc}</p>
-              )}
-              {readProgress >= 50 && (
-                <p className="animate-in fade-in duration-500">Materi Bagian 2: Fakta unik tentang topik ini adalah pentingnya menjaga keseimbangan ekosistem demi masa depan bumi kita.</p>
-              )}
-              {readProgress >= 75 && (
-                <p className="animate-in fade-in duration-500">Kesimpulan: Ekosistem laut dan pesisir sangat rentan terhadap perubahan iklim dan campur tangan manusia.</p>
-              )}
-            </div>
-
-            <div className="flex flex-col gap-4 pt-6 border-t border-white/10">
-              {readProgress >= 100 && (
-                <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-medium text-center">
-                  ✅ Materi Selesai Dibaca!
-                </div>
-              )}
-
-              <div className="flex items-center justify-between">
-                <button
-                  onClick={() => setShowBackConfirm(true)}
-                  className="px-6 py-4 rounded-xl font-bold text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 transition-all border border-transparent hover:border-white/10 flex items-center gap-2"
-                >
-                  <span>← Kembali ke Akademi</span>
-                </button>
-
-                {readProgress < 100 ? (
-                  <button
-                    onClick={handleSimulateScroll}
-                    className="px-6 py-4 rounded-xl font-bold text-cyan-400 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/20 transition-all flex items-center gap-2"
-                  >
-                    <span>Lanjut Membaca (Scroll ↓)</span>
-                  </button>
-                ) : completedQuizzes.includes(`Kuis: ${selectedModule?.title}`) ? (
-                  <div className="px-6 py-4 rounded-xl font-bold text-blue-400 bg-blue-500/10 border border-blue-500/20 shadow-inner flex items-center gap-3">
-                    <span className="text-2xl">📝</span>
-                    <div>
-                      <p className="text-sm">Kuis Selesai</p>
-                      <p className="text-xs text-blue-400/80 font-medium">Anda sudah mengerjakan kuis ini sebelumnya.</p>
-                    </div>
+                <div className="mb-6">
+                  <div className="flex justify-between text-xs text-cyan-400 font-bold mb-2 uppercase tracking-wider">
+                    <span>Progres Membaca</span>
+                    <span>{readProgress}%</span>
                   </div>
-                ) : (
-                  <button
-                    onClick={() => {
-                      setQuizAnswers({});
-                      if (selectedModule) loadUserQuiz(selectedModule.slug);
-                      setView('user_quiz');
-                    }}
-                    className="px-8 py-4 rounded-xl font-bold text-white bg-gradient-to-r from-blue-600 to-cyan-500 hover:scale-[1.02] transition-all shadow-xl shadow-blue-500/25"
-                  >
-                    Mulai Quiz
-                  </button>
-                )}
+                  <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-blue-500 to-cyan-400 transition-all duration-500"
+                      style={{ width: `${readProgress}%` }}
+                    />
+                  </div>
+                </div>
+
+                <div className="prose prose-invert max-w-none text-gray-300 space-y-4 mb-8 min-h-[200px]">
+                  <p>Ini adalah konten pengantar untuk modul <strong>{selectedModule?.title}</strong>. Pelajari dengan saksama karena evaluasi quiz akan berdasarkan materi ini.</p>
+                  {readProgress >= 25 && (
+                    <p className="animate-in fade-in duration-500">Materi Bagian 1: {selectedModule?.desc}</p>
+                  )}
+                  {readProgress >= 50 && (
+                    <p className="animate-in fade-in duration-500">Materi Bagian 2: Memahami topik ini secara mendalam adalah kunci untuk menjaga keseimbangan ekosistem demi masa depan bumi kita.</p>
+                  )}
+                  {readProgress >= 75 && (
+                    <p className="animate-in fade-in duration-500">Kesimpulan: Ekosistem laut dan pesisir sangat rentan terhadap perubahan iklim dan campur tangan manusia. Pengetahuan yang Anda miliki adalah langkah pertama menuju aksi nyata.</p>
+                  )}
+                </div>
+
+                <div className="flex flex-col gap-4 pt-6 border-t border-white/10">
+                  {readProgress >= 100 && (
+                    <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-medium text-center">
+                      ✅ Materi Selesai Dibaca!
+                    </div>
+                  )}
+
+                  <div className="flex items-center justify-between">
+                    <button
+                      onClick={() => setShowBackConfirm(true)}
+                      className="px-6 py-4 rounded-xl font-bold text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 transition-all border border-transparent hover:border-white/10 flex items-center gap-2"
+                    >
+                      <span>← Kembali ke Akademi</span>
+                    </button>
+
+                    {readProgress < 100 ? (
+                      <button
+                        onClick={handleSimulateScroll}
+                        className="px-6 py-4 rounded-xl font-bold text-cyan-400 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/20 transition-all flex items-center gap-2"
+                      >
+                        <span>Lanjut Membaca (Scroll ↓)</span>
+                      </button>
+                    ) : completedQuizzes.includes(`Kuis: ${selectedModule?.title}`) ? (
+                      <div className="px-6 py-4 rounded-xl font-bold text-blue-400 bg-blue-500/10 border border-blue-500/20 shadow-inner flex items-center gap-3">
+                        <span className="text-2xl">📝</span>
+                        <div>
+                          <p className="text-sm">Kuis Selesai</p>
+                          <p className="text-xs text-blue-400/80 font-medium">Anda sudah mengerjakan kuis ini sebelumnya.</p>
+                        </div>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => {
+                          setQuizAnswers({});
+                          if (selectedModule) loadUserQuiz(selectedModule.slug);
+                          setView('user_quiz');
+                        }}
+                        className="px-8 py-4 rounded-xl font-bold text-white bg-gradient-to-r from-blue-600 to-cyan-500 hover:scale-[1.02] transition-all shadow-xl shadow-blue-500/25"
+                      >
+                        Mulai Quiz
+                      </button>
+                    )}
+                  </div>
+                </div>
               </div>
+
+              {/* KOLOM KANAN: Fun Facts (1/3) */}
+              <div className="col-span-1 p-6 rounded-[32px] bg-[#000814] border border-white/10 shadow-2xl flex flex-col gap-4">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-lg">💡</span>
+                  <h3 className="text-sm font-black uppercase tracking-widest text-cyan-400">Fun Facts</h3>
+                </div>
+                <p className="text-xs text-gray-500 -mt-2 mb-1">Fakta menarik terbuka seiring Anda membaca.</p>
+
+                {(() => {
+                  const facts = selectedModule ? FUN_FACTS[selectedModule.slug] : undefined;
+                  const factConfig = [
+                    { threshold: 25, icon: '💡', border: 'border-cyan-500/40', bg: 'from-cyan-950/60 to-blue-950/60', label: 'text-cyan-400', num: 'bg-cyan-500/20 text-cyan-300' },
+                    { threshold: 50, icon: '🌊', border: 'border-teal-500/40', bg: 'from-teal-950/60 to-cyan-950/60', label: 'text-teal-400', num: 'bg-teal-500/20 text-teal-300' },
+                    { threshold: 75, icon: '🐠', border: 'border-blue-500/40', bg: 'from-blue-950/60 to-indigo-950/60', label: 'text-blue-400', num: 'bg-blue-500/20 text-blue-300' },
+                  ];
+                  return factConfig.map((cfg, i) => {
+                    const unlocked = readProgress >= cfg.threshold;
+                    const fact = facts?.[i];
+                    return (
+                      <div
+                        key={i}
+                        className={`rounded-2xl border p-4 transition-all duration-500 ${
+                          unlocked
+                            ? `bg-gradient-to-br ${cfg.bg} ${cfg.border}`
+                            : 'bg-white/[0.02] border-white/5'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className={`text-xs font-black px-2 py-0.5 rounded-full ${unlocked ? cfg.num : 'bg-white/5 text-gray-600'}`}>
+                            #{i + 1}
+                          </span>
+                          <span className={`text-lg ${unlocked ? '' : 'grayscale opacity-30'}`}>{cfg.icon}</span>
+                          <span className={`text-[10px] font-black uppercase tracking-widest ${unlocked ? cfg.label : 'text-gray-600'}`}>
+                            Fun Fact
+                          </span>
+                        </div>
+                        {unlocked && fact ? (
+                          <p className="text-xs text-white/80 leading-relaxed animate-in fade-in duration-700">{fact}</p>
+                        ) : (
+                          <div className="flex items-center gap-2">
+                            <span className="text-gray-600 text-lg">🔒</span>
+                            <p className="text-xs text-gray-600">Baca hingga {cfg.threshold}% untuk membuka.</p>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  });
+                })()}
+              </div>
+
             </div>
           </div>
         )}
@@ -1265,6 +1378,7 @@ export default function LMSPage() {
           </div>
         </div>
       )}
+
     </div>
   );
 }

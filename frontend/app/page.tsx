@@ -9,8 +9,8 @@ const LoadingScreen = () => (
   <div className="fixed inset-0 z-[100] bg-[#00040a] flex flex-col items-center justify-center">
     <div className="relative">
       <div className="w-24 h-24 border-4 border-blue-500/20 rounded-full animate-ping absolute inset-0"></div>
-      <div className="w-24 h-24 border-4 border-blue-500 rounded-full flex items-center justify-center bg-[#00040a] relative z-10">
-        <span className="text-3xl animate-bounce">🌊</span>
+      <div className="w-24 h-24 border-4 border-blue-500/50 rounded-full flex items-center justify-center bg-white/5 relative z-10 overflow-hidden">
+        <img src="/images/logo.png" alt="Dive3D Loading" className="w-[80%] h-[80%] object-contain animate-pulse" />
       </div>
     </div>
     <div className="mt-8 text-center">
@@ -45,12 +45,35 @@ export default function HomePage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [lockoutCountdown, setLockoutCountdown] = useState(0);
+
+  const MAX_ATTEMPTS = 5;
+  const LOCKOUT_DURATION = 15 * 60 * 1000; // 15 menit dalam ms
+
+  const getAttemptData = () => {
+    const raw = localStorage.getItem('login_attempts');
+    if (!raw) return { count: 0, lockUntil: 0 };
+    try { return JSON.parse(raw); } catch { return { count: 0, lockUntil: 0 }; }
+  };
+
+  const saveAttemptData = (data: { count: number; lockUntil: number }) => {
+    localStorage.setItem('login_attempts', JSON.stringify(data));
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    setIsLoginProcessing(true);
 
+    // Cek lockout
+    const attempts = getAttemptData();
+    const now = Date.now();
+    if (attempts.lockUntil > now) {
+      const secsLeft = Math.ceil((attempts.lockUntil - now) / 1000);
+      setError(`Terlalu banyak percobaan. Coba lagi dalam ${Math.floor(secsLeft / 60)}m ${secsLeft % 60}s.`);
+      return;
+    }
+
+    setIsLoginProcessing(true);
     try {
       const response = await fetch('http://127.0.0.1:8000/api/login', {
         method: 'POST',
@@ -64,11 +87,28 @@ export default function HomePage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || 'Email atau password salah!');
+        // Gagal — tambah hitungan
+        const newCount = attempts.count + 1;
+        if (newCount >= MAX_ATTEMPTS) {
+          const lockUntil = now + LOCKOUT_DURATION;
+          saveAttemptData({ count: newCount, lockUntil });
+          const secsLeft = Math.ceil(LOCKOUT_DURATION / 1000);
+          setError(`Akun dikunci sementara (${MAX_ATTEMPTS}x gagal). Coba lagi dalam 15 menit.`);
+          // Mulai countdown
+          setLockoutCountdown(secsLeft);
+        } else {
+          saveAttemptData({ count: newCount, lockUntil: 0 });
+          const sisa = MAX_ATTEMPTS - newCount;
+          throw new Error((data.message || 'Email atau password salah!') + ` (sisa ${sisa} percobaan)`);
+        }
+        return;
       }
 
-      const role = data.role ?? data.user?.role ?? 'user';
+      // Berhasil — reset hitungan
+      saveAttemptData({ count: 0, lockUntil: 0 });
+      setLockoutCountdown(0);
 
+      const role = data.role ?? data.user?.role ?? 'user';
       localStorage.setItem('auth_token', data.token);
       localStorage.setItem('user_role', role);
       localStorage.setItem('user_name', data.user?.name ?? '');
@@ -85,6 +125,24 @@ export default function HomePage() {
       setIsLoginProcessing(false);
     }
   };
+
+  // Countdown timer saat lockout
+  React.useEffect(() => {
+    if (lockoutCountdown <= 0) return;
+    const timer = setInterval(() => {
+      setLockoutCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          setError('');
+          return 0;
+        }
+        const remaining = prev - 1;
+        setError(`Akun dikunci sementara. Coba lagi dalam ${Math.floor(remaining / 60)}m ${remaining % 60}s.`);
+        return remaining;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [lockoutCountdown]);
 
   const handleProtectedNav = (e: React.MouseEvent, href: string) => {
     const protectedRoutes = ['/gallery', '/akademi', '/tutorial', '/dashboard'];
@@ -121,8 +179,8 @@ export default function HomePage() {
 
         {/* Logo */}
         <div className={`flex items-center gap-3 backdrop-blur-xl py-2 px-5 rounded-full border shadow-xl transition-colors ${isDark ? 'bg-white/10 border-white/10' : 'bg-white/80 border-blue-100 shadow-sm'}`}>
-          <div className="w-9 h-9 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-full flex items-center justify-center shadow-lg shadow-blue-500/20">
-            <span className="text-base">🌊</span>
+          <div className="w-9 h-9 rounded-full flex items-center justify-center shadow-lg bg-white/5 border border-blue-500/20 overflow-hidden">
+            <img src="/images/logo.png" alt="Dive3D Logo" className="w-full h-full object-cover" />
           </div>
           <span className={`text-lg font-black tracking-widest pr-1 ${isDark ? 'text-white' : 'text-blue-900'}`}>DIVEXPLORE</span>
         </div>
@@ -423,7 +481,7 @@ export default function HomePage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full px-5 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-600 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-all"
-                  placeholder="admin@lms.com / user@lms.com"
+                  placeholder="user@email.com"
                   required
                 />
               </div>

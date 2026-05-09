@@ -9,6 +9,7 @@ export default function TutorialPage() {
   const pathname = usePathname();
   const { isDark, toggleTheme } = useTheme();
   const [activeTab, setActiveTab] = useState('Semua');
+  const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
 
   const categories = ['Semua', 'Fotografi', 'Videografi', 'Storytelling', 'Editing', 'Etika'];
 
@@ -22,6 +23,7 @@ export default function TutorialPage() {
       icon: '📸',
       color: 'from-blue-500 to-cyan-400',
       progress: 0,
+      youtubeUrl: 'https://www.youtube.com/embed/OMmoUzmPprE?autoplay=1',
     },
     {
       id: 2,
@@ -32,6 +34,7 @@ export default function TutorialPage() {
       icon: '🎥',
       color: 'from-purple-500 to-pink-500',
       progress: 0,
+      youtubeUrl: 'https://www.youtube.com/embed/V2QpKo1LLJI?autoplay=1',
     },
     {
       id: 3,
@@ -42,6 +45,7 @@ export default function TutorialPage() {
       icon: '📖',
       color: 'from-emerald-400 to-teal-500',
       progress: 0,
+      youtubeUrl: 'https://www.youtube.com/embed/KdNHDwYYD2Y?autoplay=1',
     },
     {
       id: 4,
@@ -52,6 +56,7 @@ export default function TutorialPage() {
       icon: '💻',
       color: 'from-amber-400 to-orange-500',
       progress: 0,
+      youtubeUrl: 'https://www.youtube.com/embed/DJ5Wrlb3bxQ?autoplay=1',
     },
     {
       id: 5,
@@ -62,6 +67,7 @@ export default function TutorialPage() {
       icon: '🤝',
       color: 'from-red-400 to-rose-500',
       progress: 0,
+      youtubeUrl: 'https://www.youtube.com/embed/dz_kxLtYFT0?autoplay=1',
     },
   ];
 
@@ -82,8 +88,8 @@ export default function TutorialPage() {
       {/* NAVBAR */}
       <nav className="fixed top-0 w-full z-50 px-6 py-5 flex justify-between items-center">
         <div className={`flex items-center gap-3 backdrop-blur-xl py-2 px-5 rounded-full border shadow-xl transition-colors ${isDark ? 'bg-white/10 border-white/10' : 'bg-white/80 border-blue-100 shadow-sm'}`}>
-          <div className="w-9 h-9 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-full flex items-center justify-center shadow-lg shadow-blue-500/20">
-            <span className="text-base">🌊</span>
+          <div className="w-9 h-9 rounded-full flex items-center justify-center shadow-lg bg-white/5 border border-blue-500/20 overflow-hidden">
+            <img src="/images/logo.png" alt="Dive3D Logo" className="w-full h-full object-cover" />
           </div>
           <span className={`text-lg font-black tracking-widest pr-1 ${isDark ? 'text-white' : 'text-blue-900'}`}>
             DIVEXPLORE
@@ -195,32 +201,16 @@ export default function TutorialPage() {
 
                 {/* Left/Right Side: Video Thumbnail */}
                 <div className={`w-full md:w-1/2 flex ${!isEven ? 'md:justify-start' : 'md:justify-end'}`}>
-                  <div className={`relative w-full max-w-lg aspect-video rounded-2xl overflow-hidden border ${isDark ? 'border-white/10 bg-gradient-to-br from-blue-900/40 to-cyan-900/20' : 'border-gray-200 bg-gradient-to-br from-blue-200 to-cyan-100'} group cursor-pointer shadow-2xl transition-all hover:scale-[1.02] hover:shadow-cyan-500/20`}>
+                  <div className={`relative w-full max-w-lg aspect-video rounded-2xl overflow-hidden border ${isDark ? 'border-white/10' : 'border-gray-200'} shadow-2xl transition-all hover:shadow-cyan-500/20`}>
+                    <iframe 
+                      src={tutorial.youtubeUrl.replace('?autoplay=1', '')} 
+                      className="absolute inset-0 w-full h-full"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                      allowFullScreen
+                    ></iframe>
                     
-                    {/* Placeholder Underwater Background Effect */}
-                    <div className="absolute inset-0 opacity-40 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] mix-blend-overlay"></div>
-                    <div className="absolute top-[-50px] right-[-50px] w-[200px] h-[200px] bg-cyan-400/20 blur-[60px] rounded-full" />
-                    
-                    {/* Decorative Icons in background */}
-                    <span className="absolute top-4 left-6 text-3xl opacity-20 transform -rotate-12">🐠</span>
-                    <span className="absolute bottom-6 right-8 text-4xl opacity-10">🪸</span>
-                    
-                    {/* Big Play Button */}
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className={`w-20 h-20 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-110 shadow-[0_0_40px_rgba(255,255,255,0.4)] ${isDark ? 'bg-white text-blue-600' : 'bg-blue-600 text-white'}`}>
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" className="ml-2">
-                          <path d="M8 5v14l11-7z" />
-                        </svg>
-                      </div>
-                    </div>
-
-                    {/* Duration Badge */}
-                    <div className="absolute bottom-4 right-4 px-3 py-1.5 bg-black/80 backdrop-blur-md rounded-lg text-white text-sm font-bold font-mono">
-                      {tutorial.duration}
-                    </div>
-
                     {/* Number on mobile */}
-                    <div className="absolute top-4 left-4 w-10 h-10 rounded-full bg-blue-600 text-white font-black text-lg flex items-center justify-center sm:hidden shadow-lg border-2 border-white/20">
+                    <div className="absolute top-4 left-4 w-10 h-10 rounded-full bg-blue-600 text-white font-black text-lg flex items-center justify-center sm:hidden shadow-lg border-2 border-white/20 pointer-events-none z-10">
                       {index + 1}
                     </div>
                   </div>
