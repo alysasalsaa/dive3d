@@ -19,12 +19,22 @@ export default function DashboardPage() {
     const [digitalDone, setDigitalDone] = useState(0);
     const [userRole, setUserRole] = useState('user');
     const [topScore, setTopScore] = useState(0);
+    const [watchedTutorialCount, setWatchedTutorialCount] = useState(0);
+    const [claimedCertificates, setClaimedCertificates] = useState<{type: string; label: string; track: string; date: string}[]>([]);
 
     useEffect(() => {
         const role = localStorage.getItem('user_role') || 'user';
         setUserRole(role);
-        
+
         const userEmail = (localStorage.getItem('user_email') || '').toLowerCase();
+
+        // Baca tutorial yang sudah ditonton (selalu, untuk semua user)
+        const watched = localStorage.getItem('tutorial_watched');
+        if (watched) setWatchedTutorialCount(JSON.parse(watched).length);
+
+        // Baca riwayat sertifikat yang sudah diklaim
+        const claimed = localStorage.getItem('claimed_certificates');
+        if (claimed) setClaimedCertificates(JSON.parse(claimed));
 
         // TEST: vinzcan11 langsung semua selesai
         if (userEmail === 'vinzcan11@gmail.com') {
@@ -48,7 +58,6 @@ export default function DashboardPage() {
                 if (!isNaN(val)) scores.push(val);
             }
         }
-        // Fallback: jika ada quiz selesai, minimal skor = 100 (karena completedQuizzes hanya disimpan jika lulus)
         const totalDone = (k ? JSON.parse(k).length : 0) + (d ? JSON.parse(d).length : 0);
         if (totalDone > 0 && scores.length === 0) scores.push(100);
         if (scores.length > 0) setTopScore(Math.max(...scores));
@@ -113,8 +122,21 @@ export default function DashboardPage() {
     const rankName = dashboardData.user?.rank_name || 'Rookie';
 
     const completedQuizzesCount = dashboardData.recent_quizzes?.filter((q: any) => q.score === 100).length || 0;
-    const totalModules = 4;
-    const totalVideos = 4;
+
+    const claimCertificate = (type: string, label: string, track: string, url: string) => {
+        const existing = JSON.parse(localStorage.getItem('claimed_certificates') || '[]');
+        const alreadyClaimed = existing.some((c: any) => c.type === type);
+        if (!alreadyClaimed) {
+            const newEntry = { type, label, track, date: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) };
+            const updated = [...existing, newEntry];
+            localStorage.setItem('claimed_certificates', JSON.stringify(updated));
+            setClaimedCertificates(updated);
+        }
+        window.location.href = url;
+    };
+    const completedAkademikCount = konservasiDone + digitalDone;
+    const totalModules = 9;
+    const totalVideos = 5;
     const totalKuis = 4;
 
     return (
@@ -285,11 +307,11 @@ export default function DashboardPage() {
                             </div>
                             <div>
                                 <div className="flex justify-between items-end mb-2">
-                                    <span className="text-3xl font-bold text-cyan-400">{Math.round((completedQuizzesCount / totalModules) * 100)}%</span>
-                                    <span className="text-xs text-gray-500 font-medium">{completedQuizzesCount} / {totalModules} Modul</span>
+                                    <span className="text-3xl font-bold text-cyan-400">{Math.round((completedAkademikCount / totalModules) * 100)}%</span>
+                                    <span className="text-xs text-gray-500 font-medium">{completedAkademikCount} / {totalModules} Modul</span>
                                 </div>
                                 <div className={`h-1.5 rounded-full w-full mb-4 ${isDark ? 'bg-gray-800' : 'bg-gray-200'}`}>
-                                    <div className="h-full rounded-full bg-cyan-400" style={{ width: `${(completedQuizzesCount / totalModules) * 100}%` }} />
+                                    <div className="h-full rounded-full bg-cyan-400" style={{ width: `${(completedAkademikCount / totalModules) * 100}%` }} />
                                 </div>
                                 <Link href="/akademi" className="text-xs text-cyan-400 hover:text-cyan-300 font-medium flex items-center gap-1">
                                     Lihat Detail ➔
@@ -308,11 +330,11 @@ export default function DashboardPage() {
                             </div>
                             <div>
                                 <div className="flex justify-between items-end mb-2">
-                                    <span className="text-3xl font-bold text-cyan-400">{Math.round((completedQuizzesCount / totalVideos) * 100)}%</span>
-                                    <span className="text-xs text-gray-500 font-medium">{completedQuizzesCount} / {totalVideos} Video</span>
+                                    <span className="text-3xl font-bold text-cyan-400">{Math.round((watchedTutorialCount / totalVideos) * 100)}%</span>
+                                    <span className="text-xs text-gray-500 font-medium">{watchedTutorialCount} / {totalVideos} Video</span>
                                 </div>
                                 <div className={`h-1.5 rounded-full w-full mb-4 ${isDark ? 'bg-gray-800' : 'bg-gray-200'}`}>
-                                    <div className="h-full rounded-full bg-cyan-400" style={{ width: `${(completedQuizzesCount / totalVideos) * 100}%` }} />
+                                    <div className="h-full rounded-full bg-cyan-400" style={{ width: `${(watchedTutorialCount / totalVideos) * 100}%` }} />
                                 </div>
                                 <Link href="/tutorial" className="text-xs text-cyan-400 hover:text-cyan-300 font-medium flex items-center gap-1">
                                     Lihat Detail ➔
@@ -428,7 +450,7 @@ export default function DashboardPage() {
                                 </ul>
                                 <button
                                     disabled={konservasiDone < 4}
-                                    onClick={() => konservasiDone >= 4 && (window.location.href = '/lms?track=konservasi-laut&module=all&action=certificate')}
+                                    onClick={() => konservasiDone >= 4 && claimCertificate('konservasi', 'Sertifikat Edukasi Konservasi Laut', 'Konservasi Laut', '/lms?track=konservasi-laut&module=all&action=certificate')}
                                     className={`w-full mt-3 py-2 rounded-lg font-semibold text-xs flex items-center justify-center gap-2 transition-all ${konservasiDone >= 4 ? 'bg-cyan-500 text-white hover:bg-cyan-400 cursor-pointer' : 'bg-gray-800 text-gray-500 border border-white/5 cursor-not-allowed'}`}>
                                     <span>{konservasiDone >= 4 ? '📜' : '🔒'}</span> Claim Sertifikat Konservasi Laut
                                 </button>
@@ -448,7 +470,7 @@ export default function DashboardPage() {
                                 </ul>
                                 <button
                                     disabled={digitalDone < 5}
-                                    onClick={() => digitalDone >= 5 && (window.location.href = '/lms?track=konten-digital&module=all&action=certificate')}
+                                    onClick={() => digitalDone >= 5 && claimCertificate('digital', 'Sertifikat Pembuatan Konten Digital Bahari', 'Konten Digital Bahari', '/lms?track=konten-digital&module=all&action=certificate')}
                                     className={`w-full mt-3 py-2 rounded-lg font-semibold text-xs flex items-center justify-center gap-2 transition-all ${digitalDone >= 5 ? 'bg-purple-500 text-white hover:bg-purple-400 cursor-pointer' : 'bg-gray-800 text-gray-500 border border-white/5 cursor-not-allowed'}`}>
                                     <span>{digitalDone >= 5 ? '📜' : '🔒'}</span> Claim Sertifikat Konten Digital
                                 </button>
@@ -471,15 +493,38 @@ export default function DashboardPage() {
                     </div>
                     
                     {/* Riwayat Sertifikat content */}
-                    <div className={`rounded-2xl p-8 border border-dashed flex items-center justify-center gap-4 ${isDark ? 'bg-transparent border-white/10' : 'bg-gray-50 border-gray-300'}`}>
-                        <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-2xl text-gray-500">
-                            🏅
+                    {claimedCertificates.length === 0 ? (
+                        <div className={`rounded-2xl p-8 border border-dashed flex items-center justify-center gap-4 ${isDark ? 'bg-transparent border-white/10' : 'bg-gray-50 border-gray-300'}`}>
+                            <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-2xl text-gray-500">
+                                🏅
+                            </div>
+                            <div>
+                                <p className="text-sm font-semibold text-gray-300 mb-1">Belum ada sertifikat yang diklaim.</p>
+                                <p className="text-xs text-gray-500">Selesaikan semua syarat dan klaim sertifikat pertamamu!</p>
+                            </div>
                         </div>
-                        <div>
-                            <p className="text-sm font-semibold text-gray-300 mb-1">Belum ada sertifikat yang diklaim.</p>
-                            <p className="text-xs text-gray-500">Selesaikan semua syarat dan klaim sertifikat pertamamu!</p>
+                    ) : (
+                        <div className="space-y-3">
+                            {claimedCertificates.map((cert) => (
+                                <div key={cert.type} className={`flex items-center justify-between p-4 rounded-2xl border ${isDark ? 'bg-[#0B1221] border-white/5' : 'bg-white border-gray-200 shadow-sm'}`}>
+                                    <div className="flex items-center gap-3">
+                                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl ${cert.type === 'konservasi' ? 'bg-cyan-500/10' : 'bg-purple-500/10'}`}>
+                                            📜
+                                        </div>
+                                        <div>
+                                            <p className="text-sm font-semibold text-white">{cert.label}</p>
+                                            <p className="text-xs text-gray-500">Diklaim pada {cert.date}</p>
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={() => window.location.href = `/lms?track=${cert.type === 'konservasi' ? 'konservasi-laut' : 'konten-digital'}&module=all&action=certificate`}
+                                        className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${cert.type === 'konservasi' ? 'bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20 border border-cyan-500/20' : 'bg-purple-500/10 text-purple-400 hover:bg-purple-500/20 border border-purple-500/20'}`}>
+                                        Download Ulang
+                                    </button>
+                                </div>
+                            ))}
                         </div>
-                    </div>
+                    )}
                     </div>
                 )}
 
