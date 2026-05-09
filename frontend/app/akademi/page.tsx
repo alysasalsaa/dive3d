@@ -25,10 +25,10 @@ export default function AkademiPage() {
     const prevModule = () => setCurrentLMSIndex((prev) => (prev - 1 + lmsModules.length) % lmsModules.length);
 
     const lmsModules = [
-        { id: 1, slug: 'ekosistem-laut', title: 'Ekosistem Laut', img: '/images/sertifikat-konservasi-laut.jpeg' },
-        { id: 2, slug: 'biota-laut', title: 'Biota Laut', img: '/images/sertifikat-konten-digital.jpeg' },
-        { id: 3, slug: 'terumbu-karang', title: 'Terumbu Karang', img: '/images/sertifikat-konservasi-laut.jpeg' },
-        { id: 4, slug: 'sampah-laut', title: 'Sampah Laut', img: '/images/sertifikat-konten-digital.jpeg' },
+        { id: 1, slug: 'ekosistem-laut', title: 'Ekosistem Laut', img: '/images/2.png' },
+        { id: 2, slug: 'biota-laut', title: 'Biota Laut', img: '/images/1.png' },
+        { id: 3, slug: 'terumbu-karang', title: 'Terumbu Karang', img: '/images/3.png' },
+        { id: 4, slug: 'sampah-laut', title: 'Sampah Laut', img: '/images/4.png' },
     ];
 
     const totalModules = lmsModules.length;
