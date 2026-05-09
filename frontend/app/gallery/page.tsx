@@ -595,7 +595,6 @@ export default function CommunityGallery() {
             {selectedItem && (
                 <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 md:p-10">
                     <div className="absolute inset-0 bg-black/90 backdrop-blur-md" onClick={() => setSelectedItem(null)} />
-                    <button onClick={() => setSelectedItem(null)} className="absolute top-4 right-4 md:top-8 md:right-8 w-12 h-12 flex items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors z-10 text-xl font-bold backdrop-blur-lg">✕</button>
                     
                     <div className="relative z-10 w-full max-w-6xl h-full max-h-[85vh] flex flex-col md:flex-row bg-[#000814] rounded-3xl overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-white/10">
                         {/* Media Section (Object Contain to respect ratio) */}
