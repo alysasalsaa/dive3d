@@ -15,7 +15,9 @@ export interface PoiData {
 
 export interface ModuleData {
   id: string;
+  slug: string;
   title: string;
+  desc: string;
   longDescription: string;
   icon: string;
   difficulty: string;
@@ -37,6 +39,8 @@ export interface UserProgress {
 export const MOCK_MODULES: ModuleData[] = [
   {
     id: 'terumbu-karang',
+    slug: 'terumbu-karang',
+    desc: 'Pelajari struktur dan pentingnya ekosistem terumbu karang.',
     title: 'Ekosistem Terumbu Karang',
     longDescription:
       'Pelajari struktur dan pentingnya ekosistem terumbu karang sebagai rumah bagi ribuan spesies laut di Raja Ampat.',
@@ -69,6 +73,8 @@ export const MOCK_MODULES: ModuleData[] = [
   },
   {
     id: 'keanekaragaman-laut',
+    slug: 'keanekaragaman-laut',
+    desc: 'Eksplorasi ragam spesies ikan, moluska, dan invertebrata laut.',
     title: 'Keanekaragaman Hayati Laut',
     longDescription:
       'Eksplorasi ragam spesies ikan, moluska, dan invertebrata yang menghuni perairan Raja Ampat yang kaya.',
@@ -95,6 +101,8 @@ export const MOCK_MODULES: ModuleData[] = [
   },
   {
     id: 'ancaman-lingkungan',
+    slug: 'ancaman-lingkungan',
+    desc: 'Pahami dampak perubahan iklim dan polusi terhadap ekosistem laut.',
     title: 'Ancaman Lingkungan Laut',
     longDescription:
       'Pahami dampak perubahan iklim, pemutihan karang, dan polusi terhadap ekosistem laut yang rapuh.',
@@ -127,6 +135,8 @@ export const MOCK_MODULES: ModuleData[] = [
   },
   {
     id: 'konservasi-aksi',
+    slug: 'konservasi-aksi',
+    desc: 'Temukan cara nyata berkontribusi pada pelestarian laut.',
     title: 'Aksi Konservasi Nyata',
     longDescription:
       'Temukan cara nyata untuk berkontribusi pada pelestarian laut: dari penyelaman ramah lingkungan hingga program adopsi terumbu karang.',
