@@ -5,6 +5,8 @@ import { usePathname } from 'next/navigation';
 import { useTheme } from '../lib/useTheme';
 import toast from 'react-hot-toast';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+
 const LoadingScreen = () => (
   <div className="fixed inset-0 z-[100] bg-[#00040a] flex flex-col items-center justify-center">
     <div className="relative">
@@ -75,7 +77,7 @@ export default function HomePage() {
 
     setIsLoginProcessing(true);
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/login`, {
+      const response = await fetch(`${API_URL}/api/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

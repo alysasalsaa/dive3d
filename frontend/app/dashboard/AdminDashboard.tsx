@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { getModules } from '../../lib/api';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+
 type ViewState = 'admin_dashboard' | 'admin_edit_data' | 'admin_quiz' | 'admin_gallery';
 
 type ModuleData = {
@@ -48,7 +50,7 @@ export default function AdminDashboard() {
     setGalleryLoading(true);
     setGalleryError(null);
     try {
-      const res = await fetch('http://localhost:8000/api/admin/pending', { headers: { 'Authorization': `Bearer ${token}` } });
+      const res = await fetch(`${API_URL}/api/admin/pending`, { headers: { 'Authorization': `Bearer ${token}` } });
       if (!res.ok) {
         setGalleryError(`Error ${res.status}: ${res.statusText}`);
         setPendingGallery([]);
@@ -68,7 +70,7 @@ export default function AdminDashboard() {
     const token = localStorage.getItem('auth_token');
     setPendingGallery(prev => prev.filter(item => item.id !== id));
     try {
-      await fetch(`http://localhost:8000/api/admin/approve/${id}`, { method: 'POST', headers: { 'Authorization': `Bearer ${token}` } });
+      await fetch(`${API_URL}/api/admin/approve/${id}`, { method: 'POST', headers: { 'Authorization': `Bearer ${token}` } });
     } catch (e) {
       console.error(e);
       loadPendingGallery();
@@ -79,7 +81,7 @@ export default function AdminDashboard() {
     const token = localStorage.getItem('auth_token');
     setPendingGallery(prev => prev.filter(item => item.id !== id));
     try {
-      await fetch(`http://localhost:8000/api/admin/reject/${id}`, { method: 'POST', headers: { 'Authorization': `Bearer ${token}` } });
+      await fetch(`${API_URL}/api/admin/reject/${id}`, { method: 'POST', headers: { 'Authorization': `Bearer ${token}` } });
     } catch (e) {
       console.error(e);
       loadPendingGallery();
@@ -93,7 +95,7 @@ export default function AdminDashboard() {
       if (manageCategory === 'Modul') {
         if (editingModuleSlug) {
           // UPDATE
-          await fetch(`http://localhost:8000/api/admin/modules/${editingModuleSlug}`, {
+          await fetch(`${API_URL}/api/admin/modules/${editingModuleSlug}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': `Bearer ${token}` },
             body: JSON.stringify({ title: newTitle, desc: newDesc }),
@@ -101,7 +103,7 @@ export default function AdminDashboard() {
         } else {
           // CREATE
           const slug = newTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
-          await fetch('http://localhost:8000/api/admin/modules', {
+          await fetch(`${API_URL}/api/admin/modules`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': `Bearer ${token}` },
             body: JSON.stringify({ slug, title: newTitle, desc: newDesc }),
@@ -124,7 +126,7 @@ export default function AdminDashboard() {
     if (!confirm('Yakin ingin menghapus modul ini beserta semua datanya?')) return;
     const token = localStorage.getItem('auth_token');
     try {
-      await fetch(`http://localhost:8000/api/admin/modules/${slug}`, {
+      await fetch(`${API_URL}/api/admin/modules/${slug}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` },
       });
@@ -153,7 +155,7 @@ export default function AdminDashboard() {
 
   const loadQuizQuestions = async (slug: string) => {
     try {
-      const res = await fetch(`http://localhost:8000/api/quiz/questions/${slug}`);
+      const res = await fetch(`${API_URL}/api/quiz/questions/${slug}`);
       const responseData = await res.json();
       // Handle jika backend membungkus dengan objek { data: [...] }
       setExistingQuestions(Array.isArray(responseData) ? responseData : (responseData.data || []));
@@ -168,7 +170,7 @@ export default function AdminDashboard() {
     const token = localStorage.getItem('auth_token');
     setIsAdminProcessing(true);
     try {
-      await fetch('http://localhost:8000/api/quiz/questions', {
+      await fetch(`${API_URL}/api/quiz/questions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({
@@ -193,7 +195,7 @@ export default function AdminDashboard() {
     if (!confirm('Yakin ingin menghapus soal ini?')) return;
     const token = localStorage.getItem('auth_token');
     try {
-      await fetch(`http://localhost:8000/api/quiz/questions/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+      await fetch(`${API_URL}/api/quiz/questions/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
       if (quizModuleSlug) loadQuizQuestions(quizModuleSlug);
     } catch (e) { console.error(e); }
   };
@@ -439,9 +441,9 @@ export default function AdminDashboard() {
                   <div key={item.id} className="bg-white/5 rounded-2xl border border-white/10 overflow-hidden flex flex-col group">
                     <div className="h-40 bg-black/50 relative">
                       {item.file_path.match(/\.(mp4|webm|ogg|mov)$/i) ? (
-                        <video src={item.file_path.startsWith('http') ? item.file_path.replace('http://localhost/', 'http://localhost:8000/') : `http://localhost:8000${item.file_path}`} className="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity" controls />
+                        <video src={item.file_path.startsWith('http') ? item.file_path.replace('http://localhost/', `${API_URL}/`) : `${API_URL}${item.file_path}`} className="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity" controls />
                       ) : (
-                        <img src={item.file_path.startsWith('http') ? item.file_path.replace('http://localhost/', 'http://localhost:8000/') : `http://localhost:8000${item.file_path}`} alt={item.title} className="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity" />
+                        <img src={item.file_path.startsWith('http') ? item.file_path.replace('http://localhost/', `${API_URL}/`) : `${API_URL}${item.file_path}`} alt={item.title} className="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity" />
                       )}
                     </div>
                     <div className="p-5 flex-1 flex flex-col">
