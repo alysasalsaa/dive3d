@@ -53,6 +53,7 @@ export default function OnboardingTour({ steps, tourKey, forceRun = false, onFin
 
   return (
     <Joyride
+      key={`${tourKey}-${forceRun}-${run}`}
       onEvent={handleEvent}
       continuous
       run={run}
