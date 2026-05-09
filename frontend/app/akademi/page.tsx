@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTheme } from '../../lib/useTheme';
@@ -25,16 +25,24 @@ export default function AkademiPage() {
     const nextModule = () => setCurrentLMSIndex((prev) => (prev + 1) % lmsModules.length);
     const prevModule = () => setCurrentLMSIndex((prev) => (prev - 1 + lmsModules.length) % lmsModules.length);
 
-    // Mocks for UI
     const lmsModules = [
-        { id: 1, slug: 'ekosistem-laut', title: 'Ekosistem Laut', progress: 100, img: '/images/sertifikat-konservasi-laut.jpeg' },
-        { id: 2, slug: 'biota-laut', title: 'Biota Laut', progress: 75, img: '/images/sertifikat-konten-digital.jpeg' },
-        { id: 3, slug: 'terumbu-karang', title: 'Terumbu Karang', progress: 50, img: '/images/sertifikat-konservasi-laut.jpeg' },
-        { id: 4, slug: 'sampah-laut', title: 'Sampah Laut', progress: 0, img: '/images/sertifikat-konten-digital.jpeg' },
+        { id: 1, slug: 'ekosistem-laut', title: 'Ekosistem Laut', img: '/images/sertifikat-konservasi-laut.jpeg' },
+        { id: 2, slug: 'biota-laut', title: 'Biota Laut', img: '/images/sertifikat-konten-digital.jpeg' },
+        { id: 3, slug: 'terumbu-karang', title: 'Terumbu Karang', img: '/images/sertifikat-konservasi-laut.jpeg' },
+        { id: 4, slug: 'sampah-laut', title: 'Sampah Laut', img: '/images/sertifikat-konten-digital.jpeg' },
     ];
 
-    const completedModules = lmsModules.filter(m => m.progress === 100).length;
     const totalModules = lmsModules.length;
+    const [completedQuizTitles, setCompletedQuizTitles] = useState<string[]>([]);
+
+    useEffect(() => {
+        const userEmail = (localStorage.getItem('user_email') || '').toLowerCase();
+        const saved = localStorage.getItem(`completed_quizzes_${userEmail}_konservasi-laut`);
+        const done = saved ? JSON.parse(saved) : [];
+        setCompletedQuizTitles(Array.isArray(done) ? done : []);
+    }, []);
+
+    const completedModules = completedQuizTitles.length;
 
     const navLinks = [
         { href: '/', label: 'Beranda' },
@@ -57,8 +65,8 @@ export default function AkademiPage() {
             {/* NAVBAR */}
             <nav className="fixed top-0 w-full z-50 px-6 py-5 flex justify-between items-center pointer-events-none">
                 <div className={`pointer-events-auto flex items-center gap-3 backdrop-blur-xl py-2 px-5 rounded-full border shadow-xl transition-colors ${isDark ? 'bg-white/10 border-white/10' : 'bg-white/80 border-blue-100 shadow-sm'}`}>
-                  <div className="w-9 h-9 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-full flex items-center justify-center shadow-lg shadow-blue-500/20">
-                    <span className="text-base">🌊</span>
+                  <div className="w-9 h-9 rounded-full flex items-center justify-center shadow-lg bg-white/5 border border-blue-500/20 overflow-hidden">
+                    <img src="/images/logo.png" alt="Dive3D Logo" className="w-full h-full object-cover" />
                   </div>
                   <span className={`text-lg font-black tracking-widest pr-1 ${isDark ? 'text-white' : 'text-blue-900'}`}>
                     DIVEXPLORE
@@ -191,10 +199,10 @@ export default function AkademiPage() {
                                             <div className="mb-8">
                                                 <div className="flex justify-between items-end mb-2">
                                                     <span className={`text-[12px] font-bold uppercase tracking-wider ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>Progres Belajar</span>
-                                                    <span className={`text-lg font-black ${isDark ? 'text-blue-400' : 'text-blue-600'}`}>{lmsModules[currentLMSIndex].progress}%</span>
+                                                    <span className={`text-lg font-black ${isDark ? 'text-blue-400' : 'text-blue-600'}`}>{completedQuizTitles.includes(`Kuis: ${lmsModules[currentLMSIndex].title}`) ? 100 : 0}%</span>
                                                 </div>
                                                 <div className={`h-3 w-full rounded-full overflow-hidden ${isDark ? 'bg-white/10' : 'bg-gray-100'}`}>
-                                                    <div className="h-full bg-gradient-to-r from-blue-500 to-cyan-400 transition-all duration-1000 ease-out" style={{ width: `${lmsModules[currentLMSIndex].progress}%` }}></div>
+                                                    <div className="h-full bg-gradient-to-r from-blue-500 to-cyan-400 transition-all duration-1000 ease-out" style={{ width: completedQuizTitles.includes(`Kuis: ${lmsModules[currentLMSIndex].title}`) ? '100%' : '0%' }}></div>
                                                 </div>
                                             </div>
 
@@ -235,10 +243,10 @@ export default function AkademiPage() {
                                         <div className="w-[120px] h-[120px] shrink-0 relative flex items-center justify-center">
                                             <svg className="w-full h-full -rotate-90 drop-shadow-md" viewBox="0 0 36 36">
                                                 <path className={isDark ? 'text-white/10' : 'text-gray-100'} stroke="currentColor" strokeWidth="4" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                                                <path className="text-blue-600" strokeDasharray="56, 100" stroke="currentColor" strokeWidth="4" strokeLinecap="round" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                                <path className="text-blue-600" strokeDasharray={`${Math.round((completedModules / totalModules) * 100)}, 100`} stroke="currentColor" strokeWidth="4" strokeLinecap="round" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                                             </svg>
                                             <div className="absolute flex flex-col items-center justify-center">
-                                                <span className={`font-black text-3xl ${isDark ? 'text-white' : 'text-[#0a1e3f]'}`}>56%</span>
+                                                <span className={`font-black text-3xl ${isDark ? 'text-white' : 'text-[#0a1e3f]'}`}>{Math.round((completedModules / totalModules) * 100)}%</span>
                                                 <span className={`text-[9px] font-bold uppercase tracking-widest ${isDark ? 'text-blue-400' : 'text-blue-600'}`}>Selesai</span>
                                             </div>
                                         </div>
@@ -253,10 +261,10 @@ export default function AkademiPage() {
                                             <div>
                                                 <div className="flex justify-between text-xs font-bold text-gray-500 mb-2">
                                                     <span>Status Kuis Evaluasi</span>
-                                                    <span>1 dari 4 Lulus</span>
+                                                    <span>{completedModules} dari {totalModules} Lulus</span>
                                                 </div>
                                                 <div className={`h-2 w-full rounded-full ${isDark ? 'bg-white/10' : 'bg-gray-100'}`}>
-                                                    <div className="h-full bg-blue-600 rounded-full w-1/4"></div>
+                                                    <div className="h-full bg-blue-600 rounded-full transition-all duration-700" style={{ width: `${(completedModules / totalModules) * 100}%` }}></div>
                                                 </div>
                                             </div>
                                         </div>

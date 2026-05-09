@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Content;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 
 
@@ -13,7 +14,7 @@ class ContentController extends Controller
     public function upload(Request $request)
     {
         $request->validate([
-            "file" => "required|file",
+            "file" => "required|file|max:204800",
             'title' => 'required|string',
             'category' => 'required|string',
             'author' => 'required|string'
@@ -22,6 +23,7 @@ class ContentController extends Controller
         $path = $request->file('file')->store('uploads', 'public');
         $url = asset('storage/' . $path);
         Content::create([
+            'user_id' => Auth::id(), // simpan siapa yang upload
             'title' => $request->title,
             'category' => $request->category,
             'author' => $request->author,
@@ -31,6 +33,21 @@ class ContentController extends Controller
         return response()->json([
             'message' => 'File uploaded successfully',
             'file' => $url,
+        ]);
+    }
+
+    /** Karya milik user yang sedang login (semua status) */
+    public function myUploads(Request $request)
+    {
+        $userId = Auth::id();
+        $contents = Content::select('id', 'title', 'category', 'author', 'file_path as image', 'status', 'created_at')
+            ->where('user_id', $userId)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $contents
         ]);
     }
     public function showcase()

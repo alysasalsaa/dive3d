@@ -9,6 +9,21 @@ export default function TutorialPage() {
   const pathname = usePathname();
   const { isDark, toggleTheme } = useTheme();
   const [activeTab, setActiveTab] = useState('Semua');
+  const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
+  const [watchedVideos, setWatchedVideos] = useState<Set<number>>(() => {
+    if (typeof window === 'undefined') return new Set();
+    const saved = localStorage.getItem('tutorial_watched');
+    return saved ? new Set<number>(JSON.parse(saved)) : new Set<number>();
+  });
+
+  const markWatched = (id: number) => {
+    setWatchedVideos(prev => {
+      const next = new Set(prev);
+      next.add(id);
+      localStorage.setItem('tutorial_watched', JSON.stringify([...next]));
+      return next;
+    });
+  };
 
   const categories = ['Semua', 'Fotografi', 'Videografi', 'Storytelling', 'Editing', 'Etika'];
 
@@ -22,6 +37,7 @@ export default function TutorialPage() {
       icon: '📸',
       color: 'from-blue-500 to-cyan-400',
       progress: 0,
+      youtubeUrl: 'https://www.youtube.com/embed/OMmoUzmPprE?autoplay=1',
     },
     {
       id: 2,
@@ -32,6 +48,7 @@ export default function TutorialPage() {
       icon: '🎥',
       color: 'from-purple-500 to-pink-500',
       progress: 0,
+      youtubeUrl: 'https://www.youtube.com/embed/V2QpKo1LLJI?autoplay=1',
     },
     {
       id: 3,
@@ -42,6 +59,7 @@ export default function TutorialPage() {
       icon: '📖',
       color: 'from-emerald-400 to-teal-500',
       progress: 0,
+      youtubeUrl: 'https://www.youtube.com/embed/KdNHDwYYD2Y?autoplay=1',
     },
     {
       id: 4,
@@ -52,6 +70,7 @@ export default function TutorialPage() {
       icon: '💻',
       color: 'from-amber-400 to-orange-500',
       progress: 0,
+      youtubeUrl: 'https://www.youtube.com/embed/DJ5Wrlb3bxQ?autoplay=1',
     },
     {
       id: 5,
@@ -62,6 +81,7 @@ export default function TutorialPage() {
       icon: '🤝',
       color: 'from-red-400 to-rose-500',
       progress: 0,
+      youtubeUrl: 'https://www.youtube.com/embed/dz_kxLtYFT0?autoplay=1',
     },
   ];
 
@@ -82,8 +102,8 @@ export default function TutorialPage() {
       {/* NAVBAR */}
       <nav className="fixed top-0 w-full z-50 px-6 py-5 flex justify-between items-center">
         <div className={`flex items-center gap-3 backdrop-blur-xl py-2 px-5 rounded-full border shadow-xl transition-colors ${isDark ? 'bg-white/10 border-white/10' : 'bg-white/80 border-blue-100 shadow-sm'}`}>
-          <div className="w-9 h-9 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-full flex items-center justify-center shadow-lg shadow-blue-500/20">
-            <span className="text-base">🌊</span>
+          <div className="w-9 h-9 rounded-full flex items-center justify-center shadow-lg bg-white/5 border border-blue-500/20 overflow-hidden">
+            <img src="/images/logo.png" alt="Dive3D Logo" className="w-full h-full object-cover" />
           </div>
           <span className={`text-lg font-black tracking-widest pr-1 ${isDark ? 'text-white' : 'text-blue-900'}`}>
             DIVEXPLORE
@@ -154,7 +174,47 @@ export default function TutorialPage() {
       {/* TUTORIAL CONTENT SECTION */}
       <section className="px-6 pb-32">
         <div className="max-w-7xl mx-auto">
-          
+
+          {/* Progress Tutorial Card */}
+          <div className={`relative overflow-hidden rounded-[28px] border mb-10 p-6 ${isDark ? 'bg-gradient-to-br from-cyan-950/50 to-blue-950/50 border-cyan-500/20' : 'bg-gradient-to-br from-cyan-50 to-blue-50 border-cyan-200'}`}>
+            {/* Glow background */}
+            <div className="absolute -top-10 -right-10 w-40 h-40 bg-cyan-500/10 blur-3xl rounded-full pointer-events-none" />
+
+            <div className="flex items-center justify-between mb-5 relative z-10">
+              <div className="flex items-center gap-3">
+                <div className={`w-11 h-11 rounded-2xl flex items-center justify-center text-xl ${isDark ? 'bg-cyan-500/15 border border-cyan-500/20' : 'bg-cyan-100 border border-cyan-200'}`}>
+                  🎬
+                </div>
+                <div>
+                  <h3 className={`font-black text-sm ${isDark ? 'text-white' : 'text-gray-800'}`}>Progress Tutorial</h3>
+                  <p className="text-xs text-gray-400 mt-0.5">Tandai video setelah selesai ditonton</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <span className="text-3xl font-black text-cyan-400">{Math.round((watchedVideos.size / 5) * 100)}%</span>
+                <p className="text-xs text-gray-500 mt-0.5">{watchedVideos.size} / 5 video</p>
+              </div>
+            </div>
+
+            {/* Segmen per video */}
+            <div className="flex gap-2 relative z-10">
+              {[1, 2, 3, 4, 5].map((id) => (
+                <div key={id} className="flex-1 flex flex-col items-center gap-1.5">
+                  <div className={`w-full h-2.5 rounded-full transition-all duration-500 ${watchedVideos.has(id) ? 'bg-gradient-to-r from-cyan-500 to-blue-500 shadow-[0_0_8px_rgba(6,182,212,0.5)]' : isDark ? 'bg-white/10' : 'bg-gray-200'}`} />
+                  <span className={`text-[10px] font-bold ${watchedVideos.has(id) ? 'text-cyan-400' : 'text-gray-600'}`}>V{id}</span>
+                </div>
+              ))}
+            </div>
+
+            {watchedVideos.size === 5 && (
+              <div className="mt-4 flex items-center gap-2 relative z-10">
+                <div className="px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-black">
+                  Semua video selesai ditonton!
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* Category Filter */}
           <div className="flex flex-wrap items-center gap-3 mb-12">
             {categories.map((cat) => (
@@ -195,32 +255,16 @@ export default function TutorialPage() {
 
                 {/* Left/Right Side: Video Thumbnail */}
                 <div className={`w-full md:w-1/2 flex ${!isEven ? 'md:justify-start' : 'md:justify-end'}`}>
-                  <div className={`relative w-full max-w-lg aspect-video rounded-2xl overflow-hidden border ${isDark ? 'border-white/10 bg-gradient-to-br from-blue-900/40 to-cyan-900/20' : 'border-gray-200 bg-gradient-to-br from-blue-200 to-cyan-100'} group cursor-pointer shadow-2xl transition-all hover:scale-[1.02] hover:shadow-cyan-500/20`}>
+                  <div className={`relative w-full max-w-lg aspect-video rounded-2xl overflow-hidden border ${isDark ? 'border-white/10' : 'border-gray-200'} shadow-2xl transition-all hover:shadow-cyan-500/20`}>
+                    <iframe 
+                      src={tutorial.youtubeUrl.replace('?autoplay=1', '')} 
+                      className="absolute inset-0 w-full h-full"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                      allowFullScreen
+                    ></iframe>
                     
-                    {/* Placeholder Underwater Background Effect */}
-                    <div className="absolute inset-0 opacity-40 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] mix-blend-overlay"></div>
-                    <div className="absolute top-[-50px] right-[-50px] w-[200px] h-[200px] bg-cyan-400/20 blur-[60px] rounded-full" />
-                    
-                    {/* Decorative Icons in background */}
-                    <span className="absolute top-4 left-6 text-3xl opacity-20 transform -rotate-12">🐠</span>
-                    <span className="absolute bottom-6 right-8 text-4xl opacity-10">🪸</span>
-                    
-                    {/* Big Play Button */}
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className={`w-20 h-20 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-110 shadow-[0_0_40px_rgba(255,255,255,0.4)] ${isDark ? 'bg-white text-blue-600' : 'bg-blue-600 text-white'}`}>
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" className="ml-2">
-                          <path d="M8 5v14l11-7z" />
-                        </svg>
-                      </div>
-                    </div>
-
-                    {/* Duration Badge */}
-                    <div className="absolute bottom-4 right-4 px-3 py-1.5 bg-black/80 backdrop-blur-md rounded-lg text-white text-sm font-bold font-mono">
-                      {tutorial.duration}
-                    </div>
-
                     {/* Number on mobile */}
-                    <div className="absolute top-4 left-4 w-10 h-10 rounded-full bg-blue-600 text-white font-black text-lg flex items-center justify-center sm:hidden shadow-lg border-2 border-white/20">
+                    <div className="absolute top-4 left-4 w-10 h-10 rounded-full bg-blue-600 text-white font-black text-lg flex items-center justify-center sm:hidden shadow-lg border-2 border-white/20 pointer-events-none z-10">
                       {index + 1}
                     </div>
                   </div>
@@ -234,9 +278,9 @@ export default function TutorialPage() {
                     <span className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider backdrop-blur-sm border ${isDark ? 'bg-cyan-500/10 border-cyan-500/20 text-cyan-400' : 'bg-blue-100 border-blue-200 text-blue-700'}`}>
                       {tutorial.category}
                     </span>
-                    <span className={`flex items-center gap-1.5 text-xs font-bold px-4 py-1.5 rounded-full border ${tutorial.progress === 100 ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' : isDark ? 'bg-white/5 border-white/10 text-gray-400' : 'bg-white border-gray-200 text-gray-500'}`}>
-                      {tutorial.progress === 100 ? (
-                        <>✅ Selesai</>
+                    <span className={`flex items-center gap-1.5 text-xs font-bold px-4 py-1.5 rounded-full border ${watchedVideos.has(tutorial.id) ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' : isDark ? 'bg-white/5 border-white/10 text-gray-400' : 'bg-white border-gray-200 text-gray-500'}`}>
+                      {watchedVideos.has(tutorial.id) ? (
+                        <>Selesai</>
                       ) : (
                         <>🕒 Belum Ditonton</>
                       )}
@@ -250,6 +294,20 @@ export default function TutorialPage() {
                   <p className={`text-base md:text-lg leading-relaxed mb-6 ${!isEven ? 'md:ml-auto' : ''} max-w-md ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                     {tutorial.description}
                   </p>
+
+                  {/* Tombol Tandai Selesai */}
+                  {!watchedVideos.has(tutorial.id) ? (
+                    <button
+                      onClick={() => markWatched(tutorial.id)}
+                      className="mt-2 px-5 py-2.5 rounded-full text-sm font-bold bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500 hover:text-white transition-all self-start flex items-center gap-2"
+                    >
+                      <span>👁️</span> Tandai Sudah Ditonton
+                    </button>
+                  ) : (
+                    <div className="mt-2 px-5 py-2.5 rounded-full text-sm font-bold bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 self-start flex items-center gap-2">
+                      <span>🎬</span> Video Selesai Ditonton
+                    </div>
+                  )}
 
                   {/* Decorative Elements */}
                   <div className={`hidden md:flex items-center gap-4 text-2xl opacity-40 animate-pulse mt-2 ${!isEven ? 'flex-row-reverse' : ''}`}>

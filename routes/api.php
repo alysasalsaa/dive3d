@@ -14,15 +14,15 @@ use App\Http\Controllers\QuizQuestionController;
 use App\Http\Controllers\CertificateController;
 
 // Endpoint Autentikasi
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:3,1');
+Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
 
+// Upload (bebas CSRF, tapi butuh auth agar user_id tersimpan)
+Route::post('/upload', [ContentController::class, 'upload'])->middleware('auth:sanctum');
 
-// Endpoint untuk Gallery
+// Endpoint untuk Gallery (publik)
 Route::get('/gallery', [GalleryController::class, 'index']);
 
-// Endpoint untuk Upload Karya (bebas CSRF)
-Route::post('/upload', [ContentController::class, 'upload']);
 
 // Endpoint untuk Modul Pembelajaran
 Route::get('/modules', [ModuleController::class, 'index']);
@@ -36,6 +36,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // Rute Progres (Pindahan dari publik agar punya ID User Asli)
     Route::get('/progress/{slug}', [UserProgressController::class, 'show']);
     Route::post('/progress', [UserProgressController::class, 'update']);
+
+    // Karya milik user sendiri (semua status: pending/approved/rejected)
+    Route::get('/my-uploads', [ContentController::class, 'myUploads']);
 
     // Admin review (diproteksi)
     Route::prefix('/admin')->group(function () {

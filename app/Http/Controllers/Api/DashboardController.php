@@ -9,6 +9,7 @@ use App\Models\Badge;
 use App\Models\UserBadge;
 use App\Models\UserProgress;
 use App\Models\QuizResult;
+use App\Models\Content;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
@@ -108,6 +109,10 @@ class DashboardController extends Controller
             ],
             'badges'           => $badges,
             'learning_progress' => $learning_progress,
+            'content_stats'    => [
+                'submitted' => Content::where('user_id', $user->id)->count(),
+                'approved'  => Content::where('user_id', $user->id)->where('status', 'approved')->count(),
+            ],
 
             // Quiz: data real dari tabel quiz_results
             'recent_quizzes' => QuizResult::where('user_id', $user->id)
