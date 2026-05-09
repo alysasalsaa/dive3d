@@ -10,47 +10,57 @@ export default function TutorialPage() {
   const { isDark, toggleTheme } = useTheme();
   const [activeTab, setActiveTab] = useState('Semua');
 
-  const categories = ['Semua', 'Pemula', 'Navigasi 3D', 'Fitur Lanjut'];
+  const categories = ['Semua', 'Fotografi', 'Videografi', 'Storytelling', 'Editing', 'Etika'];
 
   const tutorials = [
     {
       id: 1,
-      title: 'Dasar Navigasi 3D',
-      description: 'Pelajari cara menggunakan mouse dan keyboard untuk bergerak, memutar kamera, dan berinteraksi di dalam lingkungan 3D Raja Ampat.',
-      category: 'Navigasi 3D',
-      duration: '5 min',
-      icon: '🧭',
+      title: 'Fotografi Bawah Laut',
+      description: 'Belajar teknik foto bawah laut untuk hasil yang tajam dan memukau.',
+      category: 'Fotografi',
+      duration: '06:32',
+      icon: '📸',
       color: 'from-blue-500 to-cyan-400',
-      progress: 100,
+      progress: 0,
     },
     {
       id: 2,
-      title: 'Mengerjakan Kuis Interaktif',
-      description: 'Panduan lengkap menemukan titik kuis (POI) pada terumbu karang dan mengumpulkan skor untuk mendapatkan lencana.',
-      category: 'Fitur Lanjut',
-      duration: '8 min',
-      icon: '🎯',
+      title: 'Teknik-Teknik Videografi',
+      description: 'Kuasai teknik pengambilan gambar video yang stabil dan sinematik.',
+      category: 'Videografi',
+      duration: '08:15',
+      icon: '🎥',
       color: 'from-purple-500 to-pink-500',
-      progress: 45,
+      progress: 0,
     },
     {
       id: 3,
-      title: 'Mengunggah Karya ke Galeri',
-      description: 'Cara membagikan temuan 3D dan foto tangkapan layar (screenshot) Anda ke Galeri Komunitas agar dilihat oleh pengguna lain.',
-      category: 'Pemula',
-      duration: '4 min',
-      icon: '📸',
+      title: 'Storytelling Digital',
+      description: 'Bangun cerita yang kuat untuk konten wisata bahari yang menarik.',
+      category: 'Storytelling',
+      duration: '07:40',
+      icon: '📖',
       color: 'from-emerald-400 to-teal-500',
       progress: 0,
     },
     {
       id: 4,
-      title: 'Membaca Dashboard Performa',
-      description: 'Memahami cara kerja sistem lencana, leaderboard, dan statistik pembelajaran Anda selama menggunakan Divexplore.',
-      category: 'Fitur Lanjut',
-      duration: '6 min',
-      icon: '📊',
+      title: 'Editing dan Publishing Guide',
+      description: 'Panduan editing dan publikasi konten ke berbagai platform secara efektif.',
+      category: 'Editing',
+      duration: '09:10',
+      icon: '💻',
       color: 'from-amber-400 to-orange-500',
+      progress: 0,
+    },
+    {
+      id: 5,
+      title: 'Etika dalam Membuat Konten',
+      description: 'Pahami etika dan tanggung jawab saat membuat konten wisata bahari.',
+      category: 'Etika',
+      duration: '05:45',
+      icon: '🤝',
+      color: 'from-red-400 to-rose-500',
       progress: 0,
     },
   ];
@@ -129,13 +139,13 @@ export default function TutorialPage() {
               💡 Pusat Bantuan & Panduan
             </div>
             <h1 className="text-5xl md:text-7xl font-black mb-6 leading-[1.1] tracking-tight">
-              Kuasai{' '}
+              Pusat{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400">
-                Eksplorasi.
+                Tutorial.
               </span>
             </h1>
             <p className={`text-lg md:text-xl max-w-2xl leading-relaxed ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-              Pelajari semua fitur Divexplore-3D, mulai dari navigasi dasar hingga cara mendapatkan lencana di modul akademi konservasi.
+              Tonton video pembelajaran interaktif untuk menguasai keterampilan pembuatan konten wisata bahari.
             </p>
           </div>
         </div>
@@ -166,116 +176,91 @@ export default function TutorialPage() {
             ))}
           </div>
 
-          {/* Tutorial Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
-            {filteredTutorials.map((tutorial) => (
+          {/* Tutorial Timeline */}
+          <div className="relative flex flex-col gap-12 md:gap-24 py-10">
+            {/* Timeline vertical line */}
+            <div className={`absolute left-[40px] md:left-1/2 md:-translate-x-1/2 top-10 bottom-10 w-1 border-l-2 border-dashed ${isDark ? 'border-cyan-900/50' : 'border-blue-200'} z-0 hidden sm:block`} />
+
+            {filteredTutorials.map((tutorial, index) => {
+              const isEven = index % 2 === 0;
+              return (
               <div
                 key={tutorial.id}
-                className={`group relative rounded-[28px] overflow-hidden transition-all duration-500 border ${isDark ? 'bg-[#000814] border-white/5 hover:border-white/20 hover:shadow-[0_0_40px_rgba(0,0,0,0.5)]' : 'bg-white border-gray-100 hover:border-blue-200 hover:shadow-xl'}`}
+                className={`relative z-10 flex flex-col md:flex-row items-center gap-8 md:gap-16 ${!isEven ? 'md:flex-row-reverse' : ''}`}
               >
-                {/* Background Hover Glow */}
-                <div className={`absolute inset-0 opacity-0 group-hover:opacity-10 bg-gradient-to-br ${tutorial.color} transition-opacity duration-500 pointer-events-none`} />
+                {/* Number Badge on Timeline */}
+                <div className={`absolute left-[40px] md:left-1/2 -translate-x-1/2 w-14 h-14 rounded-full bg-gradient-to-br from-blue-600 to-cyan-500 border-4 ${isDark ? 'border-[#00040a]' : 'border-sky-50'} text-white font-black text-2xl flex items-center justify-center z-20 shadow-[0_0_20px_rgba(6,182,212,0.5)] hidden sm:flex`}>
+                  {index + 1}
+                </div>
 
-                <div className="p-8">
-                  {/* Header Card */}
-                  <div className="flex justify-between items-start mb-6">
-                    <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${tutorial.color} flex items-center justify-center text-3xl shadow-lg transform group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500`}>
-                      {tutorial.icon}
+                {/* Left/Right Side: Video Thumbnail */}
+                <div className={`w-full md:w-1/2 flex ${!isEven ? 'md:justify-start' : 'md:justify-end'}`}>
+                  <div className={`relative w-full max-w-lg aspect-video rounded-2xl overflow-hidden border ${isDark ? 'border-white/10 bg-gradient-to-br from-blue-900/40 to-cyan-900/20' : 'border-gray-200 bg-gradient-to-br from-blue-200 to-cyan-100'} group cursor-pointer shadow-2xl transition-all hover:scale-[1.02] hover:shadow-cyan-500/20`}>
+                    
+                    {/* Placeholder Underwater Background Effect */}
+                    <div className="absolute inset-0 opacity-40 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] mix-blend-overlay"></div>
+                    <div className="absolute top-[-50px] right-[-50px] w-[200px] h-[200px] bg-cyan-400/20 blur-[60px] rounded-full" />
+                    
+                    {/* Decorative Icons in background */}
+                    <span className="absolute top-4 left-6 text-3xl opacity-20 transform -rotate-12">🐠</span>
+                    <span className="absolute bottom-6 right-8 text-4xl opacity-10">🪸</span>
+                    
+                    {/* Big Play Button */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className={`w-20 h-20 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-110 shadow-[0_0_40px_rgba(255,255,255,0.4)] ${isDark ? 'bg-white text-blue-600' : 'bg-blue-600 text-white'}`}>
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" className="ml-2">
+                          <path d="M8 5v14l11-7z" />
+                        </svg>
+                      </div>
                     </div>
-                    <div className="flex flex-col items-end gap-2">
-                      <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider backdrop-blur-sm border ${isDark ? 'bg-white/5 border-white/10 text-gray-300' : 'bg-gray-100 border-gray-200 text-gray-600'}`}>
-                        {tutorial.category}
-                      </span>
-                      <span className="text-gray-500 text-xs font-bold flex items-center gap-1">
-                        ⏱️ {tutorial.duration}
-                      </span>
+
+                    {/* Duration Badge */}
+                    <div className="absolute bottom-4 right-4 px-3 py-1.5 bg-black/80 backdrop-blur-md rounded-lg text-white text-sm font-bold font-mono">
+                      {tutorial.duration}
+                    </div>
+
+                    {/* Number on mobile */}
+                    <div className="absolute top-4 left-4 w-10 h-10 rounded-full bg-blue-600 text-white font-black text-lg flex items-center justify-center sm:hidden shadow-lg border-2 border-white/20">
+                      {index + 1}
                     </div>
                   </div>
+                </div>
 
-                  {/* Content */}
-                  <h3 className={`text-2xl font-black mb-3 group-hover:text-cyan-400 transition-colors duration-300 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                {/* Right/Left Side: Content */}
+                <div className={`w-full md:w-1/2 flex flex-col ${!isEven ? 'md:items-end md:text-right' : 'md:items-start md:text-left'} text-center md:text-left`}>
+                  
+                  {/* Category & Status */}
+                  <div className={`flex flex-wrap items-center gap-3 mb-5 ${!isEven ? 'md:flex-row-reverse' : ''} justify-center md:justify-start`}>
+                    <span className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider backdrop-blur-sm border ${isDark ? 'bg-cyan-500/10 border-cyan-500/20 text-cyan-400' : 'bg-blue-100 border-blue-200 text-blue-700'}`}>
+                      {tutorial.category}
+                    </span>
+                    <span className={`flex items-center gap-1.5 text-xs font-bold px-4 py-1.5 rounded-full border ${tutorial.progress === 100 ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' : isDark ? 'bg-white/5 border-white/10 text-gray-400' : 'bg-white border-gray-200 text-gray-500'}`}>
+                      {tutorial.progress === 100 ? (
+                        <>✅ Selesai</>
+                      ) : (
+                        <>🕒 Belum Ditonton</>
+                      )}
+                    </span>
+                  </div>
+
+                  {/* Title & Description */}
+                  <h3 className={`text-3xl md:text-4xl font-black mb-4 transition-colors duration-300 ${isDark ? 'text-white hover:text-cyan-400' : 'text-gray-900 hover:text-blue-600'}`}>
                     {tutorial.title}
                   </h3>
-                  <p className={`text-sm leading-relaxed mb-8 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                  <p className={`text-base md:text-lg leading-relaxed mb-6 ${!isEven ? 'md:ml-auto' : ''} max-w-md ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                     {tutorial.description}
                   </p>
 
-                  {/* Progress Section */}
-                  <div className="mt-auto">
-                    <div className="flex justify-between items-end mb-2">
-                      <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">
-                        Progres Pembelajaran
-                      </span>
-                      <span className={`text-sm font-black ${tutorial.progress === 100 ? 'text-emerald-400' : 'text-cyan-400'}`}>
-                        {tutorial.progress}%
-                      </span>
-                    </div>
-                    
-                    <div className={`h-2 w-full rounded-full overflow-hidden backdrop-blur-sm ${isDark ? 'bg-white/5' : 'bg-gray-100'}`}>
-                      <div 
-                        className={`h-full rounded-full relative overflow-hidden transition-all duration-1000 ease-out ${
-                          tutorial.progress === 100 
-                            ? 'bg-gradient-to-r from-emerald-500 to-emerald-400' 
-                            : 'bg-gradient-to-r from-blue-500 to-cyan-400'
-                        }`}
-                        style={{ width: `${tutorial.progress}%` }}
-                      >
-                        {/* Shimmer effect inside progress bar */}
-                        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
-                      </div>
-                    </div>
+                  {/* Decorative Elements */}
+                  <div className={`hidden md:flex items-center gap-4 text-2xl opacity-40 animate-pulse mt-2 ${!isEven ? 'flex-row-reverse' : ''}`}>
+                    <span className="animate-[bounce_3s_infinite]">🫧</span>
+                    <span className="animate-[bounce_4s_infinite_0.5s]">🫧</span>
+                    <span className="animate-[bounce_5s_infinite_1s]">🐟</span>
                   </div>
-                  
-                  {/* Action Button */}
-                  <div className={`mt-8 pt-6 border-t flex justify-between items-center ${isDark ? 'border-white/5' : 'border-gray-100'}`}>
-                    <span className={`text-xs font-medium ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
-                      {tutorial.progress === 100 ? '✅ Selesai dipelajari' : 'Lanjutkan membaca'}
-                    </span>
-                    <button className={`w-10 h-10 rounded-full flex items-center justify-center text-cyan-400 transition-colors ${isDark ? 'bg-white/5 hover:bg-white/15' : 'bg-blue-50 hover:bg-blue-100'}`}>
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M5 12h14M12 5l7 7-7 7"/>
-                      </svg>
-                    </button>
-                  </div>
+
                 </div>
               </div>
-            ))}
-          </div>
-
-          {/* Video Tutorial CTA */}
-          <div className={`mt-20 relative rounded-[32px] overflow-hidden border p-10 md:p-16 flex flex-col md:flex-row items-center justify-between gap-10 ${isDark ? 'bg-gradient-to-br from-blue-900/40 to-cyan-900/20 border-cyan-500/20' : 'bg-gradient-to-br from-blue-700 to-blue-900 border-blue-600/30'}`}>
-            {/* Animated particles background */}
-            <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, #06b6d4 1px, transparent 0)', backgroundSize: '32px 32px' }}></div>
-            
-            <div className="relative z-10 max-w-xl">
-              <div className="inline-flex items-center gap-2 px-3 py-1 mb-4 rounded-full bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
-                </span>
-                Video Panduan Lengkap
-              </div>
-              <h2 className={`text-3xl md:text-4xl font-black mb-4 ${isDark ? 'text-white' : 'text-gray-900'}`}>Lebih Suka Menonton?</h2>
-              <p className={`mb-8 leading-relaxed ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
-                Tonton seri video tutorial lengkap kami yang memandu Anda langkah demi langkah dalam menggunakan platform Divexplore-3D.
-              </p>
-              <button className="px-8 py-3.5 rounded-full bg-white text-black font-bold hover:scale-105 transition-transform flex items-center gap-2 shadow-[0_0_30px_rgba(255,255,255,0.2)]">
-                <span>▶️</span> Tonton Video Sekarang
-              </button>
-            </div>
-
-            {/* Video Thumbnail Mockup */}
-            <div className="relative z-10 w-full md:w-1/2 aspect-video bg-black/50 border border-white/10 rounded-2xl overflow-hidden shadow-2xl flex items-center justify-center group cursor-pointer">
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent z-10" />
-              {/* Play Button */}
-              <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center z-20 group-hover:scale-110 transition-transform duration-300">
-                <div className="w-0 h-0 border-t-8 border-t-transparent border-l-[14px] border-l-white border-b-8 border-b-transparent ml-1" />
-              </div>
-              <div className="absolute bottom-4 left-4 z-20">
-                <p className="text-white font-bold text-sm">Tur Lengkap Divexplore</p>
-                <p className="text-gray-300 text-xs">12:45</p>
-              </div>
-            </div>
+            )})}
           </div>
 
         </div>

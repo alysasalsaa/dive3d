@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTheme } from '../../lib/useTheme';
+import AdminDashboard from './AdminDashboard';
 
 export default function DashboardPage() {
     const pathname = usePathname();
@@ -11,6 +12,28 @@ export default function DashboardPage() {
     const [loading, setLoading] = useState(true);
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [activeMenu, setActiveMenu] = useState(0);
+    const [konservasiDone, setKonservasiDone] = useState(0);
+    const [digitalDone, setDigitalDone] = useState(0);
+    const [userRole, setUserRole] = useState('user');
+
+    useEffect(() => {
+        const role = localStorage.getItem('user_role') || 'user';
+        setUserRole(role);
+        
+        const userEmail = (localStorage.getItem('user_email') || '').toLowerCase();
+
+        // TEST: vinzcan11 langsung semua selesai
+        if (userEmail === 'vinzcan11@gmail.com') {
+            setKonservasiDone(4);
+            setDigitalDone(5);
+            return;
+        }
+
+        const k = localStorage.getItem(`completed_quizzes_${userEmail}_konservasi-laut`);
+        const d = localStorage.getItem(`completed_quizzes_${userEmail}_konten-digital`);
+        if (k) setKonservasiDone(JSON.parse(k).length);
+        if (d) setDigitalDone(JSON.parse(d).length);
+    }, []);
 
     useEffect(() => {
         const token = localStorage.getItem('auth_token');
@@ -101,6 +124,7 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Menu */}
+                {userRole !== 'admin' && (
                 <ul className="flex-1 py-4 px-2 space-y-1 overflow-x-hidden">
                     {menuItems.map((item, idx) => (
                         <li
@@ -123,6 +147,7 @@ export default function DashboardPage() {
                         </li>
                     ))}
                 </ul>
+                )}
 
                 {/* Logout */}
                 <div className={`p-2 border-t ${isDark ? 'border-white/5' : 'border-gray-100'}`}>
@@ -148,8 +173,8 @@ export default function DashboardPage() {
                     <div className="flex items-center gap-4">
                         <div className="w-9 h-9 bg-gradient-to-br from-blue-400 to-cyan-400 rounded-full flex-shrink-0 shadow-lg shadow-blue-500/20" />
                         <div>
-                            <p className={`font-bold text-sm leading-none ${isDark ? "text-white" : "text-gray-900"}`}>{userName}</p>
-                            <p className="text-cyan-400 text-xs mt-0.5">Level {level} · {rankName}</p>
+                            <p className={`font-bold text-sm leading-none ${isDark ? "text-white" : "text-gray-900"}`}>{userName} {userRole === 'admin' && <span className="ml-2 px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-400 text-[10px] uppercase tracking-wider">Admin</span>}</p>
+                            {userRole !== 'admin' && <p className="text-cyan-400 text-xs mt-0.5">Level {level} · {rankName}</p>}
                         </div>
                     </div>
 
@@ -191,6 +216,9 @@ export default function DashboardPage() {
                 </header>
 
                 {/* DASHBOARD CONTENT */}
+                {userRole === 'admin' ? (
+                    <AdminDashboard />
+                ) : (
                 <div className="p-6 space-y-6 max-w-7xl mx-auto w-full">
                     {/* Profile & XP Row */}
                     <div className={`flex flex-col md:flex-row justify-between items-center rounded-2xl p-6 border ${isDark ? 'bg-[#0B1221] border-white/5' : 'bg-white border-gray-200 shadow-sm'}`}>
@@ -354,35 +382,42 @@ export default function DashboardPage() {
                                 <div className="text-xl text-yellow-400">📜</div>
                                 <div>
                                     <h3 className="font-semibold text-sm">Claim Sertifikat</h3>
-                                    <p className="text-xs text-gray-500 mt-0.5">Klaim sertifikat setelah memenuhi syarat.</p>
+                                    <p className="text-xs text-gray-500 mt-0.5">Selesaikan jalur pembelajaran untuk klaim sertifikat.</p>
                                 </div>
                             </div>
-                            
-                            <div className={`rounded-xl p-4 border ${isDark ? 'bg-[#0F172A]/50 border-white/5' : 'bg-white border-gray-200'}`}>
-                                <p className="text-xs font-semibold mb-3">Cek Kelayakan Sertifikat</p>
+
+                            {/* Jalur 1: Konservasi Laut */}
+                            <div className={`rounded-xl p-4 border mb-3 ${isDark ? 'bg-[#0F172A]/50 border-white/5' : 'bg-white border-gray-200'}`}>
+                                <div className="flex items-center gap-2 mb-3">
+                                    <span>🪸</span>
+                                    <p className="text-xs font-semibold">Konservasi Laut (4 Modul)</p>
+                                </div>
                                 <ul className="space-y-2 text-xs text-gray-400">
                                     <li className="flex justify-between items-center">
-                                        <span className="flex items-center gap-2"><span className={completedQuizzesCount >= totalModules ? "text-green-500" : "text-gray-600"}>✔</span> Selesaikan semua Modul Akademik</span>
-                                        <span className="flex items-center gap-1">{completedQuizzesCount} / {totalModules} {completedQuizzesCount >= totalModules ? <span className="text-green-500">✅</span> : <span className="text-red-500">❌</span>}</span>
-                                    </li>
-                                    <li className="flex justify-between items-center">
-                                        <span className="flex items-center gap-2"><span className={completedQuizzesCount >= totalVideos ? "text-green-500" : "text-gray-600"}>✔</span> Tonton semua Video Tutorial</span>
-                                        <span className="flex items-center gap-1">{completedQuizzesCount} / {totalVideos} {completedQuizzesCount >= totalVideos ? <span className="text-green-500">✅</span> : <span className="text-red-500">❌</span>}</span>
-                                    </li>
-                                    <li className="flex justify-between items-center">
-                                        <span className="flex items-center gap-2"><span className="text-gray-600">✔</span> Minimal 1 Konten Disetujui</span>
-                                        <span className="flex items-center gap-1">0 / 1 <span className="text-red-500">❌</span></span>
-                                    </li>
-                                    <li className="flex justify-between items-center">
-                                        <span className="flex items-center gap-2"><span className={completedQuizzesCount >= totalKuis ? "text-green-500" : "text-gray-600"}>✔</span> Selesaikan semua Kuis</span>
-                                        <span className="flex items-center gap-1">{completedQuizzesCount} / {totalKuis} {completedQuizzesCount >= totalKuis ? <span className="text-green-500">✅</span> : <span className="text-red-500">❌</span>}</span>
+                                        <span className="flex items-center gap-2"><span className={konservasiDone >= 4 ? "text-green-500" : "text-gray-600"}>✔</span> Selesaikan semua Modul & Kuis</span>
+                                        <span className="flex items-center gap-1">{konservasiDone} / 4 {konservasiDone >= 4 ? <span className="text-green-500">✅</span> : <span className="text-red-500">❌</span>}</span>
                                     </li>
                                 </ul>
-
-                                <button disabled className="w-full mt-4 py-2.5 rounded-lg bg-gray-800 text-gray-500 font-semibold text-xs border border-white/5 cursor-not-allowed flex items-center justify-center gap-2">
-                                    <span>🔒</span> Claim Sertifikat
+                                <button disabled={konservasiDone < 4} className={`w-full mt-3 py-2 rounded-lg font-semibold text-xs flex items-center justify-center gap-2 transition-all ${konservasiDone >= 4 ? 'bg-cyan-500 text-white hover:bg-cyan-400 cursor-pointer' : 'bg-gray-800 text-gray-500 border border-white/5 cursor-not-allowed'}`}>
+                                    <span>{konservasiDone >= 4 ? '📜' : '🔒'}</span> Claim Sertifikat Konservasi Laut
                                 </button>
-                                <p className="text-[10px] text-red-400 text-center mt-2">Lengkapi syarat untuk mengaktifkan tombol.</p>
+                            </div>
+
+                            {/* Jalur 2: Konten Digital Bahari */}
+                            <div className={`rounded-xl p-4 border ${isDark ? 'bg-[#0F172A]/50 border-white/5' : 'bg-white border-gray-200'}`}>
+                                <div className="flex items-center gap-2 mb-3">
+                                    <span>🎬</span>
+                                    <p className="text-xs font-semibold">Konten Digital Bahari (5 Modul)</p>
+                                </div>
+                                <ul className="space-y-2 text-xs text-gray-400">
+                                    <li className="flex justify-between items-center">
+                                        <span className="flex items-center gap-2"><span className={digitalDone >= 5 ? "text-green-500" : "text-gray-600"}>✔</span> Selesaikan semua Modul & Kuis</span>
+                                        <span className="flex items-center gap-1">{digitalDone} / 5 {digitalDone >= 5 ? <span className="text-green-500">✅</span> : <span className="text-red-500">❌</span>}</span>
+                                    </li>
+                                </ul>
+                                <button disabled={digitalDone < 5} className={`w-full mt-3 py-2 rounded-lg font-semibold text-xs flex items-center justify-center gap-2 transition-all ${digitalDone >= 5 ? 'bg-purple-500 text-white hover:bg-purple-400 cursor-pointer' : 'bg-gray-800 text-gray-500 border border-white/5 cursor-not-allowed'}`}>
+                                    <span>{digitalDone >= 5 ? '📜' : '🔒'}</span> Claim Sertifikat Konten Digital
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -412,6 +447,7 @@ export default function DashboardPage() {
                         </div>
                     </div>
                 </div>
+                )}
 
                 {/* FOOTER */}
                 <footer className={`mt-auto px-6 py-6 border-t text-center ${isDark ? "border-white/5" : "border-gray-200"}`}>

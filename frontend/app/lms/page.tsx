@@ -1,7 +1,9 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 type ViewState =
   | 'login'
@@ -9,11 +11,53 @@ type ViewState =
   | 'admin_manage'
   | 'admin_edit_data'
   | 'admin_quiz'
+  | 'admin_gallery'
   | 'user_dashboard'
+  | 'user_track_select'
   | 'user_modules'
   | 'user_read_module'
   | 'user_quiz'
-  | 'user_quiz_result';
+  | 'user_quiz_result'
+  | 'user_certificate';
+
+type TrackData = {
+  id: string;
+  title: string;
+  desc: string;
+  icon: string;
+  color: string;
+  modules: ModuleData[];
+};
+
+const TRACKS: TrackData[] = [
+  {
+    id: 'konservasi-laut',
+    title: 'Konservasi Laut',
+    desc: '4 modul tentang ekosistem dan pelestarian laut Raja Ampat.',
+    icon: '🪸',
+    color: 'from-blue-500 to-cyan-400',
+    modules: [
+      { id: 'm1', slug: 'ekosistem-laut', title: 'Ekosistem Laut', desc: 'Mempelajari struktur dan fungsi ekosistem laut secara komprehensif.', icon: '🌊' },
+      { id: 'm2', slug: 'biota-laut', title: 'Biota Laut', desc: 'Eksplorasi ragam spesies ikan, moluska, dan invertebrata yang menghuni perairan Raja Ampat.', icon: '🐠' },
+      { id: 'm3', slug: 'terumbu-karang', title: 'Terumbu Karang', desc: 'Mempelajari pentingnya ekosistem terumbu karang dan ancaman yang dihadapinya.', icon: '🪸' },
+      { id: 'm4', slug: 'sampah-laut', title: 'Sampah Laut', desc: 'Pahami dampak polusi sampah plastik dan cara nyata untuk berkontribusi pada pelestarian laut.', icon: '♻️' },
+    ],
+  },
+  {
+    id: 'konten-digital',
+    title: 'Konten Digital Bahari',
+    desc: '5 modul tentang pembuatan dan distribusi konten digital bertema bahari.',
+    icon: '🎬',
+    color: 'from-purple-500 to-pink-400',
+    modules: [
+      { id: 'kd1', slug: 'fotografi-bawah-laut', title: 'Fotografi Bawah Laut', desc: 'Teknik mengabadikan keindahan bawah laut dengan peralatan dan komposisi yang tepat.', icon: '📸' },
+      { id: 'kd2', slug: 'teknik-videografi', title: 'Teknik-Teknik Videografi', desc: 'Dasar-dasar dan teknik lanjutan produksi video bawah laut mulai dari peralatan hingga pengambilan gambar.', icon: '🎬' },
+      { id: 'kd3', slug: 'storytelling-digital', title: 'Storytelling Digital', desc: 'Cara membangun narasi yang kuat dan emosional melalui konten digital bahari.', icon: '✍️' },
+      { id: 'kd4', slug: 'editing-publishing', title: 'Editing dan Publishing Guide', desc: 'Panduan lengkap editing konten bahari dan strategi publishing ke berbagai platform digital.', icon: '🎞️' },
+      { id: 'kd5', slug: 'etika-konten', title: 'Etika dalam Membuat Konten', desc: 'Memahami tanggung jawab etis dalam pembuatan dan penyebaran konten bertema lingkungan laut.', icon: '⚖️' },
+    ],
+  },
+];
 
 type QuizQuestion = {
   id: number;
@@ -38,26 +82,69 @@ export default function LMSPage() {
 
   useEffect(() => {
     const role = localStorage.getItem('user_role');
-    const token = localStorage.getItem('auth_token');
+    setUserName(localStorage.getItem('user_name'));
     if (role === 'admin') {
-      setView('admin_dashboard');
+      // Admin tidak diizinkan masuk ke ruang kelas LMS, arahkan ke Pusat Kendali di Dashboard
+      window.location.href = '/dashboard';
     } else if (role === 'user') {
-      setView('user_dashboard');
-      if (token) {
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/dashboard`, {
-          headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' },
-        })
-          .then(res => res.json())
-          .then(data => {
-            if (data.status === 'success') {
-              const doneQuizzes = data.data.recent_quizzes
-                .filter((q: any) => q.score === 100)
-                .map((q: any) => q.title);
-              setCompletedQuizzes(doneQuizzes);
-            }
-          })
-          .catch(() => {});
+      // Check query params for direct module access
+      const params = new URLSearchParams(window.location.search);
+      const trackId = params.get('track');
+      const moduleSlug = params.get('module');
+      const action = params.get('action');
+
+      if (trackId && moduleSlug) {
+        const track = TRACKS.find(t => t.id === trackId);
+        if (track) {
+           setSelectedTrack(track);
+           setModules(track.modules);
+           
+           const userEmail = (localStorage.getItem('user_email') || '').toLowerCase();
+           let loadedQuizzes: string[] = [];
+           if (userEmail === 'vinzcan11@gmail.com') {
+             loadedQuizzes = track.modules.map(m => `Kuis: ${m.title}`);
+           } else {
+             const saved = localStorage.getItem(`completed_quizzes_${userEmail}_${track.id}`);
+             if (saved) loadedQuizzes = JSON.parse(saved);
+           }
+           setCompletedQuizzes(loadedQuizzes);
+
+           if (moduleSlug === 'all') {
+              setView('user_modules');
+              return;
+           }
+
+           const mod = track.modules.find(m => m.slug === moduleSlug);
+           if (mod) {
+              setSelectedModule(mod);
+              if (action === 'quiz') {
+                setQuizUserLoading(true);
+                const token = localStorage.getItem('auth_token');
+                fetch(`http://localhost:8000/api/quiz/questions/${mod.slug}`, {
+                  headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' },
+                })
+                .then(res => res.json())
+                .then(data => {
+                  setQuizQuestions(data.data ?? []);
+                  setQuizUserLoading(false);
+                  setQuizAnswers({});
+                  setView('user_quiz');
+                })
+                .catch(() => {
+                  setQuizQuestions([]);
+                  setQuizUserLoading(false);
+                  setQuizAnswers({});
+                  setView('user_quiz');
+                });
+              } else {
+                setReadProgress(0);
+                setView('user_read_module');
+              }
+              return;
+           }
+        }
       }
+      setView('user_track_select');
     } else {
       window.location.href = '/';
     }
@@ -66,48 +153,20 @@ export default function LMSPage() {
   // ==========================================
   // DATABASE SIMULATION (Bisa diakses Admin & User)
   // ==========================================
-  const [modules, setModules] = useState<ModuleData[]>([
-    {
-      id: 'm1',
-      slug: 'terumbu-karang',
-      title: 'Ekosistem Terumbu Karang',
-      desc: 'Mempelajari struktur dan fungsi ekosistem terumbu karang di lautan bebas.',
-      icon: '🪸'
-    },
-    {
-      id: 'm2',
-      slug: 'keanekaragaman-laut',
-      title: 'Keanekaragaman Hayati Laut',
-      desc: 'Eksplorasi ragam spesies ikan, moluska, dan invertebrata yang menghuni perairan Raja Ampat.',
-      icon: '🐠'
-    },
-    {
-      id: 'm3',
-      slug: 'ancaman-lingkungan',
-      title: 'Ancaman Lingkungan Laut',
-      desc: 'Pahami dampak perubahan iklim, pemutihan karang, dan polusi terhadap ekosistem laut.',
-      icon: '⚠️'
-    },
-    {
-      id: 'm4',
-      slug: 'konservasi-aksi',
-      title: 'Aksi Konservasi Nyata',
-      desc: 'Temukan cara nyata untuk berkontribusi pada pelestarian laut.',
-      icon: '💚'
-    },
-  ]);
+  const [modules, setModules] = useState<ModuleData[]>([]);
+  const [selectedTrack, setSelectedTrack] = useState<TrackData | null>(null);
 
   // ==========================================
   // STATE ADMIN
   // ==========================================
-  const [manageCategory, setManageCategory] = useState<'Modul' | 'Materi' | 'Quiz' | 'User'>('Modul');
+  const [manageCategory, setManageCategory] = useState<string>('Modul');
   const [newTitle, setNewTitle] = useState('');
   const [newDesc, setNewDesc] = useState('');
   const [newIcon, setNewIcon] = useState('📦');
   const [isAdminProcessing, setIsAdminProcessing] = useState(false);
 
   // STATE ADMIN QUIZ
-  const [quizModuleSlug, setQuizModuleSlug] = useState('terumbu-karang');
+  const [quizModuleSlug, setQuizModuleSlug] = useState('ekosistem-laut');
   const [quizQuestion, setQuizQuestion] = useState('');
   const [quizOptionA, setQuizOptionA] = useState('');
   const [quizOptionB, setQuizOptionB] = useState('');
@@ -116,6 +175,43 @@ export default function LMSPage() {
   const [quizCorrectAnswer, setQuizCorrectAnswer] = useState<'A' | 'B' | 'C' | 'D'>('A');
   const [existingQuestions, setExistingQuestions] = useState<QuizQuestion[]>([]);
   const [quizAdminLoading, setQuizAdminLoading] = useState(false);
+
+  // STATE ADMIN GALLERY
+  const [pendingGallery, setPendingGallery] = useState<any[]>([]);
+  const [galleryLoading, setGalleryLoading] = useState(false);
+
+  const loadPendingGallery = async () => {
+    setGalleryLoading(true);
+    const token = localStorage.getItem('auth_token');
+    try {
+      const res = await fetch('http://localhost:8000/api/admin/pending', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      setPendingGallery(data || []);
+    } catch(e) {
+      console.error(e);
+    }
+    setGalleryLoading(false);
+  };
+
+  const handleApproveGallery = async (id: number) => {
+    const token = localStorage.getItem('auth_token');
+    await fetch(`http://localhost:8000/api/admin/approve/${id}`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    loadPendingGallery();
+  };
+
+  const handleRejectGallery = async (id: number) => {
+    const token = localStorage.getItem('auth_token');
+    await fetch(`http://localhost:8000/api/admin/reject/${id}`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    loadPendingGallery();
+  };
 
   // ==========================================
   // STATE USER
@@ -130,6 +226,26 @@ export default function LMSPage() {
   const [hasCertificate, setHasCertificate] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [completedQuizzes, setCompletedQuizzes] = useState<string[]>([]);
+  const [certificateName, setCertificateName] = useState('');
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+  const [showBackConfirm, setShowBackConfirm] = useState(false);
+  const [userName, setUserName] = useState<string | null>(null);
+
+  // Simpan progress ke localStorage setiap kali berubah
+  useEffect(() => {
+    const userEmail = (localStorage.getItem('user_email') || '').toLowerCase();
+    if (userEmail && completedQuizzes.length > 0 && selectedTrack) {
+      localStorage.setItem(`completed_quizzes_${userEmail}_${selectedTrack.id}`, JSON.stringify(completedQuizzes));
+    }
+  }, [completedQuizzes, selectedTrack]);
+
+
+  // Cek apakah semua modul sudah selesai
+  useEffect(() => {
+    if (modules.length > 0 && completedQuizzes.length >= modules.length) {
+      setHasCertificate(true);
+    }
+  }, [completedQuizzes, modules]);
 
   // Reset semua state sementara saat logout
   const handleLogout = () => {
@@ -138,6 +254,25 @@ export default function LMSPage() {
     localStorage.removeItem('user_name');
     localStorage.removeItem('user_email');
     window.location.href = '/';
+  };
+
+  // --- PILIH TRACK ---
+  const handleSelectTrack = (track: TrackData) => {
+    const userEmail = (localStorage.getItem('user_email') || '').toLowerCase();
+    setSelectedTrack(track);
+    setModules(track.modules);
+    setCompletedQuizzes([]);
+
+    // TEST: vinzcan11 langsung semua selesai
+    if (userEmail === 'vinzcan11@gmail.com') {
+      setCompletedQuizzes(track.modules.map(m => `Kuis: ${m.title}`));
+    } else {
+      const savedKey = `completed_quizzes_${userEmail}_${track.id}`;
+      const saved = localStorage.getItem(savedKey);
+      if (saved) setCompletedQuizzes(JSON.parse(saved));
+    }
+
+    setView('user_modules');
   };
 
   // --- LOGIKA ADMIN ---
@@ -168,14 +303,17 @@ export default function LMSPage() {
     }, 2000);
   };
 
-  const openManageForm = (category: 'Modul' | 'Materi' | 'Quiz' | 'User') => {
+  const openManageForm = (category: string) => {
     setManageCategory(category);
     setNewTitle('');
     setNewDesc('');
     setNewIcon('📦');
     if (category === 'Quiz') {
-      loadQuizQuestions('terumbu-karang');
+      loadQuizQuestions('ekosistem-laut');
       setView('admin_quiz');
+    } else if (category === 'Galeri') {
+      loadPendingGallery();
+      setView('admin_gallery');
     } else {
       setView('admin_edit_data');
     }
@@ -185,7 +323,7 @@ export default function LMSPage() {
     setQuizAdminLoading(true);
     const token = localStorage.getItem('auth_token');
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/quiz/questions/${slug}`, {
+      const res = await fetch(`http://localhost:8000/api/quiz/questions/${slug}`, {
         headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' },
       });
       const data = await res.json();
@@ -199,7 +337,7 @@ export default function LMSPage() {
     setQuizAdminLoading(true);
     const token = localStorage.getItem('auth_token');
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/quiz/questions`, {
+      await fetch('http://localhost:8000/api/quiz/questions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({
@@ -221,7 +359,7 @@ export default function LMSPage() {
   const handleDeleteQuestion = async (id: number) => {
     const token = localStorage.getItem('auth_token');
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/quiz/questions/${id}`, {
+      await fetch(`http://localhost:8000/api/quiz/questions/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' },
       });
@@ -230,6 +368,24 @@ export default function LMSPage() {
   };
 
   // --- LOGIKA USER ---
+  const handleDownloadPDF = async () => {
+    const element = document.getElementById('certificate-preview');
+    if (!element) return;
+    
+    setIsGeneratingPDF(true);
+    try {
+      const canvas = await html2canvas(element, { scale: 2, useCORS: true });
+      const imgData = canvas.toDataURL('image/png');
+      
+      const pdf = new jsPDF('l', 'px', [800, 565]);
+      pdf.addImage(imgData, 'PNG', 0, 0, 800, 565);
+      pdf.save(`Sertifikat_${certificateName.replace(/\s+/g, '_') || 'Peserta'}.pdf`);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+    }
+    setIsGeneratingPDF(false);
+  };
+
   const handleSimulateScroll = () => {
     if (readProgress < 100) setReadProgress((prev) => Math.min(prev + 25, 100));
   };
@@ -238,7 +394,7 @@ export default function LMSPage() {
     setQuizUserLoading(true);
     const token = localStorage.getItem('auth_token');
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/quiz/questions/${slug}`, {
+      const res = await fetch(`http://localhost:8000/api/quiz/questions/${slug}`, {
         headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' },
       });
       const data = await res.json();
@@ -269,7 +425,7 @@ export default function LMSPage() {
     if (token && selectedModule) {
       try {
         // 1. Simpan skor quiz
-        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/quiz/submit`, {
+        await fetch('http://localhost:8000/api/quiz/submit', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -285,7 +441,7 @@ export default function LMSPage() {
 
         // 2. Tandai modul sebagai selesai jika lulus (score >= 50)
         if (calculatedScore >= 50) {
-          await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/progress`, {
+          await fetch('http://localhost:8000/api/progress', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -307,7 +463,7 @@ export default function LMSPage() {
     setTimeout(() => {
       setIsProcessing(false);
       setHasBadge(calculatedScore >= 50);
-      
+
       const isComplete = new Set([...completedQuizzes, ...(calculatedScore === 100 ? [`Kuis: ${selectedModule?.title}`] : [])]).size >= modules.length;
       setHasCertificate(isComplete);
     }, 2000);
@@ -326,9 +482,9 @@ export default function LMSPage() {
           <span className="text-xl font-black tracking-widest">DIVEXPLORE LMS</span>
         </div>
         <div className="flex items-center gap-4">
-          <Link href="/akademi" className="text-sm font-semibold text-gray-400 hover:text-white transition-colors">
-            ← Kembali ke Akademi
-          </Link>
+          <span className="text-sm font-bold text-white pr-2">
+            Halo, {userName || 'Pengguna'}!
+          </span>
           {view !== 'login' && (
             <button
               onClick={handleLogout}
@@ -409,17 +565,18 @@ export default function LMSPage() {
               </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[
                 { title: 'Modul', icon: '📚', color: 'from-blue-500 to-cyan-400', desc: 'Tambah atau ubah modul pembelajaran.' },
-                { title: 'Materi', icon: '📄', color: 'from-emerald-500 to-teal-400', desc: 'Kelola isi konten teks dan media pada modul.' },
+                { title: 'Materi', icon: '📄', color: 'from-emerald-500 to-teal-400', desc: 'Kelola isi konten teks dan media.' },
                 { title: 'Quiz', icon: '📝', color: 'from-purple-500 to-pink-500', desc: 'Atur pertanyaan dan jawaban evaluasi.' },
-                { title: 'User', icon: '👥', color: 'from-orange-500 to-amber-400', desc: 'Manajemen hak akses dan profil mahasiswa.' }
+                { title: 'User', icon: '👥', color: 'from-orange-500 to-amber-400', desc: 'Manajemen akses dan profil mahasiswa.' },
+                { title: 'Galeri', icon: '🖼️', color: 'from-indigo-500 to-blue-500', desc: 'Setujui atau tolak karya unggahan pengguna.' }
               ].map((item) => (
                 <div
                   key={item.title}
-                  onClick={() => openManageForm(item.title as 'Modul' | 'Materi' | 'Quiz' | 'User')}
-                  className="group p-6 rounded-2xl bg-white/5 border border-white/10 hover:border-cyan-400/50 hover:bg-white/10 transition-all cursor-pointer flex items-start gap-6"
+                  onClick={() => openManageForm(item.title)}
+                  className="group p-6 rounded-2xl bg-white/5 border border-white/10 hover:border-cyan-400/50 hover:bg-white/10 transition-all cursor-pointer flex flex-col items-start gap-4"
                 >
                   <div className={`w-14 h-14 rounded-xl flex items-center justify-center text-3xl bg-gradient-to-br ${item.color} shrink-0`}>
                     {item.icon}
@@ -513,6 +670,98 @@ export default function LMSPage() {
         )}
 
         {/* ========================================= */}
+        {/* VIEW: ADMIN GALLERY */}
+        {/* ========================================= */}
+        {view === 'admin_gallery' && (
+          <div className="w-full max-w-5xl p-8 rounded-[32px] bg-[#000814] border border-indigo-500/30 shadow-[0_0_50px_-12px_rgba(99,102,241,0.15)] relative z-10 animate-in slide-in-from-bottom-8 duration-500">
+            <div className="flex items-center justify-between mb-8 pb-6 border-b border-white/10">
+              <div>
+                <div className="inline-block px-3 py-1 mb-3 rounded-full border border-indigo-400/30 bg-indigo-500/15 text-indigo-300 text-[10px] font-black uppercase tracking-widest">
+                  Pengawasan Konten
+                </div>
+                <h1 className="text-3xl font-black text-white mb-2">Persetujuan Karya Galeri</h1>
+                <p className="text-gray-400">Karya-karya di bawah ini menunggu persetujuan Anda sebelum tampil ke publik.</p>
+              </div>
+              <button onClick={() => setView('admin_manage')} className="px-6 py-3 rounded-xl font-bold text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 transition-all border border-transparent hover:border-white/10">
+                ← Kembali
+              </button>
+            </div>
+
+            {galleryLoading ? (
+              <div className="py-20 text-center">
+                <div className="w-12 h-12 border-4 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin mx-auto mb-4"></div>
+                <p className="text-indigo-400 font-bold">Memuat daftar karya...</p>
+              </div>
+            ) : pendingGallery.length === 0 ? (
+              <div className="py-32 text-center border-2 border-dashed border-white/5 rounded-2xl bg-white/[0.02]">
+                <div className="text-6xl mb-4">✨</div>
+                <h3 className="text-xl font-bold text-white mb-2">Bersih Sepenuhnya!</h3>
+                <p className="text-gray-500">Tidak ada karya baru yang mengantre untuk disetujui.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {pendingGallery.map((item: any) => (
+                  <div key={item.id} className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden flex flex-col hover:border-indigo-500/50 hover:-translate-y-1 transition-all duration-300">
+                    <img src={item.file_path} alt={item.title} className="w-full h-48 object-cover bg-[#000814]" />
+                    <div className="p-5 flex-1 flex flex-col">
+                      <h3 className="font-bold text-lg text-white mb-1 line-clamp-1">{item.title}</h3>
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className="px-2 py-0.5 rounded-md bg-indigo-500/20 text-indigo-300 text-[10px] font-bold uppercase">{item.category || 'Lainnya'}</span>
+                        <span className="text-xs text-gray-400">Oleh: {item.author || 'Diver'}</span>
+                      </div>
+                      <p className="text-xs text-gray-500 mb-6">{new Date(item.created_at).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                      <div className="flex gap-3 mt-auto">
+                        <button onClick={() => handleApproveGallery(item.id)} className="flex-1 py-2.5 rounded-xl bg-emerald-500/10 text-emerald-400 font-bold hover:bg-emerald-500/20 hover:scale-105 transition-all text-sm border border-emerald-500/20">
+                          ✅ Setujui
+                        </button>
+                        <button onClick={() => handleRejectGallery(item.id)} className="flex-1 py-2.5 rounded-xl bg-red-500/10 text-red-400 font-bold hover:bg-red-500/20 hover:scale-105 transition-all text-sm border border-red-500/20">
+                          ❌ Tolak
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ========================================= */}
+        {/* VIEW: USER TRACK SELECT */}
+        {/* ========================================= */}
+        {view === 'user_track_select' && (
+          <div className="w-full max-w-4xl relative z-10 animate-in fade-in zoom-in-95 duration-500">
+            <div className="text-center mb-10">
+              <h1 className="text-4xl font-black text-white mb-3">Pilih Jalur Pembelajaran</h1>
+              <p className="text-gray-400">Pilih salah satu jalur untuk memulai dan mendapatkan sertifikat.</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {TRACKS.map((track) => (
+                <div
+                  key={track.id}
+                  onClick={() => handleSelectTrack(track)}
+                  className="group p-8 rounded-[28px] bg-[#000814] border border-white/10 hover:border-cyan-400/40 hover:bg-white/5 transition-all cursor-pointer flex flex-col gap-5"
+                >
+                  <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-4xl bg-gradient-to-br ${track.color} shadow-lg`}>
+                    {track.icon}
+                  </div>
+                  <div className="flex-1">
+                    <h2 className="text-2xl font-black text-white mb-2 group-hover:text-cyan-400 transition-colors">{track.title}</h2>
+                    <p className="text-gray-400 text-sm leading-relaxed">{track.desc}</p>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">{track.modules.length} Modul</span>
+                    <span className={`px-4 py-2 rounded-full text-xs font-bold text-white bg-gradient-to-r ${track.color}`}>
+                      Mulai →
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ========================================= */}
         {/* VIEW: USER DASHBOARD */}
         {/* ========================================= */}
         {view === 'user_dashboard' && (
@@ -555,9 +804,16 @@ export default function LMSPage() {
                 <h1 className="text-3xl font-black text-white">Pilih Modul</h1>
                 <p className="text-gray-400">Pilih modul yang ingin Anda pelajari hari ini.</p>
               </div>
-              <button onClick={() => setView('user_dashboard')} className="px-6 py-3 rounded-xl font-bold text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 transition-all border border-transparent hover:border-white/10">
-                ← Kembali
-              </button>
+              <div className="flex gap-4">
+                {hasCertificate && (
+                  <button onClick={() => setView('user_certificate')} className="px-6 py-3 rounded-xl font-bold text-white bg-gradient-to-r from-emerald-500 to-teal-400 hover:scale-105 shadow-xl shadow-emerald-500/20 transition-all flex items-center gap-2">
+                    <span>📜 Cetak Sertifikat</span>
+                  </button>
+                )}
+                <button onClick={() => setView('user_dashboard')} className="px-6 py-3 rounded-xl font-bold text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 transition-all border border-transparent hover:border-white/10">
+                  ← Kembali
+                </button>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
@@ -641,10 +897,10 @@ export default function LMSPage() {
 
               <div className="flex items-center justify-between">
                 <button
-                  onClick={() => setView('user_modules')}
+                  onClick={() => setShowBackConfirm(true)}
                   className="px-6 py-4 rounded-xl font-bold text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 transition-all border border-transparent hover:border-white/10 flex items-center gap-2"
                 >
-                  <span>← Kembali ke Modul</span>
+                  <span>← Kembali ke Akademi</span>
                 </button>
 
                 {readProgress < 100 ? (
@@ -859,13 +1115,34 @@ export default function LMSPage() {
                     <div className="text-4xl mb-3">{hasBadge ? '🏅' : '🔒'}</div>
                     <h3 className={`font-bold ${hasBadge ? 'text-amber-400' : 'text-gray-500'}`}>Badge</h3>
                   </div>
-                  <div className={`p-6 rounded-2xl border ${hasCertificate ? 'bg-cyan-500/10 border-cyan-500/30' : 'bg-black/50 border-white/5 opacity-50'}`}>
+                  <div
+                    onClick={() => hasCertificate && setView('user_certificate')}
+                    className={`p-6 rounded-2xl border transition-all ${hasCertificate ? 'bg-cyan-500/10 border-cyan-500/30 cursor-pointer hover:bg-cyan-500/20 hover:scale-[1.02]' : 'bg-black/50 border-white/5 opacity-50 cursor-not-allowed'}`}
+                  >
                     <div className="text-4xl mb-3">{hasCertificate ? '📜' : '🔒'}</div>
                     <h3 className={`font-bold ${hasCertificate ? 'text-cyan-400' : 'text-gray-500'}`}>Sertifikat</h3>
+                    {hasCertificate && <p className="text-xs text-cyan-400/70 mt-1">Klik untuk cetak</p>}
                   </div>
                 </div>
 
                 <div className="flex flex-col gap-3 mt-8">
+                  {(() => {
+                    const currentIndex = modules.findIndex(m => m.id === selectedModule?.id);
+                    const nextModule = modules[currentIndex + 1];
+                    return nextModule && score === 100 ? (
+                      <button
+                        onClick={() => {
+                          setSelectedModule(nextModule);
+                          setReadProgress(0);
+                          setQuizAnswers({});
+                          setView('user_read_module');
+                        }}
+                        className="w-full py-4 rounded-xl font-bold text-white bg-gradient-to-r from-emerald-500 to-teal-400 hover:scale-[1.02] transition-all shadow-lg shadow-emerald-500/25"
+                      >
+                        Lanjut ke Modul Berikutnya: {nextModule.icon} {nextModule.title}
+                      </button>
+                    ) : null;
+                  })()}
                   <button onClick={() => setView('user_modules')} className="w-full py-4 rounded-xl font-bold text-white bg-gradient-to-r from-blue-600 to-cyan-500 hover:scale-[1.02] transition-all shadow-lg shadow-blue-500/25">
                     Kembali ke Pemilihan Modul
                   </button>
@@ -877,7 +1154,117 @@ export default function LMSPage() {
             )}
           </div>
         )}
+
+        {/* ========================================= */}
+        {/* VIEW: USER CERTIFICATE */}
+        {/* ========================================= */}
+        {view === 'user_certificate' && (
+          <div className="w-full max-w-5xl p-8 rounded-[32px] bg-[#000814] border border-cyan-500/30 shadow-[0_0_50px_-12px_rgba(6,182,212,0.15)] relative z-10 animate-in fade-in zoom-in-95 duration-500">
+            <div className="flex justify-between items-center mb-8 border-b border-white/10 pb-6">
+              <div>
+                <h1 className="text-3xl font-black text-white">Sertifikat Penghargaan</h1>
+                <p className="text-gray-400">Selamat! Anda telah menyelesaikan seluruh modul <span className="text-cyan-400 font-semibold">{selectedTrack?.title}</span>.</p>
+              </div>
+              <button onClick={() => setView('user_modules')} className="px-6 py-3 rounded-xl font-bold text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 transition-all border border-transparent hover:border-white/10">
+                ← Kembali
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Form Input */}
+              <div className="lg:col-span-1 space-y-6">
+                <div className="p-6 rounded-2xl bg-white/5 border border-white/10">
+                  <h3 className="text-lg font-bold text-white mb-4">Detail Sertifikat</h3>
+                  <div className="mb-4">
+                    <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Nama di Sertifikat</label>
+                    <input
+                      type="text"
+                      value={certificateName}
+                      onChange={(e) => setCertificateName(e.target.value)}
+                      className="w-full px-5 py-4 rounded-xl bg-black/50 border border-white/10 text-white placeholder-gray-600 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-all"
+                      placeholder="Masukkan nama lengkap..."
+                    />
+                  </div>
+                  <button
+                    onClick={handleDownloadPDF}
+                    disabled={!certificateName || isGeneratingPDF}
+                    className="w-full py-4 rounded-xl font-bold text-white bg-gradient-to-r from-blue-600 to-cyan-500 hover:scale-[1.02] transition-all shadow-xl shadow-blue-500/25 disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    {isGeneratingPDF ? (
+                      <>
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <span>Memproses...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>📥</span>
+                        <span>Download PDF</span>
+                      </>
+                    )}
+                  </button>
+                  <p className="text-xs text-gray-500 mt-4 leading-relaxed">
+                    Pastikan nama yang dimasukkan sudah benar. Sertifikat dapat diunduh berkali-kali.
+                  </p>
+                </div>
+              </div>
+
+              {/* Preview Sertifikat */}
+              <div className="lg:col-span-2 overflow-x-auto bg-black/50 rounded-2xl p-4 flex items-center justify-center border border-white/5">
+                <div className="relative w-[800px] h-[565px] shrink-0 bg-white shadow-2xl overflow-hidden" id="certificate-preview">
+                  {/* Background Certificate sesuai track */}
+                  <img
+                    src={selectedTrack?.id === 'konten-digital' ? '/images/sertifikat-konten-digital.jpeg' : '/images/sertifikat-konservasi-laut.jpeg'}
+                    alt="Background Sertifikat"
+                    className="absolute inset-0 w-full h-full object-cover z-0"
+                  />
+
+                  {/* Text Overlay */}
+                  <div className="absolute inset-0 z-10 flex flex-col items-center pt-[215px]">
+                    <h2 className="text-4xl font-serif text-[#0b1c3d] tracking-wide italic font-bold" style={{ fontFamily: "'Playfair Display', 'Times New Roman', serif" }}>
+                      {certificateName || 'Nama Peserta'}
+                    </h2>
+
+                    {/* Posisi tanggal: top dari atas sertifikat (565px tinggi), left dari kiri (800px lebar) */}
+                    <div style={{ position: 'absolute', top: '440px', left: '375px', width: '310px', textAlign: 'center' }}>
+                      <p className="text-base font-serif text-[#0b1c3d] font-bold" style={{ fontFamily: "'Playfair Display', 'Times New Roman', serif" }}>
+                        {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
+
+      {/* MODAL KONFIRMASI KEMBALI */}
+      {showBackConfirm && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowBackConfirm(false)} />
+          <div className="bg-[#001020] border border-white/10 rounded-[32px] p-8 max-w-md w-full relative z-10 animate-in fade-in zoom-in-95 duration-200 shadow-2xl">
+            <div className="w-20 h-20 bg-blue-500/10 text-blue-400 rounded-full flex items-center justify-center text-4xl mb-6 mx-auto">
+              🌊
+            </div>
+            <h3 className="text-2xl font-black text-white text-center mb-2">Konfirmasi Keluar</h3>
+            <p className="text-gray-400 text-center mb-8 text-sm leading-relaxed">Apakah Anda yakin ingin keluar dari sistem LMS dan kembali ke Halaman Akademi?</p>
+            <div className="flex gap-4">
+              <button
+                onClick={() => setShowBackConfirm(false)}
+                className="flex-1 px-6 py-3.5 rounded-xl font-bold text-gray-300 bg-white/5 hover:bg-white/10 transition-colors border border-white/10"
+              >
+                Batal
+              </button>
+              <button
+                onClick={() => window.location.href = '/akademi'}
+                className="flex-1 px-6 py-3.5 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-700 transition-colors shadow-lg shadow-blue-600/20"
+              >
+                Ya, Kembali
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

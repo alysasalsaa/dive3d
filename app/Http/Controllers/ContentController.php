@@ -13,22 +13,18 @@ class ContentController extends Controller
     public function upload(Request $request)
     {
         $request->validate([
-            "file" => "required|file|max:102400",
-            'title' => 'required|string'
+            "file" => "required|file",
+            'title' => 'required|string',
+            'category' => 'required|string',
+            'author' => 'required|string'
         ]);
-
-        $extension = $request->file('file')->getClientOriginalExtension();
-        if (!in_array(strtolower($extension), ['glb', 'gltf', 'obj'])) {
-            return response()->json([
-                'message' => 'The file field must be a file of type: glb, gltf, obj.',
-                'errors' => ['file' => ['The file extension must be .glb, .gltf, or .obj.']]
-            ], 422);
-        }
 
         $path = $request->file('file')->store('uploads', 'public');
         $url = asset('storage/' . $path);
         Content::create([
             'title' => $request->title,
+            'category' => $request->category,
+            'author' => $request->author,
             'file_path' => $url,
             'status' => 'pending'
         ]);
@@ -93,6 +89,16 @@ class ContentController extends Controller
 
         return response()->json(
             ['message' => 'Content rejected']
+        );
+    }
+
+    public function destroy($id)
+    {
+        $content = Content::findOrFail($id);
+        $content->delete();
+
+        return response()->json(
+            ['message' => 'Content deleted permanently']
         );
     }
 }
