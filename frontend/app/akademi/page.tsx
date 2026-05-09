@@ -12,7 +12,7 @@ const getModelUrl = (tab: string) => {
     switch(tab) {
         case 'ikan': return '/models/ClownFish3D/ClownFish3d.glb';
         case 'karang': return '/models/usnm_74016-100k-2048-gltf_std/usnm_74016-100k-2048.gltf';
-        case 'ekosistem': return '/models/Ekosistem3D/ekosistem3d.glb';
+        case 'ekosistem': return 'https://github.com/vinzyid/dive3d/releases/download/v1.0-models/ekosistem3d.glb';
         case 'tridacna': return '/models/Tridacna/TridacnaAhnaf3D.glb';
         case 'tridacna-gigas': return '/models/Tridacna Gigas/Tridacna Gigas.glb';
         case 'zooplankton': return '/models/Zooplankton Daphnia/Zooplankton daphnia.glb';
