@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useTheme } from '../../lib/useTheme';
 import toast from 'react-hot-toast';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 /** Ubah file_path dari DB menjadi URL yang bisa diakses browser */
 const resolveMediaUrl = (url: string): string => {
