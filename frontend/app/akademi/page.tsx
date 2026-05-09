@@ -3,8 +3,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import { useTheme } from '../../lib/useTheme';
-import ModelViewer from '../../components/ModelViewer';
+
+const ModelViewer = dynamic(() => import('../../components/ModelViewer'), { ssr: false });
 
 const getModelUrl = (tab: string) => {
     switch(tab) {

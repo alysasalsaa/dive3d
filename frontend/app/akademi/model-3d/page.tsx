@@ -3,7 +3,9 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import ModelViewer from '../../../components/ModelViewer';
+import dynamic from 'next/dynamic';
+
+const ModelViewer = dynamic(() => import('../../../components/ModelViewer'), { ssr: false });
 import { useTheme } from '../../../lib/useTheme';
 
 const models = [
