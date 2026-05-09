@@ -195,77 +195,92 @@ export default function DashboardPage() {
                 <div className="absolute bottom-1/4 right-0 w-[400px] h-[400px] bg-cyan-500/5 blur-[100px] rounded-full" />
             </div>
 
-            {/* SIDEBAR */}
-            <aside className={`relative z-10 flex flex-col border-r backdrop-blur-2xl transition-all duration-500 ease-in-out flex-shrink-0 ${isSidebarOpen ? 'w-60' : 'w-[72px]'} ${isDark ? 'border-white/5 bg-white/[0.03]' : 'border-gray-200 bg-white shadow-sm'}`}>
-
-                {/* Logo */}
-                <div className={`h-20 flex items-center px-4 border-b ${isDark ? 'border-white/5' : 'border-gray-100'}`}>
-                    <div
-                        className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 cursor-pointer overflow-hidden bg-white/5 border border-white/10`}
-                        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                    >
-                        {/* Ganti '/logo.png' dengan nama file logo Anda jika berbeda */}
-                        <img src="/images/logo.png" alt="Dive3D Logo" className="w-full h-full object-cover" />
-                    </div>
-                    <span className={`ml-3 text-base font-black tracking-widest whitespace-nowrap ${isDark ? "text-white" : "text-blue-900"} transition-all duration-500 ${isSidebarOpen ? 'opacity-100 max-w-[200px]' : 'opacity-0 max-w-0 overflow-hidden'}`}>
-                        DIVEXPLORE
-                    </span>
-                </div>
-
-                {/* Menu */}
-                {userRole !== 'admin' && (
-                <ul className="tour-sidebar flex-1 py-4 px-2 space-y-1 overflow-x-hidden">
-                    {menuItems.map((item, idx) => (
-                        <li
-                            key={idx}
-                            onClick={item.action}
-                            title={!isSidebarOpen ? item.label : ''}
-                            className={`flex items-center rounded-xl cursor-pointer transition-all duration-200 group
-                                ${isSidebarOpen ? 'px-3 py-2.5 gap-3' : 'justify-center p-3'}
-                                ${activeMenu === idx
-                                    ? 'bg-gradient-to-r from-blue-600/30 to-cyan-500/20 border border-blue-500/30 text-cyan-400'
-                                    : isDark
-                                      ? 'text-gray-500 hover:text-white hover:bg-white/5 border border-transparent'
-                                      : 'text-gray-500 hover:text-blue-700 hover:bg-blue-50 border border-transparent'
-                                }`}
+            {/* SIDEBAR - Sembunyikan jika Admin */}
+            {userRole !== 'admin' && (
+                <aside className={`relative z-10 flex flex-col border-r backdrop-blur-2xl transition-all duration-500 ease-in-out flex-shrink-0 ${isSidebarOpen ? 'w-60' : 'w-[72px]'} ${isDark ? 'border-white/5 bg-white/[0.03]' : 'border-gray-200 bg-white shadow-sm'}`}>
+                    {/* Logo */}
+                    <div className={`h-20 flex items-center px-4 border-b ${isDark ? 'border-white/5' : 'border-gray-100'}`}>
+                        <div
+                            className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 cursor-pointer overflow-hidden bg-white/5 border border-white/10`}
+                            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
                         >
-                            <span className="text-lg flex-shrink-0">{item.icon}</span>
-                            <span className={`text-sm font-semibold whitespace-nowrap transition-all duration-500 ${isSidebarOpen ? 'opacity-100 max-w-[200px]' : 'opacity-0 max-w-0 overflow-hidden pointer-events-none'}`}>
-                                {item.label}
-                            </span>
-                        </li>
-                    ))}
-                </ul>
-                )}
-
-                {/* Logout */}
-                <div className={`p-2 border-t ${isDark ? 'border-white/5' : 'border-gray-100'}`}>
-                    <button
-                        onClick={() => { localStorage.removeItem('auth_token'); localStorage.removeItem('user_role'); localStorage.removeItem('user_name'); localStorage.removeItem('user_email'); window.location.href = '/'; }}
-                        title={!isSidebarOpen ? 'Keluar' : ''}
-                        className={`w-full flex items-center rounded-xl text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200 border border-transparent
-                            ${isSidebarOpen ? 'px-3 py-2.5 gap-3' : 'justify-center p-3'}`}
-                    >
-                        <span className="text-lg flex-shrink-0">🚪</span>
-                        <span className={`text-sm font-semibold whitespace-nowrap transition-all duration-500 ${isSidebarOpen ? 'opacity-100 max-w-[200px]' : 'opacity-0 max-w-0 overflow-hidden pointer-events-none'}`}>
-                            Keluar
+                            <img src="/images/logo.png" alt="Dive3D Logo" className="w-full h-full object-cover" />
+                        </div>
+                        <span className={`ml-3 text-base font-black tracking-widest whitespace-nowrap ${isDark ? "text-white" : "text-blue-900"} transition-all duration-500 ${isSidebarOpen ? 'opacity-100 max-w-[200px]' : 'opacity-0 max-w-0 overflow-hidden'}`}>
+                            DIVEXPLORE
                         </span>
-                    </button>
-                </div>
-            </aside>
+                    </div>
+
+                    {/* Menu */}
+                    <ul className="tour-sidebar flex-1 py-4 px-2 space-y-1 overflow-x-hidden">
+                        {menuItems.map((item, idx) => (
+                            <li
+                                key={idx}
+                                onClick={item.action}
+                                title={!isSidebarOpen ? item.label : ''}
+                                className={`flex items-center rounded-xl cursor-pointer transition-all duration-200 group
+                                    ${isSidebarOpen ? 'px-3 py-2.5 gap-3' : 'justify-center p-3'}
+                                    ${activeMenu === idx
+                                        ? 'bg-gradient-to-r from-blue-600/30 to-cyan-500/20 border border-blue-500/30 text-cyan-400'
+                                        : isDark
+                                          ? 'text-gray-500 hover:text-white hover:bg-white/5 border border-transparent'
+                                          : 'text-gray-500 hover:text-blue-700 hover:bg-blue-50 border border-transparent'
+                                    }`}
+                            >
+                                <span className="text-lg flex-shrink-0">{item.icon}</span>
+                                <span className={`text-sm font-semibold whitespace-nowrap transition-all duration-500 ${isSidebarOpen ? 'opacity-100 max-w-[200px]' : 'opacity-0 max-w-0 overflow-hidden pointer-events-none'}`}>
+                                    {item.label}
+                                </span>
+                            </li>
+                        ))}
+                    </ul>
+
+                    {/* Logout */}
+                    <div className={`p-2 border-t ${isDark ? 'border-white/5' : 'border-gray-100'}`}>
+                        <button
+                            onClick={() => { localStorage.removeItem('auth_token'); localStorage.removeItem('user_role'); localStorage.removeItem('user_name'); localStorage.removeItem('user_email'); window.location.href = '/'; }}
+                            title={!isSidebarOpen ? 'Keluar' : ''}
+                            className={`w-full flex items-center rounded-xl text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200 border border-transparent
+                                ${isSidebarOpen ? 'px-3 py-2.5 gap-3' : 'justify-center p-3'}`}
+                        >
+                            <span className="text-lg flex-shrink-0">🚪</span>
+                            <span className={`text-sm font-semibold whitespace-nowrap transition-all duration-500 ${isSidebarOpen ? 'opacity-100 max-w-[200px]' : 'opacity-0 max-w-0 overflow-hidden pointer-events-none'}`}>
+                                Keluar
+                            </span>
+                        </button>
+                    </div>
+                </aside>
+            )}
 
             {/* MAIN CONTENT */}
             <main className="relative z-10 flex-1 flex flex-col overflow-y-auto">
 
                 {/* TOP HEADER */}
                 <header className={`sticky top-0 z-20 px-6 py-5 border-b backdrop-blur-2xl grid grid-cols-3 items-center ${isDark ? 'border-white/5 bg-[#00040a]/80' : 'border-gray-200 bg-sky-50/80'}`}>
-                    {/* User Profile Info - Left */}
+                    {/* Logo & Admin Profile - Left */}
                     <div className="flex items-center gap-4">
-                        <div className="w-9 h-9 bg-gradient-to-br from-blue-400 to-cyan-400 rounded-full flex-shrink-0 shadow-lg shadow-blue-500/20" />
-                        <div>
-                            <p className={`font-bold text-sm leading-none ${isDark ? "text-white" : "text-gray-900"}`}>{userName} {userRole === 'admin' && <span className="ml-2 px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-400 text-[10px] uppercase tracking-wider">Admin</span>}</p>
-                            {userRole !== 'admin' && <p className="text-cyan-400 text-xs mt-0.5">Level {level} · {rankName}</p>}
-                        </div>
+                        {userRole === 'admin' ? (
+                            <>
+                                <div className={`flex items-center gap-3 backdrop-blur-xl py-2 px-5 rounded-full border shadow-xl transition-colors ${isDark ? 'bg-white/10 border-white/10' : 'bg-white/80 border-blue-100 shadow-sm'}`}>
+                                    <div className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg bg-white/5 border border-blue-500/20 overflow-hidden">
+                                        <img src="/images/logo.png" alt="Dive3D Logo" className="w-full h-full object-cover" />
+                                    </div>
+                                    <span className={`text-lg font-black tracking-widest pr-1 ${isDark ? 'text-white' : 'text-blue-900'}`}>DIVEXPLORE</span>
+                                </div>
+                                <div className="flex flex-col">
+                                    <p className={`font-black text-sm leading-none ${isDark ? "text-white" : "text-gray-900"}`}>{userName}</p>
+                                    <span className="px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-400 text-[9px] uppercase font-black tracking-widest mt-1.5 inline-block">ADMIN</span>
+                                </div>
+                            </>
+                        ) : (
+                            <div className="flex items-center gap-4">
+                                <div className="w-9 h-9 bg-gradient-to-br from-blue-400 to-cyan-400 rounded-full flex-shrink-0 shadow-lg shadow-blue-500/20" />
+                                <div>
+                                    <p className={`font-bold text-sm leading-none ${isDark ? "text-white" : "text-gray-900"}`}>{userName}</p>
+                                    <p className="text-cyan-400 text-xs mt-0.5">Level {level} · {rankName}</p>
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     {/* Navbar - Center */}
@@ -273,8 +288,16 @@ export default function DashboardPage() {
                         <NavbarLinks isDark={isDark} />
                     </div>
 
-                    {/* Icons - Right */}
-                    <div className="flex items-center justify-end gap-2">
+                    {/* Icons & Logout - Right */}
+                    <div className="flex items-center justify-end gap-4">
+                        {userRole === 'admin' && (
+                            <button
+                                onClick={() => { localStorage.clear(); window.location.href = '/'; }}
+                                className={`hidden md:block px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider border transition-all ${isDark ? 'bg-red-500/10 text-red-400 border-red-500/20 hover:bg-red-500/20' : 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100'}`}
+                            >
+                                Logout
+                            </button>
+                        )}
                         <button
                             onClick={toggleTheme}
                             title={isDark ? 'Mode Gelap' : 'Mode Terang'}
@@ -290,10 +313,11 @@ export default function DashboardPage() {
                 </header>
 
                 {/* DASHBOARD CONTENT */}
-                {userRole === 'admin' ? (
-                    <AdminDashboard />
-                ) : (
-                <>
+                <div className={userRole === 'admin' ? "min-h-[110vh] p-6" : ""}>
+                    {userRole === 'admin' ? (
+                        <AdminDashboard />
+                    ) : (
+                    <>
                 {activeMenu === 0 && (
                 <div className="p-6 space-y-6 max-w-7xl mx-auto w-full">
                     {/* Profile & XP Row */}
@@ -731,6 +755,7 @@ export default function DashboardPage() {
                 )}
                 </>
                 )}
+                </div>
 
                 {/* FOOTER */}
                 <footer className={`mt-auto px-6 py-4 border-t text-center ${isDark ? "border-white/5" : "border-gray-200"}`}>

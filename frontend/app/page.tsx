@@ -98,6 +98,7 @@ export default function HomePage() {
 
       setIsLoggedIn(true);
       setUserRole(role);
+      setIsAdmin(role?.toLowerCase().trim() === 'admin');
       setUserName(data.user?.name ?? '');
       setShowLoginModal(false);
       toast.success('Login Berhasil!');
@@ -136,8 +137,11 @@ export default function HomePage() {
   };
 
   useEffect(() => {
-    setIsLoggedIn(!!localStorage.getItem('auth_token'));
-    setUserRole(localStorage.getItem('user_role'));
+    const token = localStorage.getItem('auth_token');
+    const role = localStorage.getItem('user_role');
+    setIsLoggedIn(!!token);
+    setUserRole(role);
+    setIsAdmin(role?.toLowerCase().trim() === 'admin');
     setUserName(localStorage.getItem('user_name'));
   }, []);
 
@@ -529,8 +533,8 @@ export default function HomePage() {
           </div>
         </div>
       )}
-      {/* Floating Bantuan Button - hanya untuk user biasa */}
-      {!isAdmin && (
+      {/* Floating Bantuan Button - hanya untuk user biasa, sembunyikan jika Admin */}
+      {!(isLoggedIn && userRole?.toLowerCase().trim() === 'admin') && (
         <button
           onClick={() => setForceTour(true)}
           title="Tampilkan panduan tour"
