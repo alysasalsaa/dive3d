@@ -50,7 +50,7 @@ export default function AdminDashboard() {
     setGalleryLoading(true);
     setGalleryError(null);
     try {
-      const res = await fetch(`${API_URL}/api/admin/pending', { headers: { 'Authorization': `Bearer ${token}` } });
+      const res = await fetch(`${API_URL}/api/admin/pending`, { headers: { 'Authorization': `Bearer ${token}` } });
       if (!res.ok) {
         setGalleryError(`Error ${res.status}: ${res.statusText}`);
         setPendingGallery([]);
@@ -103,7 +103,7 @@ export default function AdminDashboard() {
         } else {
           // CREATE
           const slug = newTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
-          await fetch(`${API_URL}/api/admin/modules', {
+          await fetch(`${API_URL}/api/admin/modules`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': `Bearer ${token}` },
             body: JSON.stringify({ slug, title: newTitle, desc: newDesc }),
@@ -170,7 +170,7 @@ export default function AdminDashboard() {
     const token = localStorage.getItem('auth_token');
     setIsAdminProcessing(true);
     try {
-      await fetch(`${API_URL}/api/quiz/questions', {
+      await fetch(`${API_URL}/api/quiz/questions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({
