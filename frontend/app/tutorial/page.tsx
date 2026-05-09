@@ -175,23 +175,43 @@ export default function TutorialPage() {
       <section className="px-6 pb-32">
         <div className="max-w-7xl mx-auto">
 
-          {/* Progress Bar Tutorial */}
-          <div className={`flex items-center gap-4 p-4 rounded-2xl border mb-8 ${isDark ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200 shadow-sm'}`}>
-            <span className="text-2xl">▶️</span>
-            <div className="flex-1">
-              <div className="flex justify-between text-xs font-bold mb-1.5">
-                <span className={isDark ? 'text-gray-300' : 'text-gray-700'}>Progress Tutorial</span>
-                <span className="text-cyan-400">{watchedVideos.size} / 5 Video Selesai</span>
+          {/* Progress Tutorial Card */}
+          <div className={`relative overflow-hidden rounded-[28px] border mb-10 p-6 ${isDark ? 'bg-gradient-to-br from-cyan-950/50 to-blue-950/50 border-cyan-500/20' : 'bg-gradient-to-br from-cyan-50 to-blue-50 border-cyan-200'}`}>
+            {/* Glow background */}
+            <div className="absolute -top-10 -right-10 w-40 h-40 bg-cyan-500/10 blur-3xl rounded-full pointer-events-none" />
+
+            <div className="flex items-center justify-between mb-5 relative z-10">
+              <div className="flex items-center gap-3">
+                <div className={`w-11 h-11 rounded-2xl flex items-center justify-center text-xl ${isDark ? 'bg-cyan-500/15 border border-cyan-500/20' : 'bg-cyan-100 border border-cyan-200'}`}>
+                  🎬
+                </div>
+                <div>
+                  <h3 className={`font-black text-sm ${isDark ? 'text-white' : 'text-gray-800'}`}>Progress Tutorial</h3>
+                  <p className="text-xs text-gray-400 mt-0.5">Tandai video setelah selesai ditonton</p>
+                </div>
               </div>
-              <div className={`h-2 rounded-full w-full ${isDark ? 'bg-gray-800' : 'bg-gray-200'}`}>
-                <div
-                  className="h-full rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 transition-all duration-500"
-                  style={{ width: `${(watchedVideos.size / 5) * 100}%` }}
-                />
+              <div className="text-right">
+                <span className="text-3xl font-black text-cyan-400">{Math.round((watchedVideos.size / 5) * 100)}%</span>
+                <p className="text-xs text-gray-500 mt-0.5">{watchedVideos.size} / 5 video</p>
               </div>
             </div>
+
+            {/* Segmen per video */}
+            <div className="flex gap-2 relative z-10">
+              {[1, 2, 3, 4, 5].map((id) => (
+                <div key={id} className="flex-1 flex flex-col items-center gap-1.5">
+                  <div className={`w-full h-2.5 rounded-full transition-all duration-500 ${watchedVideos.has(id) ? 'bg-gradient-to-r from-cyan-500 to-blue-500 shadow-[0_0_8px_rgba(6,182,212,0.5)]' : isDark ? 'bg-white/10' : 'bg-gray-200'}`} />
+                  <span className={`text-[10px] font-bold ${watchedVideos.has(id) ? 'text-cyan-400' : 'text-gray-600'}`}>V{id}</span>
+                </div>
+              ))}
+            </div>
+
             {watchedVideos.size === 5 && (
-              <span className="text-emerald-400 font-black text-xs whitespace-nowrap">✅ Semua Selesai!</span>
+              <div className="mt-4 flex items-center gap-2 relative z-10">
+                <div className="px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-black">
+                  Semua video selesai ditonton!
+                </div>
+              </div>
             )}
           </div>
 
@@ -260,7 +280,7 @@ export default function TutorialPage() {
                     </span>
                     <span className={`flex items-center gap-1.5 text-xs font-bold px-4 py-1.5 rounded-full border ${watchedVideos.has(tutorial.id) ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' : isDark ? 'bg-white/5 border-white/10 text-gray-400' : 'bg-white border-gray-200 text-gray-500'}`}>
                       {watchedVideos.has(tutorial.id) ? (
-                        <>✅ Selesai</>
+                        <>Selesai</>
                       ) : (
                         <>🕒 Belum Ditonton</>
                       )}
@@ -279,13 +299,13 @@ export default function TutorialPage() {
                   {!watchedVideos.has(tutorial.id) ? (
                     <button
                       onClick={() => markWatched(tutorial.id)}
-                      className="mt-2 px-5 py-2.5 rounded-full text-sm font-bold bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500 hover:text-white transition-all self-start"
+                      className="mt-2 px-5 py-2.5 rounded-full text-sm font-bold bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500 hover:text-white transition-all self-start flex items-center gap-2"
                     >
-                      ✔ Tandai Selesai Ditonton
+                      <span>👁️</span> Tandai Sudah Ditonton
                     </button>
                   ) : (
-                    <div className="mt-2 px-5 py-2.5 rounded-full text-sm font-bold bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 self-start">
-                      ✅ Video Selesai Ditonton
+                    <div className="mt-2 px-5 py-2.5 rounded-full text-sm font-bold bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 self-start flex items-center gap-2">
+                      <span>🎬</span> Video Selesai Ditonton
                     </div>
                   )}
 
