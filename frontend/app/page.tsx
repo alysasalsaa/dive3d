@@ -275,7 +275,7 @@ export default function HomePage() {
             <>
               <button
                 onClick={() => setShowLoginModal(true)}
-                className={`px-5 py-2 rounded-full text-sm font-semibold transition-all backdrop-blur-xl ${isDark ? 'text-gray-300 hover:text-white border border-white/10 hover:border-white/30 bg-white/5' : 'text-gray-700 hover:text-blue-700 border border-gray-200 hover:border-blue-300 bg-white'}`}
+                className={`px-5 py-2 rounded-full text-sm font-semibold transition-all backdrop-blur-xl ${isDark ? 'text-white border border-white/20 hover:border-white/40 bg-black/40 hover:bg-black/60 shadow-lg shadow-black/20' : 'text-gray-700 hover:text-blue-700 border border-gray-200 hover:border-blue-300 bg-white'}`}
               >
                 Masuk
               </button>
@@ -289,7 +289,7 @@ export default function HomePage() {
           <button
             onClick={toggleTheme}
             title={isDark ? 'Mode Gelap' : 'Mode Terang'}
-            className={`tour-theme w-10 h-10 rounded-full flex items-center justify-center transition-all text-base ${isDark ? 'bg-white/10 hover:bg-white/20 border border-white/10' : 'bg-white hover:bg-gray-100 border border-gray-200 shadow-sm'}`}
+            className={`tour-theme w-10 h-10 rounded-full flex items-center justify-center transition-all text-base backdrop-blur-md ${isDark ? 'bg-black/40 hover:bg-black/60 border border-white/20 shadow-lg shadow-black/20' : 'bg-white hover:bg-gray-100 border border-gray-200 shadow-sm'}`}
           >
             {isDark ? '🌙' : '☀️'}
           </button>
