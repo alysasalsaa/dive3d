@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useTheme } from '../../lib/useTheme';
 import toast from 'react-hot-toast';
 import OnboardingTour from '../../components/OnboardingTour';
+import NavbarLinks from '../../components/Navbar';
 import { Step } from 'react-joyride';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
@@ -239,7 +240,7 @@ export default function CommunityGallery() {
     const currentTourKey = activeTab === 'karyaku' ? 'karyakuPage' : 'galleryPage';
 
     return (
-        <div className={`min-h-screen flex flex-col font-sans transition-colors duration-300 ${isDark ? 'bg-[#00040a] text-white' : 'bg-sky-50 text-gray-900'}`}>
+        <div className={`min-h-[110vh] flex flex-col font-sans transition-colors duration-300 ${isDark ? 'bg-[#00040a] text-white' : 'bg-sky-50 text-gray-900'}`}>
             {!isAdmin && (
                 <OnboardingTour 
                     steps={currentSteps} 
@@ -258,43 +259,32 @@ export default function CommunityGallery() {
             )}
 
             {/* NAVBAR */}
-            <nav className="fixed top-0 w-full z-50 px-6 py-5 flex justify-between items-center transition-all">
-                {/* Logo */}
-                <div className={`flex items-center gap-3 backdrop-blur-xl py-2 px-5 rounded-full border shadow-xl transition-colors ${isDark ? 'bg-white/10 border-white/10' : 'bg-white/80 border-blue-100 shadow-sm'}`}>
-                    <div className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg bg-white/5 border border-blue-500/20 overflow-hidden">
-                        <img src="/images/logo.png" alt="Dive3D Logo" className="w-full h-full object-cover" />
+            <nav className="fixed top-0 w-full z-50 px-6 py-5 grid grid-cols-3 items-center">
+                {/* Logo - left */}
+                <div className="flex justify-start">
+                    <div className={`flex items-center gap-3 backdrop-blur-xl py-2 px-5 rounded-full border shadow-xl transition-colors w-fit ${isDark ? 'bg-white/10 border-white/10' : 'bg-white/80 border-blue-100 shadow-sm'}`}>
+                        <div className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg bg-white/5 border border-blue-500/20 overflow-hidden">
+                            <img src="/images/logo.png" alt="Dive3D Logo" className="w-full h-full object-cover" />
+                        </div>
+                        <span className={`text-lg font-black tracking-widest pr-1 ${isDark ? 'text-white' : 'text-blue-900'}`}>DIVEXPLORE</span>
                     </div>
-                    <span className={`text-lg font-black tracking-widest pr-1 ${isDark ? 'text-white' : 'text-blue-900'}`}>DIVEXPLORE</span>
                 </div>
 
-                {/* Nav links */}
-                <div className={`hidden md:flex items-center gap-1 backdrop-blur-2xl p-1.5 rounded-full border transition-colors ${isDark ? 'bg-white/5 border-white/10' : 'bg-white/80 border-gray-200 shadow-sm'}`}>
-                    {navLinks.map(({ href, label }) => {
-                        const isActive = pathname === href;
-                        return (
-                            <Link key={href} href={href}
-                                className={`px-5 py-2 rounded-full text-sm font-semibold transition-all ${
-                                    isActive
-                                        ? 'bg-gradient-to-r from-blue-600 to-cyan-500 text-white shadow-lg shadow-blue-500/20'
-                                        : isDark
-                                            ? 'text-gray-400 hover:text-white hover:bg-white/5'
-                                            : 'text-gray-600 hover:text-blue-700 hover:bg-blue-50'
-                                }`}
-                            >
-                                {label}
-                            </Link>
-                        );
-                    })}
+                {/* Nav links - center column */}
+                <div className="flex justify-center">
+                    <NavbarLinks isDark={isDark} className="tour-nav" />
                 </div>
 
-                {/* Theme toggle */}
-                <button
-                    onClick={toggleTheme}
-                    title={isDark ? 'Mode Gelap' : 'Mode Terang'}
-                    className={`w-10 h-10 rounded-full flex items-center justify-center transition-all text-base ${isDark ? 'bg-white/10 hover:bg-white/20 border border-white/10' : 'bg-white hover:bg-gray-100 border border-gray-200 shadow-sm'}`}
-                >
-                    {isDark ? '🌙' : '☀️'}
-                </button>
+                {/* Theme toggle - right */}
+                <div className="flex justify-end">
+                    <button
+                        onClick={toggleTheme}
+                        title={isDark ? 'Mode Gelap' : 'Mode Terang'}
+                        className={`tour-theme w-10 h-10 rounded-full flex items-center justify-center transition-all text-base backdrop-blur-md ${isDark ? 'bg-black/40 hover:bg-black/60 border border-white/20 shadow-lg shadow-black/20' : 'bg-white hover:bg-gray-100 border border-gray-200 shadow-sm'}`}
+                    >
+                        {isDark ? '🌙' : '☀️'}
+                    </button>
+                </div>
             </nav>
 
             {/* MAIN */}

@@ -6,6 +6,7 @@ import { useTheme } from '../../lib/useTheme';
 import AdminDashboard from './AdminDashboard';
 import dynamic from 'next/dynamic';
 import OnboardingTour from '../../components/OnboardingTour';
+import NavbarLinks from '../../components/Navbar';
 import { Step } from 'react-joyride';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
@@ -257,7 +258,8 @@ export default function DashboardPage() {
             <main className="relative z-10 flex-1 flex flex-col overflow-y-auto">
 
                 {/* TOP HEADER */}
-                <header className={`sticky top-0 z-20 px-6 py-4 border-b backdrop-blur-2xl flex justify-between items-center ${isDark ? 'border-white/5 bg-[#00040a]/80' : 'border-gray-200 bg-sky-50/80'}`}>
+                <header className={`sticky top-0 z-20 px-6 py-5 border-b backdrop-blur-2xl grid grid-cols-3 items-center ${isDark ? 'border-white/5 bg-[#00040a]/80' : 'border-gray-200 bg-sky-50/80'}`}>
+                    {/* User Profile Info - Left */}
                     <div className="flex items-center gap-4">
                         <div className="w-9 h-9 bg-gradient-to-br from-blue-400 to-cyan-400 rounded-full flex-shrink-0 shadow-lg shadow-blue-500/20" />
                         <div>
@@ -266,33 +268,17 @@ export default function DashboardPage() {
                         </div>
                     </div>
 
-                    {/* Navbar */}
-                    <div className={`hidden md:flex items-center gap-1 backdrop-blur-2xl p-1.5 rounded-full border ${isDark ? "bg-white/5 border-white/10" : "bg-white/80 border-gray-200 shadow-sm"}`}>
-                        {[
-                            { href: '/', label: 'Beranda' },
-                            { href: '/gallery', label: 'Galeri' },
-                            { href: '/akademi', label: 'Akademi' },
-                            { href: '/tutorial', label: 'Tutorial' },
-                            { href: '/dashboard', label: 'Dashboard' },
-                        ].map(({ href, label }) => {
-                            const isActive = pathname === href;
-                            return (
-                                <Link key={href} href={href}
-                                    className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${isActive
-                                        ? 'bg-gradient-to-r from-blue-600 to-cyan-500 text-white shadow-lg shadow-blue-500/20'
-                                        : isDark ? 'text-gray-400 hover:text-white hover:bg-white/5' : 'text-gray-600 hover:text-blue-700 hover:bg-blue-50'}`}
-                                >
-                                    {label}
-                                </Link>
-                            );
-                        })}
+                    {/* Navbar - Center */}
+                    <div className="flex justify-center">
+                        <NavbarLinks isDark={isDark} />
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    {/* Icons - Right */}
+                    <div className="flex items-center justify-end gap-2">
                         <button
                             onClick={toggleTheme}
                             title={isDark ? 'Mode Gelap' : 'Mode Terang'}
-                            className={`w-9 h-9 rounded-full flex items-center justify-center transition-all text-sm ${isDark ? 'bg-white/10 hover:bg-white/20 border border-white/10' : 'bg-white hover:bg-gray-100 border border-gray-200 shadow-sm'}`}
+                            className={`w-10 h-10 rounded-full flex items-center justify-center transition-all text-base backdrop-blur-md ${isDark ? 'bg-black/40 hover:bg-black/60 border border-white/20 shadow-lg shadow-black/20' : 'bg-white hover:bg-gray-100 border border-gray-200 shadow-sm'}`}
                         >
                             {isDark ? '🌙' : '☀️'}
                         </button>

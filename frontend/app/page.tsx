@@ -5,41 +5,16 @@ import { usePathname } from 'next/navigation';
 import { useTheme } from '../lib/useTheme';
 import toast from 'react-hot-toast';
 import OnboardingTour from '../components/OnboardingTour';
+import NavbarLinks from '../components/Navbar';
 import { Step } from 'react-joyride';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
-const LoadingScreen = () => (
-  <div className="fixed inset-0 z-[100] bg-[#00040a] flex flex-col items-center justify-center">
-    <div className="relative">
-      <div className="w-24 h-24 border-4 border-blue-500/20 rounded-full animate-ping absolute inset-0"></div>
-      <div className="w-24 h-24 border-4 border-blue-500/50 rounded-full flex items-center justify-center bg-white/5 relative z-10 overflow-hidden">
-        <img src="/images/logo.png" alt="Dive3D Loading" className="w-[80%] h-[80%] object-contain animate-pulse" />
-      </div>
-    </div>
-    <div className="mt-8 text-center">
-      <h2 className="text-white font-black tracking-[0.3em] uppercase text-sm mb-2">Menyiapkan Ekosistem</h2>
-      <div className="w-48 h-1 bg-white/10 rounded-full overflow-hidden mx-auto">
-        <div className="h-full bg-gradient-to-r from-blue-600 to-cyan-400 animate-[loading_2s_ease-in-out_infinite]"></div>
-      </div>
-      <p className="text-gray-500 text-[10px] mt-4 italic max-w-xs px-6">
-        "Laut adalah jantung bumi. Mari kita jaga detaknya tetap kuat."
-      </p>
-    </div>
-    <style jsx>{`
-      @keyframes loading {
-        0% { width: 0%; transform: translateX(-100%); }
-        50% { width: 100%; transform: translateX(0%); }
-        100% { width: 0%; transform: translateX(100%); }
-      }
-    `}</style>
-  </div>
-);
 
 export default function HomePage() {
   const pathname = usePathname();
   const { isDark, toggleTheme } = useTheme();
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userRole, setUserRole] = useState<string | null>(null);
   const [userName, setUserName] = useState<string | null>(null);
@@ -161,14 +136,10 @@ export default function HomePage() {
   };
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 3000);
     setIsLoggedIn(!!localStorage.getItem('auth_token'));
     setUserRole(localStorage.getItem('user_role'));
     setUserName(localStorage.getItem('user_name'));
-    return () => clearTimeout(timer);
   }, []);
-
-  if (isLoading) return <LoadingScreen />;
 
   const navLinks = [
     { href: '/', label: 'Beranda' },
@@ -206,93 +177,84 @@ export default function HomePage() {
 
   return (
     <div className={`min-h-screen font-sans overflow-x-hidden animate-in fade-in duration-1000 transition-colors ${isDark ? 'bg-[#00040a] text-white' : 'bg-sky-50 text-gray-900'}`}>
-      
+
       {!isAdmin && (
-        <OnboardingTour 
-          steps={homeTourSteps} 
-          tourKey="homePage" 
-          forceRun={forceTour} 
-          onFinish={() => setForceTour(false)} 
+        <OnboardingTour
+          steps={homeTourSteps}
+          tourKey="homePage"
+          forceRun={forceTour}
+          onFinish={() => setForceTour(false)}
         />
       )}
 
       {/* NAVBAR */}
-      <nav className="fixed top-0 w-full z-50 px-6 py-5 flex justify-between items-center transition-all">
-
-        {/* Logo */}
-        <div className={`tour-logo flex items-center gap-3 backdrop-blur-xl py-2 px-5 rounded-full border shadow-xl transition-colors ${isDark ? 'bg-white/10 border-white/10' : 'bg-white/80 border-blue-100 shadow-sm'}`}>
-          <div className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg bg-white/5 border border-blue-500/20 overflow-hidden">
-            <img src="/images/logo.png" alt="Dive3D Logo" className="w-full h-full object-cover" />
-          </div>
-          <span className={`text-lg font-black tracking-widest pr-1 ${isDark ? 'text-white' : 'text-blue-900'}`}>DIVEXPLORE</span>
-        </div>
-
-        {/* Nav links */}
-        <div className={`tour-nav hidden md:flex items-center gap-1 backdrop-blur-2xl p-1.5 rounded-full border shadow-2xl transition-colors ${isDark ? 'bg-white/5 border-white/10' : 'bg-white/80 border-gray-200 shadow-sm'}`}>
-          {navLinks.map(({ href, label }) => {
-            const isActive = pathname === href;
-            return (
-              <Link key={href} href={href}
-                onClick={(e) => handleProtectedNav(e, href)}
-                className={`px-5 py-2 rounded-full text-sm font-semibold transition-all ${
-                  isActive
-                    ? 'bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-bold shadow-lg shadow-blue-500/20'
-                    : isDark
-                      ? 'hover:bg-white/5 text-gray-400 hover:text-white'
-                      : 'text-gray-600 hover:text-blue-700 hover:bg-blue-50'
-                }`}
-              >
-                {label}
-              </Link>
-            );
-          })}
-        </div>
-
-        {/* Auth + Toggle */}
-        <div className="tour-auth hidden md:flex items-center gap-2">
-          {isLoggedIn ? (
-            <div className="flex items-center gap-4 px-2">
-              <span className={`text-sm font-bold ${isDark ? 'text-white' : 'text-blue-900'}`}>
-                Halo, {userName || 'Pengguna'}!
-              </span>
-              <button 
-                onClick={() => {
-                  localStorage.removeItem('auth_token');
-                  localStorage.removeItem('user_role');
-                  localStorage.removeItem('user_name');
-                  localStorage.removeItem('user_email');
-                  setIsLoggedIn(false);
-                  setUserRole(null);
-                  setUserName(null);
-                  toast.success('Logout Berhasil!');
-                }}
-                className={`text-xs font-semibold px-3 py-1.5 rounded-full border transition-all ${isDark ? 'bg-red-500/10 text-red-400 border-red-500/20 hover:bg-red-500/20' : 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100'}`}
-              >
-                Logout
-              </button>
+      <nav className="fixed top-0 w-full z-50 px-6 py-5 grid grid-cols-3 items-center">
+        {/* Logo - left */}
+        <div className="flex justify-start">
+          <div className={`tour-logo flex items-center gap-3 backdrop-blur-xl py-2 px-5 rounded-full border shadow-xl transition-colors ${isDark ? 'bg-white/10 border-white/10' : 'bg-white/80 border-blue-100 shadow-sm'}`}>
+            <div className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg bg-white/5 border border-blue-500/20 overflow-hidden">
+              <img src="/images/logo.png" alt="Dive3D Logo" className="w-full h-full object-cover" />
             </div>
-          ) : (
-            <>
-              <button
-                onClick={() => setShowLoginModal(true)}
-                className={`px-5 py-2 rounded-full text-sm font-semibold transition-all backdrop-blur-xl ${isDark ? 'text-white border border-white/20 hover:border-white/40 bg-black/40 hover:bg-black/60 shadow-lg shadow-black/20' : 'text-gray-700 hover:text-blue-700 border border-gray-200 hover:border-blue-300 bg-white'}`}
-              >
-                Masuk
-              </button>
-              <Link href="/register"
-                className="px-5 py-2 rounded-full text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-cyan-500 hover:opacity-90 transition-all shadow-lg shadow-blue-500/20"
-              >
-                Daftar
-              </Link>
-            </>
-          )}
-          <button
-            onClick={toggleTheme}
-            title={isDark ? 'Mode Gelap' : 'Mode Terang'}
-            className={`tour-theme w-10 h-10 rounded-full flex items-center justify-center transition-all text-base backdrop-blur-md ${isDark ? 'bg-black/40 hover:bg-black/60 border border-white/20 shadow-lg shadow-black/20' : 'bg-white hover:bg-gray-100 border border-gray-200 shadow-sm'}`}
-          >
-            {isDark ? '🌙' : '☀️'}
-          </button>
+            <span className={`text-lg font-black tracking-widest pr-1 ${isDark ? 'text-white' : 'text-blue-900'}`}>DIVEXPLORE</span>
+          </div>
+        </div>
+
+        {/* Nav links - center column */}
+        <div className="flex justify-center">
+          <NavbarLinks
+            isDark={isDark}
+            className="tour-nav"
+            onLinkClick={(href, e) => handleProtectedNav(e, href)}
+          />
+        </div>
+
+        {/* Auth + Toggle - right column */}
+        <div className="flex justify-end">
+          <div className="tour-auth hidden md:flex items-center gap-2">
+            {isLoggedIn ? (
+              <div className="flex items-center gap-4 px-2">
+                <span className={`text-sm font-bold ${isDark ? 'text-white' : 'text-blue-900'}`}>
+                  Halo, {userName || 'Pengguna'}!
+                </span>
+                <button
+                  onClick={() => {
+                    localStorage.removeItem('auth_token');
+                    localStorage.removeItem('user_role');
+                    localStorage.removeItem('user_name');
+                    localStorage.removeItem('user_email');
+                    setIsLoggedIn(false);
+                    setUserRole(null);
+                    setUserName(null);
+                    toast.success('Logout Berhasil!');
+                  }}
+                  className={`text-xs font-semibold px-3 py-1.5 rounded-full border transition-all ${isDark ? 'bg-red-500/10 text-red-400 border-red-500/20 hover:bg-red-500/20' : 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100'}`}
+                >
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <>
+                <button
+                  onClick={() => setShowLoginModal(true)}
+                  className={`px-5 py-2 rounded-full text-sm font-semibold transition-all backdrop-blur-xl ${isDark ? 'text-white border border-white/20 hover:border-white/40 bg-black/40 hover:bg-black/60 shadow-lg shadow-black/20' : 'text-gray-700 hover:text-blue-700 border border-gray-200 hover:border-blue-300 bg-white'}`}
+                >
+                  Masuk
+                </button>
+                <Link href="/register"
+                  className="px-5 py-2 rounded-full text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-cyan-500 hover:opacity-90 transition-all shadow-lg shadow-blue-500/20"
+                >
+                  Daftar
+                </Link>
+              </>
+            )}
+            <button
+              onClick={toggleTheme}
+              title={isDark ? 'Mode Gelap' : 'Mode Terang'}
+              className={`tour-theme w-10 h-10 rounded-full flex items-center justify-center transition-all text-base backdrop-blur-md ${isDark ? 'bg-black/40 hover:bg-black/60 border border-white/20 shadow-lg shadow-black/20' : 'bg-white hover:bg-gray-100 border border-gray-200 shadow-sm'}`}
+            >
+              {isDark ? '🌙' : '☀️'}
+            </button>
+          </div>
         </div>
       </nav>
 
@@ -310,7 +272,7 @@ export default function HomePage() {
 
         {/* Konten */}
         <div className="relative z-10 w-full max-w-7xl mx-auto px-8 pt-32 pb-16 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
-          
+
           {/* LEFT: Teks */}
           <div className="pr-0 md:pr-10">
             <p className={`text-base md:text-lg mb-1 font-bold transition-colors ${isDark ? 'text-gray-300' : 'text-[#041e42]'}`}>Selamat Datang di</p>
@@ -355,7 +317,7 @@ export default function HomePage() {
 
               <div className="relative aspect-[16/10] flex items-center justify-center bg-black/40 overflow-hidden">
                 <img src="/images/hero-bg.jpg" alt="Trailer" className="absolute inset-0 w-full h-full object-cover opacity-70" />
-                
+
                 <button
                   onClick={() => setShowTrailer(true)}
                   className="relative z-10 w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-2xl transition-all hover:scale-105 active:scale-95 group"
@@ -386,7 +348,7 @@ export default function HomePage() {
       {/* INFORMASI RAJA AMPAT SECTION */}
       <section id="info-raja-ampat" className="relative py-24 min-h-screen flex items-center">
         {/* Background */}
-        <div 
+        <div
           className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat bg-fixed"
           style={{ backgroundImage: 'url(/images/hero-bg.jpg)' }}
         >
@@ -471,9 +433,9 @@ export default function HomePage() {
               <button onClick={() => setShowTrailer(false)} className="text-gray-400 hover:text-white transition-colors">✕</button>
             </div>
             <div className="aspect-video bg-gray-900 flex items-center justify-center text-gray-500 text-sm">
-              <video 
-                src="/videos/trailer.mp4" 
-                controls 
+              <video
+                src="/videos/trailer.mp4"
+                controls
                 autoPlay
                 className="w-full h-full object-cover"
                 poster="/images/hero-bg.jpg"
@@ -487,7 +449,7 @@ export default function HomePage() {
 
       {/* FOOTER */}
       <footer className={`py-12 border-t px-6 flex flex-col items-center justify-center gap-6 ${isDark ? 'border-white/5' : 'border-gray-200'}`}>
-        <button 
+        <button
           onClick={() => setForceTour(true)}
           className="px-6 py-2 rounded-full border border-cyan-500/30 text-cyan-500 font-bold hover:bg-cyan-500/10 transition-colors text-sm flex items-center gap-2"
         >
@@ -502,7 +464,7 @@ export default function HomePage() {
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowLoginModal(false)}></div>
           <div className="w-full max-w-md p-8 rounded-[28px] bg-[#00040a] border border-white/10 shadow-2xl relative z-10 animate-in zoom-in-95 duration-300">
-            <button 
+            <button
               onClick={() => setShowLoginModal(false)}
               className="absolute top-6 right-6 text-gray-500 hover:text-white transition-colors"
             >
@@ -555,8 +517,8 @@ export default function HomePage() {
               </div>
 
               <div className="pt-2">
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   disabled={isLoginProcessing}
                   className="w-full py-3.5 rounded-xl font-bold text-white bg-gradient-to-r from-blue-600 to-cyan-500 hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-blue-500/25 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:scale-100"
                 >
