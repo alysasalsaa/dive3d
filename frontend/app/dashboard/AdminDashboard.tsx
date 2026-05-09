@@ -441,9 +441,9 @@ export default function AdminDashboard() {
                   <div key={item.id} className="bg-white/5 rounded-2xl border border-white/10 overflow-hidden flex flex-col group">
                     <div className="h-40 bg-black/50 relative">
                       {item.file_path.match(/\.(mp4|webm|ogg|mov)$/i) ? (
-                        <video src={item.file_path.startsWith('http') ? item.file_path.replace('http://localhost/', `${API_URL}/') : `${API_URL}${item.file_path}`} className="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity" controls />
+                        <video src={item.file_path.startsWith('http') ? item.file_path.replace('http://localhost/', `${API_URL}/`) : `${API_URL}${item.file_path}`} className="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity" controls />
                       ) : (
-                        <img src={item.file_path.startsWith('http') ? item.file_path.replace('http://localhost/', `${API_URL}/') : `${API_URL}${item.file_path}`} alt={item.title} className="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity" />
+                        <img src={item.file_path.startsWith('http') ? item.file_path.replace('http://localhost/', `${API_URL}/`) : `${API_URL}${item.file_path}`} alt={item.title} className="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity" />
                       )}
                     </div>
                     <div className="p-5 flex-1 flex flex-col">
