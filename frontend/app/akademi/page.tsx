@@ -556,7 +556,7 @@ export default function AkademiPage() {
                                 >
                                     {[
                                         { id: 'ekosistem', label: 'Ekosistem Besar', icon: '🌊' },
-                                        { id: 'clown', label: 'Clownfish', icon: '🐟' },
+                                        { id: 'ikan', label: 'Clownfish', icon: '🐟' },
                                         { id: 'butterfly', label: 'Butterfly Fish', icon: '🐠' },
                                         { id: 'parrot', label: 'Parrot Fish', icon: '🐡' },
                                         { id: 'karang', label: 'Karang', icon: '🪸' },
