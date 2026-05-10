@@ -25,6 +25,7 @@ export default function DashboardPage() {
     const [watchedTutorialCount, setWatchedTutorialCount] = useState(0);
     const [claimedCertificates, setClaimedCertificates] = useState<{type: string; label: string; track: string; date: string}[]>([]);
     const [forceTour, setForceTour] = useState(false);
+    const [loadingProgress, setLoadingProgress] = useState(0);
 
     useEffect(() => {
         if (forceTour) {
@@ -96,42 +97,40 @@ export default function DashboardPage() {
             .catch(() => setLoading(false));
     }, []);
 
-    if (loading) {
-        return (
-            <div className={`flex h-screen items-center justify-center ${isDark ? 'bg-[#00040a]' : 'bg-sky-50'}`}>
-                <div className="text-center">
-                    <div className="w-16 h-16 border-4 border-blue-500/20 border-t-cyan-400 rounded-full animate-spin mx-auto mb-4" />
-                    <p className="text-cyan-400 font-bold tracking-widest text-sm uppercase">Memuat Dashboard...</p>
-                </div>
-            </div>
-        );
-    }
+    useEffect(() => {
+        if (loading) {
+            setLoadingProgress(0);
+            const interval = setInterval(() => {
+                setLoadingProgress(prev => {
+                    if (prev >= 96) return prev;
+                    const step = Math.floor(Math.random() * 8) + 2;
+                    return Math.min(prev + step, 96);
+                });
+            }, 200);
+            return () => clearInterval(interval);
+        } else {
+            setLoadingProgress(100);
+        }
+    }, [loading]);
 
-    if (!dashboardData) return (
-        <div className={`flex h-screen items-center justify-center ${isDark ? 'bg-[#00040a]' : 'bg-sky-50'}`}>
-            <div className="text-center">
-                <div className="text-4xl mb-4">🌊</div>
-                <p className="text-red-400 font-bold">Gagal terhubung ke server</p>
-                <p className="text-gray-500 text-sm mt-2">Pastikan backend sudah berjalan</p>
-            </div>
-        </div>
-    );
+    // Removed top-level loading check to show header/sidebar immediately
+
+    // Removed top-level error check to keep header/sidebar visible
 
     const menuItems = [
         { icon: '📊', label: 'Dashboard', action: () => setActiveMenu(0) },
         { icon: '📚', label: 'Mulai Akademi', action: () => window.location.href = '/lms' },
         { icon: '👑', label: 'Leaderboard', action: () => setActiveMenu(2) },
         { icon: '🎁', label: 'Klaim Hadiah', action: () => setActiveMenu(3) },
-        // { icon: '⚙️', label: 'Pengaturan', action: () => setActiveMenu(4) }, // Disembunyikan sementara
     ];
 
-    const userName = dashboardData.user?.name || 'Pengguna';
-    const xp = dashboardData.user?.current_xp || 0;
-    const targetXp = dashboardData.user?.next_level_xp || 500;
-    const level = dashboardData.user?.level || 0;
-    const rankName = dashboardData.user?.rank_name || 'Rookie';
+    const userName = dashboardData?.user?.name || 'Pengguna';
+    const xp = dashboardData?.user?.current_xp || 0;
+    const targetXp = dashboardData?.user?.next_level_xp || 500;
+    const level = dashboardData?.user?.level || 0;
+    const rankName = dashboardData?.user?.rank_name || 'Rookie';
 
-    const completedQuizzesCount = dashboardData.recent_quizzes?.filter((q: any) => q.score === 100).length || 0;
+    const completedQuizzesCount = dashboardData?.recent_quizzes?.filter((q: any) => q.score === 100).length || 0;
 
     const claimCertificate = (type: string, label: string, track: string, url: string) => {
         const existing = JSON.parse(localStorage.getItem('claimed_certificates') || '[]');
@@ -174,12 +173,11 @@ export default function DashboardPage() {
             target: '.tour-certificates',
             content: 'Kalau semua modul udah beres, kamu bisa klaim dan download sertifikat resmi kamu di sini. Keren kan? 📜',
             placement: 'top',
-            skipScroll: true,
         }
     ];
 
     return (
-        <div className={`flex h-screen font-sans overflow-hidden transition-colors duration-300 ${isDark ? 'bg-[#00040a] text-white' : 'bg-sky-50 text-gray-900'}`}>
+        <div className={`flex flex-col min-h-screen font-sans transition-colors duration-300 ${isDark ? 'bg-[#00040a] text-white' : 'bg-sky-50 text-gray-900'}`}>
             {userRole !== 'admin' && (
                 <OnboardingTour 
                     steps={dashboardTourSteps} 
@@ -189,133 +187,155 @@ export default function DashboardPage() {
                 />
             )}
 
-            {/* Ambient glow background */}
             <div className="fixed inset-0 pointer-events-none z-0">
                 <div className="absolute top-0 left-1/4 w-[500px] h-[300px] bg-blue-500/10 blur-[120px] rounded-full" />
                 <div className="absolute bottom-1/4 right-0 w-[400px] h-[400px] bg-cyan-500/5 blur-[100px] rounded-full" />
             </div>
 
-            {/* SIDEBAR - Sembunyikan jika Admin */}
-            {userRole !== 'admin' && (
-                <aside className={`relative z-10 flex flex-col border-r backdrop-blur-2xl transition-all duration-500 ease-in-out flex-shrink-0 ${isSidebarOpen ? 'w-60' : 'w-[72px]'} ${isDark ? 'border-white/5 bg-white/[0.03]' : 'border-gray-200 bg-white shadow-sm'}`}>
-                    {/* Logo */}
-                    <div className={`h-20 flex items-center px-4 border-b ${isDark ? 'border-white/5' : 'border-gray-100'}`}>
-                        <div
-                            className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 cursor-pointer overflow-hidden bg-white/5 border border-white/10`}
-                            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                        >
+            <header className="fixed top-0 w-full z-50 px-6 py-5 grid grid-cols-3 items-center backdrop-blur-xl">
+                <div className="flex items-center">
+                    <div className={`flex items-center gap-3 backdrop-blur-xl py-2 px-5 rounded-full border shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer ${isDark ? 'bg-white/10 border-white/10 hover:bg-white/20' : 'bg-white/80 border-blue-100 hover:shadow-md shadow-sm'}`}>
+                        <div className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg bg-white/5 border border-blue-500/20 overflow-hidden">
                             <img src="/images/logo.png" alt="Dive3D Logo" className="w-full h-full object-cover" />
                         </div>
-                        <span className={`ml-3 text-base font-black tracking-widest whitespace-nowrap ${isDark ? "text-white" : "text-blue-900"} transition-all duration-500 ${isSidebarOpen ? 'opacity-100 max-w-[200px]' : 'opacity-0 max-w-0 overflow-hidden'}`}>
-                            DIVEXPLORE
-                        </span>
+                        <span className={`text-lg font-black tracking-widest pr-1 ${isDark ? 'text-white' : 'text-blue-900'}`}>DIVEXPLORE</span>
                     </div>
+                </div>
 
-                    {/* Menu */}
-                    <ul className="tour-sidebar flex-1 py-4 px-2 space-y-1 overflow-x-hidden">
-                        {menuItems.map((item, idx) => (
-                            <li
-                                key={idx}
-                                onClick={item.action}
-                                title={!isSidebarOpen ? item.label : ''}
-                                className={`flex items-center rounded-xl cursor-pointer transition-all duration-200 group
-                                    ${isSidebarOpen ? 'px-3 py-2.5 gap-3' : 'justify-center p-3'}
-                                    ${activeMenu === idx
-                                        ? 'bg-gradient-to-r from-blue-600/30 to-cyan-500/20 border border-blue-500/30 text-cyan-400'
-                                        : isDark
-                                          ? 'text-gray-500 hover:text-white hover:bg-white/5 border border-transparent'
-                                          : 'text-gray-500 hover:text-blue-700 hover:bg-blue-50 border border-transparent'
-                                    }`}
-                            >
-                                <span className="text-lg flex-shrink-0">{item.icon}</span>
-                                <span className={`text-sm font-semibold whitespace-nowrap transition-all duration-500 ${isSidebarOpen ? 'opacity-100 max-w-[200px]' : 'opacity-0 max-w-0 overflow-hidden pointer-events-none'}`}>
-                                    {item.label}
-                                </span>
-                            </li>
-                        ))}
-                    </ul>
+                <div className="flex justify-center">
+                    <NavbarLinks isDark={isDark} className="tour-nav" />
+                </div>
 
-                    {/* Logout */}
-                    <div className={`p-2 border-t ${isDark ? 'border-white/5' : 'border-gray-100'}`}>
-                        <button
-                            onClick={() => { localStorage.removeItem('auth_token'); localStorage.removeItem('user_role'); localStorage.removeItem('user_name'); localStorage.removeItem('user_email'); window.location.href = '/'; }}
-                            title={!isSidebarOpen ? 'Keluar' : ''}
-                            className={`w-full flex items-center rounded-xl text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200 border border-transparent
-                                ${isSidebarOpen ? 'px-3 py-2.5 gap-3' : 'justify-center p-3'}`}
-                        >
-                            <span className="text-lg flex-shrink-0">🚪</span>
-                            <span className={`text-sm font-semibold whitespace-nowrap transition-all duration-500 ${isSidebarOpen ? 'opacity-100 max-w-[200px]' : 'opacity-0 max-w-0 overflow-hidden pointer-events-none'}`}>
-                                Keluar
+                <div className="flex items-center justify-end gap-3">
+                    {userRole === 'admin' && (
+                        <div className="flex items-center gap-4 px-2">
+                            <span className={`text-sm font-bold ${isDark ? 'text-white' : 'text-blue-900'}`}>
+                                Halo, {userName || 'Admin'}!
                             </span>
-                        </button>
-                    </div>
-                </aside>
-            )}
-
-            {/* MAIN CONTENT */}
-            <main className="relative z-10 flex-1 flex flex-col overflow-y-auto">
-
-                {/* TOP HEADER */}
-                <header className={`sticky top-0 z-20 px-6 py-5 border-b backdrop-blur-2xl grid grid-cols-3 items-center ${isDark ? 'border-white/5 bg-[#00040a]/80' : 'border-gray-200 bg-sky-50/80'}`}>
-                    {/* Logo & Admin Profile - Left */}
-                    <div className="flex items-center gap-4">
-                        {userRole === 'admin' ? (
-                            <>
-                                <div className={`flex items-center gap-3 backdrop-blur-xl py-2 px-5 rounded-full border shadow-xl transition-colors ${isDark ? 'bg-white/10 border-white/10' : 'bg-white/80 border-blue-100 shadow-sm'}`}>
-                                    <div className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg bg-white/5 border border-blue-500/20 overflow-hidden">
-                                        <img src="/images/logo.png" alt="Dive3D Logo" className="w-full h-full object-cover" />
-                                    </div>
-                                    <span className={`text-lg font-black tracking-widest pr-1 ${isDark ? 'text-white' : 'text-blue-900'}`}>DIVEXPLORE</span>
-                                </div>
-                                <div className="flex flex-col">
-                                    <p className={`font-black text-sm leading-none ${isDark ? "text-white" : "text-gray-900"}`}>{userName}</p>
-                                    <span className="px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-400 text-[9px] uppercase font-black tracking-widest mt-1.5 inline-block">ADMIN</span>
-                                </div>
-                            </>
-                        ) : (
-                            <div className="flex items-center gap-4">
-                                <div className="w-9 h-9 bg-gradient-to-br from-blue-400 to-cyan-400 rounded-full flex-shrink-0 shadow-lg shadow-blue-500/20" />
-                                <div>
-                                    <p className={`font-bold text-sm leading-none ${isDark ? "text-white" : "text-gray-900"}`}>{userName}</p>
-                                    <p className="text-cyan-400 text-xs mt-0.5">Level {level} · {rankName}</p>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Navbar - Center */}
-                    <div className="flex justify-center">
-                        <NavbarLinks isDark={isDark} />
-                    </div>
-
-                    {/* Icons & Logout - Right */}
-                    <div className="flex items-center justify-end gap-4">
-                        {userRole === 'admin' && (
                             <button
-                                onClick={() => { localStorage.clear(); window.location.href = '/'; }}
-                                className={`hidden md:block px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider border transition-all ${isDark ? 'bg-red-500/10 text-red-400 border-red-500/20 hover:bg-red-500/20' : 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100'}`}
+                                onClick={() => {
+                                    localStorage.removeItem('auth_token');
+                                    localStorage.removeItem('user_role');
+                                    localStorage.removeItem('user_name');
+                                    localStorage.removeItem('user_email');
+                                    window.location.href = '/';
+                                }}
+                                className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all border ${isDark ? 'bg-red-500/10 text-red-400 border-red-500/20 hover:bg-red-500/20' : 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100'}`}
                             >
                                 Logout
                             </button>
-                        )}
-                        <button
-                            onClick={toggleTheme}
-                            title={isDark ? 'Mode Gelap' : 'Mode Terang'}
-                            className={`w-10 h-10 rounded-full flex items-center justify-center transition-all text-base backdrop-blur-md ${isDark ? 'bg-black/40 hover:bg-black/60 border border-white/20 shadow-lg shadow-black/20' : 'bg-white hover:bg-gray-100 border border-gray-200 shadow-sm'}`}
-                        >
-                            {isDark ? '🌙' : '☀️'}
-                        </button>
-                        <div className={`relative cursor-pointer p-2 rounded-full transition-colors ${isDark ? 'hover:bg-white/5' : 'hover:bg-gray-100'}`}>
-                            <span className="text-xl">🔔</span>
-                            <div className="absolute top-1.5 right-1.5 w-2 h-2 bg-cyan-400 rounded-full" />
                         </div>
-                    </div>
-                </header>
+                    )}
+                    <button
+                        onClick={toggleTheme}
+                        title={isDark ? 'Mode Gelap' : 'Mode Terang'}
+                        className={`w-10 h-10 rounded-full flex items-center justify-center transition-all text-base backdrop-blur-md ${isDark ? 'bg-black/40 hover:bg-black/60 border border-white/20 shadow-lg shadow-black/20' : 'bg-white hover:bg-gray-100 border border-gray-200 shadow-sm'}`}
+                    >
+                        {isDark ? '🌙' : '☀️'}
+                    </button>
+                </div>
+            </header>
 
-                {/* DASHBOARD CONTENT */}
-                <div className={userRole === 'admin' ? "min-h-[110vh] p-6" : ""}>
-                    {userRole === 'admin' ? (
-                        <AdminDashboard />
+            <div className="flex flex-1 pt-24 relative z-10">
+                {userRole !== 'admin' && (
+                    <aside className={`flex flex-col border-r backdrop-blur-xl transition-all duration-500 ease-in-out flex-shrink-0 sticky top-24 h-[calc(100vh-6rem)] ${isSidebarOpen ? 'w-64' : 'w-[80px]'} ${isDark ? 'border-white/5 bg-white/[0.02]' : 'border-gray-200 bg-white/50'}`}>
+                        <div className="p-4 flex justify-end">
+                            <button 
+                                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                                className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${isDark ? 'bg-white/5 hover:bg-white/10 text-gray-400' : 'bg-gray-100 hover:bg-gray-200 text-gray-600'}`}
+                            >
+                                {isSidebarOpen ? '❮' : '❯'}
+                            </button>
+                        </div>
+
+                        <ul className="tour-sidebar flex-1 py-2 px-3 space-y-2 overflow-x-hidden">
+                            {menuItems.map((item, idx) => (
+                                <li
+                                    key={idx}
+                                    onClick={item.action}
+                                    title={!isSidebarOpen ? item.label : ''}
+                                    className={`flex items-center rounded-2xl cursor-pointer transition-all duration-300 group
+                                        ${isSidebarOpen ? 'px-4 py-3.5 gap-4' : 'justify-center p-4'}
+                                        ${activeMenu === idx
+                                            ? 'bg-gradient-to-r from-blue-600 to-cyan-500 text-white shadow-lg shadow-blue-500/25'
+                                            : isDark
+                                              ? 'text-gray-400 hover:text-white hover:bg-white/5'
+                                              : 'text-gray-500 hover:text-blue-700 hover:bg-blue-50'
+                                        }`}
+                                >
+                                    <span className="text-xl flex-shrink-0">{item.icon}</span>
+                                    <span className={`text-sm font-bold whitespace-nowrap transition-all duration-500 ${isSidebarOpen ? 'opacity-100 max-w-[200px]' : 'opacity-0 max-w-0 overflow-hidden'}`}>
+                                        {item.label}
+                                    </span>
+                                </li>
+                            ))}
+                        </ul>
+
+                        <div className={`p-4 border-t ${isDark ? 'border-white/5' : 'border-gray-100'}`}>
+                            <button
+                                onClick={() => { 
+                                    localStorage.removeItem('auth_token'); 
+                                    localStorage.removeItem('user_role'); 
+                                    localStorage.removeItem('user_name'); 
+                                    localStorage.removeItem('user_email'); 
+                                    window.location.href = '/'; 
+                                }}
+                                title={!isSidebarOpen ? 'Keluar' : ''}
+                                className={`w-full flex items-center rounded-2xl text-red-400 hover:bg-red-500/10 transition-all duration-300
+                                    ${isSidebarOpen ? 'px-4 py-3.5 gap-4' : 'justify-center p-4'}`}
+                            >
+                                <span className="text-xl flex-shrink-0">🚪</span>
+                                <span className={`text-sm font-bold whitespace-nowrap transition-all duration-500 ${isSidebarOpen ? 'opacity-100 max-w-[200px]' : 'opacity-0 max-w-0 overflow-hidden'}`}>
+                                    Keluar
+                                </span>
+                            </button>
+                        </div>
+                    </aside>
+                )}
+
+                <main className="flex-1 flex flex-col">
+                    {loading ? (
+                        <div className="p-6 space-y-8 max-w-7xl mx-auto w-full">
+                             {/* Progress Info */}
+                             <div className="flex flex-col items-center justify-center py-12 space-y-5">
+                                <div className="relative">
+                                    <div className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300 animate-pulse">
+                                        {loadingProgress}%
+                                    </div>
+                                    <div className="absolute -inset-4 bg-cyan-400/10 blur-xl rounded-full -z-10 animate-pulse" />
+                                </div>
+                                <div className="flex flex-col items-center gap-3">
+                                    <p className="text-sm text-gray-500 font-bold uppercase tracking-[0.3em] animate-pulse">Menyiapkan Dashboard...</p>
+                                    <div className={`w-80 h-2.5 rounded-full overflow-hidden border shadow-inner transition-colors ${isDark ? 'bg-black/60 border-white/10' : 'bg-gray-200 border-gray-300'}`}>
+                                        <div 
+                                            className="h-full bg-gradient-to-r from-blue-500 via-cyan-300 to-cyan-500 transition-all duration-700 ease-out shadow-[0_0_20px_rgba(6,182,212,0.8)]" 
+                                            style={{ width: `${loadingProgress}%` }}
+                                        />
+                                    </div>
+                                </div>
+                             </div>
+
+                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 opacity-40">
+                               <div className="h-48 bg-gray-700/10 animate-pulse rounded-[2.5rem] border border-white/5" />
+                               <div className="h-48 bg-gray-700/10 animate-pulse rounded-[2.5rem] border border-white/5" />
+                               <div className="h-48 bg-gray-700/10 animate-pulse rounded-[2.5rem] border border-white/5" />
+                             </div>
+                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 opacity-40">
+                               <div className="h-64 bg-gray-700/10 animate-pulse rounded-[2.5rem] border border-white/5" />
+                               <div className="h-64 bg-gray-700/10 animate-pulse rounded-[2.5rem] border border-white/5" />
+                               <div className="h-64 bg-gray-700/10 animate-pulse rounded-[2.5rem] border border-white/5" />
+                             </div>
+                        </div>
+                    ) : !dashboardData ? (
+                        <div className="flex-1 flex items-center justify-center p-10 text-center">
+                            <div>
+                                <div className="text-4xl mb-4">🌊</div>
+                                <p className="text-red-400 font-bold">Gagal terhubung ke server</p>
+                                <p className="text-gray-500 text-sm mt-2">Pastikan backend sudah berjalan</p>
+                            </div>
+                        </div>
+                    ) : userRole === 'admin' ? (
+                        <AdminDashboard isDark={isDark} />
                     ) : (
                     <>
                 {activeMenu === 0 && (
@@ -436,11 +456,11 @@ export default function DashboardPage() {
                             </div>
                             <div className="flex justify-around mb-8">
                                 <div className="text-center border-r border-white/10 w-1/2">
-                                    <p className="text-3xl font-bold text-cyan-400 mb-1">{dashboardData.content_stats?.submitted || 0}</p>
+                                    <p className="text-3xl font-bold text-cyan-400 mb-1">{dashboardData?.content_stats?.submitted || 0}</p>
                                     <p className="text-xs text-gray-500">Diajukan</p>
                                 </div>
                                 <div className="text-center w-1/2">
-                                    <p className="text-3xl font-bold text-cyan-400 mb-1">{dashboardData.content_stats?.approved || 0}</p>
+                                    <p className="text-3xl font-bold text-cyan-400 mb-1">{dashboardData?.content_stats?.approved || 0}</p>
                                     <p className="text-xs text-gray-500">Disetujui</p>
                                 </div>
                             </div>
@@ -591,7 +611,7 @@ export default function DashboardPage() {
                             <p className="text-gray-400">Peringkat poin XP tertinggi dari seluruh penjelajah laut.</p>
                         </div>
                         <div className={`rounded-3xl p-6 border ${isDark ? 'bg-[#0B1221]/80 backdrop-blur-md border-white/5 shadow-2xl' : 'bg-white border-gray-200 shadow-xl'} space-y-4`}>
-                            {dashboardData.leaderboard?.map((user: any, idx: number) => (
+                            {dashboardData?.leaderboard?.map((user: any, idx: number) => (
                                 <div key={idx} className={`flex items-center justify-between p-5 rounded-2xl border transition-all hover:scale-[1.01] ${user.is_me ? 'bg-gradient-to-r from-blue-900/40 to-cyan-900/40 border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.15)]' : (isDark ? 'bg-white/5 border-white/5 hover:bg-white/10' : 'bg-gray-50 border-gray-100')}`}>
                                     <div className="flex items-center gap-5">
                                         <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-black text-xl shadow-lg ${user.rank === 1 ? 'bg-gradient-to-br from-yellow-300 to-amber-500 text-black' : user.rank === 2 ? 'bg-gradient-to-br from-slate-300 to-gray-400 text-black' : user.rank === 3 ? 'bg-gradient-to-br from-orange-300 to-amber-700 text-white' : 'bg-white/10 text-white border border-white/10'}`}>
@@ -609,7 +629,7 @@ export default function DashboardPage() {
                                     </div>
                                 </div>
                             ))}
-                            {(!dashboardData.leaderboard || dashboardData.leaderboard.length === 0) && (
+                            {(!dashboardData?.leaderboard || dashboardData?.leaderboard.length === 0) && (
                                 <div className="text-center py-10 opacity-50">Belum ada data klasemen.</div>
                             )}
                         </div>
@@ -755,22 +775,24 @@ export default function DashboardPage() {
                 )}
                 </>
                 )}
-                </div>
 
-                {/* FOOTER */}
-                <footer className={`mt-auto px-6 py-4 border-t text-center ${isDark ? "border-white/5" : "border-gray-200"}`}>
-                    <p className={`text-[10px] tracking-[0.4em] font-bold uppercase ${isDark ? "text-gray-600" : "text-gray-400"}`}>
-                        © 2026 Tim DiveXplore-3D · Teknologi Informasi UNY
-                    </p>
-                </footer>
-            </main>
+                    {/* FOOTER - Sembunyikan jika Admin (Admin punya footer detail sendiri) */}
+                    {userRole !== 'admin' && (
+                        <footer className={`mt-auto px-6 py-4 border-t text-center ${isDark ? "border-white/5" : "border-gray-200"}`}>
+                            <p className={`text-[10px] tracking-[0.4em] font-bold uppercase ${isDark ? "text-gray-600" : "text-gray-400"}`}>
+                                © 2026 Tim DiveXplore-3D · Teknologi Informasi UNY
+                            </p>
+                        </footer>
+                    )}
+                </main>
+            </div>
 
             {/* Floating Bantuan Button - hanya untuk user biasa */}
             {userRole !== 'admin' && (
                 <button
                     onClick={() => setForceTour(true)}
                     title="Tampilkan panduan tour"
-                    className="fixed bottom-6 right-6 z-[9999] flex items-center gap-2 px-4 py-3 rounded-full bg-cyan-500 hover:bg-cyan-400 text-black font-black text-sm shadow-2xl shadow-cyan-500/40 transition-all hover:-translate-y-1 hover:scale-105 active:scale-95"
+                    className="fixed bottom-6 right-6 z-40 flex items-center gap-2 px-4 py-3 rounded-full bg-cyan-500 hover:bg-cyan-400 text-black font-black text-sm shadow-2xl shadow-cyan-500/40 transition-all hover:-translate-y-1 hover:scale-105 active:scale-95"
                 >
                     <span className="text-base">💡</span>
                     <span className="hidden sm:inline">Bantuan</span>
