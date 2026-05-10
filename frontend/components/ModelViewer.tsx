@@ -37,10 +37,27 @@ class ModelErrorBoundary extends Component<
 }
 
 function Loader() {
+  const [progress, setProgress] = React.useState(0);
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      setProgress(prev => {
+        if (prev >= 90) return prev;
+        return prev + Math.random() * 10;
+      });
+    }, 500);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <Html center>
-      <div className="text-white font-bold bg-black/50 px-4 py-2 rounded-xl backdrop-blur-md whitespace-nowrap">
-        Memuat Aset 3D... ⏳
+      <div className="text-white font-bold bg-black/50 px-6 py-4 rounded-xl backdrop-blur-md text-center" style={{width: '280px'}}>
+        <div className="mb-2">Memuat Aset 3D... {Math.round(progress)}%</div>
+        <div className="w-full bg-white/20 rounded-full h-3">
+          <div 
+            className="bg-cyan-400 h-3 rounded-full transition-all duration-500"
+            style={{width: `${progress}%`}}
+          ></div>
+        </div>
       </div>
     </Html>
   );
