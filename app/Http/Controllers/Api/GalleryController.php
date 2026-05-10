@@ -27,7 +27,7 @@ class GalleryController extends Controller
             "data" => $contents
         ]);
     }
-        public function paginated(Request $request): JsonResponse
+    public function paginated(Request $request): JsonResponse
     {
         $perPage = $request->input('per_page', 12);
 
@@ -48,29 +48,4 @@ class GalleryController extends Controller
             ]
         ]);
     }
-        public function store(Request $request): JsonResponse 
-        {
-            $request->validate([
-                'title' => 'required|string|max:255',
-                'file' => 'required|file|mimes: jpg,jpeg,png,pdf|max:102400',
-            ]);
-            $file = $request->file('file');
-            $path = $file->store('gallery','public');
-
-            $content = Content::create([
-                'title'=> $request->title,
-                'file_path' => $path,
-                'status' => 'pending'
-            ]);
-
-                return response()->json([
-                    "status" => "success",
-                    "message" => "Upload Berhasil",
-                    "data" => $content
-                ]);
-
-        }
-        
-    }
- 
-
+}
