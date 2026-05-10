@@ -168,7 +168,7 @@ export default function AkademiPage() {
     const pathname = usePathname();
     const { isDark, toggleTheme } = useTheme();
     const [activeTab, setActiveTab] = useState('lms');
-    const [active3DTab, setActive3DTab] = useState('ikan');
+    const [active3DTab, setActive3DTab] = useState('ekosistem');
     const [currentLMSIndex, setCurrentLMSIndex] = useState(0);
     const scrollRef = useRef<HTMLDivElement>(null);
 
