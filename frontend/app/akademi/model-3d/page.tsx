@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import dynamic from 'next/dynamic';
+import { Moon, Sun, CoralIcon, Fish, Info, MousePointer2, Mouse, ZoomIn, Package } from '../../../components/DiveIcons';
 
 const ModelViewer = dynamic(() => import('../../../components/ModelViewer'), { ssr: false });
 import { useTheme } from '../../../lib/useTheme';
@@ -11,12 +12,12 @@ import { useTheme } from '../../../lib/useTheme';
 const models = [
   {
     key: 'terumbu-karang',
-    badge: '🪸 Spesimen 3D Interaktif',
+    badge: 'Spesimen 3D Interaktif',
     badgeColor: 'cyan',
     title: 'Model Terumbu Karang',
     desc: 'Terumbu karang adalah "hutan hujan laut" yang menjadi rumah bagi 25% spesies laut meski hanya menutupi kurang dari 1% dasar samudra. Organisme ini tumbuh sangat lambat, hanya beberapa sentimeter per tahun.',
     url: '/models/usnm_74016-100k-2048-gltf_std/usnm_74016-100k-2048.gltf',
-    credit: '📦 USNM 74016 — Smithsonian 3D Digitization',
+    credit: 'USNM 74016 — Smithsonian 3D Digitization',
     stats: {
       "Tipe": "Invertebrata",
       "Habitat": "Perairan Dangkal",
@@ -25,12 +26,12 @@ const models = [
   },
   {
     key: 'clownfish',
-    badge: '🐟 Spesimen 3D Interaktif',
+    badge: 'Spesimen 3D Interaktif',
     badgeColor: 'orange',
     title: 'Model Ikan Badut (Clownfish)',
     desc: 'Ikan badut kebal terhadap sengatan anemon laut berkat lapisan lendir khusus di tubuhnya. Mereka hidup berdampingan secara harmonis; anemon memberikan perlindungan, dan ikan badut membersihkan parasit dari anemon.',
     url: '/models/ClownFish3D/ClownFish3d.glb',
-    credit: '📦 Koleksi Divexplore 3D',
+    credit: 'Koleksi Divexplore 3D',
     stats: {
       "Nama Ilmiah": "Amphiprioninae",
       "Habitat": "Terumbu Karang",
@@ -103,7 +104,7 @@ export default function Model3DPage() {
           title={isDark ? 'Mode Gelap' : 'Mode Terang'}
           className={`w-10 h-10 rounded-full flex items-center justify-center transition-all text-base ${isDark ? 'bg-white/10 hover:bg-white/20 border border-white/10' : 'bg-white hover:bg-gray-100 border border-gray-200 shadow-sm'}`}
         >
-          {isDark ? '🌙' : '☀️'}
+          {isDark ? <Moon size={18} /> : <Sun size={18} />}
         </button>
       </nav>
 
@@ -128,7 +129,7 @@ export default function Model3DPage() {
           <div className="flex items-start justify-between gap-6 flex-wrap">
             <div className="max-w-2xl">
               <div className={`inline-block px-4 py-1.5 mb-6 rounded-full border text-[11px] font-black tracking-[0.2em] uppercase ${isDark ? 'bg-cyan-500/15 border-cyan-400/30 text-cyan-300' : 'bg-cyan-500/10 border-cyan-400/20 text-cyan-600'}`}>
-                🪸 Eksplorasi 3D Interaktif
+                <CoralIcon size={14} className="inline mr-1" /> Eksplorasi 3D Interaktif
               </div>
               <h1 className="text-5xl md:text-7xl font-black mb-6 leading-[1.05] tracking-tight">
                 Model 3D{' '}
@@ -197,7 +198,7 @@ export default function Model3DPage() {
               {/* Floating Info Panel - Glassmorphism */}
               <div className="absolute top-6 left-6 w-64 p-5 rounded-2xl bg-black/60 backdrop-blur-xl border border-white/10 shadow-2xl opacity-0 translate-x-[-20px] group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500 pointer-events-none hidden md:block">
                 <h4 className="text-white font-bold text-sm mb-4 uppercase tracking-widest flex items-center gap-2 border-b border-white/10 pb-3">
-                  <span>ℹ️</span> Info Spesimen
+                  <Info size={14} /> Info Spesimen
                 </h4>
                 <div className="space-y-4">
                   {Object.entries(model.stats).map(([key, value]) => (
@@ -211,14 +212,14 @@ export default function Model3DPage() {
 
               {/* Tooltip hint di tengah bawah */}
               <div className="absolute bottom-6 left-1/2 -translate-x-1/2 px-6 py-3 rounded-full bg-black/60 border border-white/10 text-xs font-bold text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity duration-500 backdrop-blur-md pointer-events-none flex items-center gap-2 shadow-xl">
-                <span>👆</span> Geser untuk memutar atau zoom
+                <MousePointer2 size={14} /> Geser untuk memutar atau zoom
               </div>
             </div>
 
             <div className={`mt-4 flex items-center gap-3 text-xs ${isDark ? 'text-gray-600' : 'text-gray-400'}`}>
-              <span>🖱️ Klik + Tarik untuk memutar</span>
+              <span className="flex items-center gap-1"><Mouse size={13} /> Klik + Tarik untuk memutar</span>
               <span className="w-px h-4 bg-white/10" />
-              <span>🔍 Scroll untuk zoom</span>
+              <span className="flex items-center gap-1"><ZoomIn size={13} /> Scroll untuk zoom</span>
               <span className="w-px h-4 bg-white/10" />
               <span>{model.credit}</span>
             </div>

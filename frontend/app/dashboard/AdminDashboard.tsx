@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { getModules } from '../../lib/api';
+import { BookOpen, FileText, Image, Clock, Trash2, Sparkles, Users } from '../../components/DiveIcons';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -24,7 +25,7 @@ export default function AdminDashboard({ isDark }: { isDark: boolean }) {
   // Form states
   const [newTitle, setNewTitle] = useState('');
   const [newDesc, setNewDesc] = useState('');
-  const [newIcon, setNewIcon] = useState('📦');
+  const [newIcon, setNewIcon] = useState('package');
   const [isAdminProcessing, setIsAdminProcessing] = useState(false);
   const [editingModuleSlug, setEditingModuleSlug] = useState<string | null>(null);
 
@@ -117,7 +118,7 @@ export default function AdminDashboard({ isDark }: { isDark: boolean }) {
 
     setNewTitle('');
     setNewDesc('');
-    setNewIcon('📦');
+    setNewIcon('package');
     setEditingModuleSlug(null);
     setIsAdminProcessing(false);
   };
@@ -139,7 +140,7 @@ export default function AdminDashboard({ isDark }: { isDark: boolean }) {
     setManageCategory(category);
     setNewTitle('');
     setNewDesc('');
-    setNewIcon('📦');
+    setNewIcon('package');
     setEditingModuleSlug(null);
     if (category === 'Quiz') {
       setSelectedQuizModule(null);
@@ -252,12 +253,12 @@ export default function AdminDashboard({ isDark }: { isDark: boolean }) {
               </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[
-                { label: 'Modul', icon: '📚', desc: 'Atur materi pembelajaran', color: 'from-blue-600 to-cyan-500' },
-                { label: 'Quiz', icon: '📝', desc: 'Kelola bank soal kuis', color: 'from-purple-600 to-pink-500' },
-                { label: 'User', icon: '👥', desc: 'Manajemen pengguna', color: 'from-emerald-500 to-teal-400' },
-                { label: 'Galeri', icon: '🖼️', desc: 'Moderasi karya digital', color: 'from-orange-500 to-yellow-400' }
-              ].map((item, idx) => (
+              {([
+                { label: 'Modul', icon: <BookOpen size={20} />, desc: 'Atur materi pembelajaran', color: 'from-blue-600 to-cyan-500' },
+                { label: 'Quiz', icon: <FileText size={20} />, desc: 'Kelola bank soal kuis', color: 'from-purple-600 to-pink-500' },
+                { label: 'User', icon: <Users size={20} />, desc: 'Manajemen pengguna', color: 'from-emerald-500 to-teal-400' },
+                { label: 'Galeri', icon: <Image size={20} />, desc: 'Moderasi karya digital', color: 'from-orange-500 to-yellow-400' }
+              ] as { label: string; icon: React.ReactNode; desc: string; color: string }[]).map((item, idx) => (
                 <div
                   key={idx}
                   onClick={() => openManageForm(item.label)}
@@ -437,7 +438,7 @@ export default function AdminDashboard({ isDark }: { isDark: boolean }) {
                       </select>
                     </div>
                     <button onClick={handleSaveQuizQuestion} disabled={isAdminProcessing} className="px-6 py-3 rounded-xl font-bold text-white bg-gradient-to-r from-pink-600 to-purple-500 hover:scale-105 transition-transform flex items-center gap-2">
-                      {isAdminProcessing ? '⏳ Menyimpan...' : '+ Simpan Soal'}
+                      {isAdminProcessing ? <><Clock size={18} /> Menyimpan...</> : '+ Simpan Soal'}
                     </button>
                   </div>
                 </div>
@@ -451,7 +452,7 @@ export default function AdminDashboard({ isDark }: { isDark: boolean }) {
                     ) : (
                       existingQuestions.map((q: any) => (
                         <div key={q.id} className="p-5 rounded-2xl bg-white/5 border border-white/10 relative group">
-                          <button onClick={() => handleDeleteQuizQuestion(q.id)} className="absolute top-4 right-4 w-8 h-8 rounded-lg bg-red-500/10 text-red-500 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500 hover:text-white">🗑️</button>
+                          <button onClick={() => handleDeleteQuizQuestion(q.id)} className="absolute top-4 right-4 w-8 h-8 rounded-lg bg-red-500/10 text-red-500 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500 hover:text-white"><Trash2 size={16} /></button>
                           <p className="font-bold text-white mb-4 pr-10">{q.question}</p>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
                             <div className={`p-3 rounded-xl border ${q.correct_answer === 'A' ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-300' : 'bg-black/30 border-white/5 text-gray-400'}`}>A. {q.option_a}</div>
@@ -490,7 +491,7 @@ export default function AdminDashboard({ isDark }: { isDark: boolean }) {
               <div className="py-20 text-center text-gray-400">Memuat data...</div>
             ) : pendingGallery.length === 0 ? (
               <div className="py-20 text-center">
-                <div className="text-6xl mb-4">✨</div>
+                <div className="mb-4"><Sparkles size={20} /></div>
                 <h3 className="text-xl font-bold text-white mb-2">Semua Bersih!</h3>
                 <p className="text-gray-500">Tidak ada karya yang menunggu persetujuan saat ini.</p>
                 <button onClick={loadPendingGallery} className="mt-6 px-5 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 text-sm font-bold transition-all">
