@@ -321,7 +321,7 @@ export default function HomePage() {
               </div>
 
               <div className="relative aspect-[16/10] flex items-center justify-center bg-black/40 overflow-hidden">
-                <img src="/images/hero-bg.jpg" alt="Trailer" className="absolute inset-0 w-full h-full object-cover opacity-70" />
+                <img src="https://img.youtube.com/vi/ufEgoTFJtPc/maxresdefault.jpg" alt="Trailer" className="absolute inset-0 w-full h-full object-cover opacity-80" />
 
                 <button
                   onClick={() => setShowTrailer(true)}
@@ -334,10 +334,10 @@ export default function HomePage() {
 
                 <div className="absolute bottom-0 left-0 right-0 z-10">
                   <div className="h-1 bg-white/20">
-                    <div className="h-full w-1/3 bg-blue-500"></div>
+                    <div className="h-full w-0 bg-blue-500"></div>
                   </div>
                   <div className="px-4 py-3 flex items-center gap-2 bg-black/60 backdrop-blur-md">
-                    <span className="text-white text-xs font-medium">00:00 / 01:10</span>
+                    <span className="text-white text-xs font-medium">00:00 / 01:58</span>
                     <div className="ml-auto flex items-center gap-4">
                       <button className="text-white hover:text-blue-300 transition-colors"><Volume2 size={18} /></button>
                       <button className="text-white hover:text-blue-300 text-lg transition-colors">⛶</button>
@@ -437,16 +437,15 @@ export default function HomePage() {
               <p className="text-white text-sm font-semibold flex items-center gap-2"><Clapperboard size={20} /> Trailer DIVEXPLORE</p>
               <button onClick={() => setShowTrailer(false)} className="text-gray-400 hover:text-white transition-colors">✕</button>
             </div>
-            <div className="aspect-video bg-gray-900 flex items-center justify-center text-gray-500 text-sm">
-              <video
-                src="/videos/trailer.mp4"
-                controls
-                autoPlay
-                className="w-full h-full object-cover"
-                poster="/images/hero-bg.jpg"
-              >
-                Browser Anda tidak mendukung tag video HTML5.
-              </video>
+            <div className="aspect-video bg-black">
+              <iframe
+                className="w-full h-full"
+                src="https://www.youtube.com/embed/ufEgoTFJtPc?autoplay=1"
+                title="Divexplore 3D Trailer"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
             </div>
           </div>
         </div>

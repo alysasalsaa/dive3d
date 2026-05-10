@@ -19,17 +19,14 @@ export default function TutorialPage() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState<string | null>(null);
-  const [watchedVideos, setWatchedVideos] = useState<Set<number>>(() => {
-    if (typeof window === 'undefined') return new Set();
-    const saved = localStorage.getItem('tutorial_watched');
-    return saved ? new Set<number>(JSON.parse(saved)) : new Set<number>();
-  });
+  const [watchedVideos, setWatchedVideos] = useState<Set<number>>(new Set());
 
   const markWatched = (id: number) => {
+    const userEmail = (localStorage.getItem('user_email') || '').toLowerCase();
     setWatchedVideos(prev => {
       const next = new Set(prev);
       next.add(id);
-      localStorage.setItem('tutorial_watched', JSON.stringify([...next]));
+      localStorage.setItem(`tutorial_watched_${userEmail}`, JSON.stringify([...next]));
       return next;
     });
   };
@@ -42,9 +39,16 @@ export default function TutorialPage() {
 
   React.useEffect(() => {
     const role = (localStorage.getItem('user_role') || '').toLowerCase();
+    const email = (localStorage.getItem('user_email') || '').toLowerCase();
     setIsAdmin(role === 'admin');
     setIsLoggedIn(!!localStorage.getItem('auth_token'));
     setUserName(localStorage.getItem('user_name'));
+
+    // Load watched videos spesifik per user
+    const saved = localStorage.getItem(`tutorial_watched_${email}`);
+    if (saved) {
+      setWatchedVideos(new Set(JSON.parse(saved)));
+    }
   }, []);
 
   const categories = ['Semua', 'Fotografi', 'Videografi', 'Storytelling', 'Editing', 'Etika'];

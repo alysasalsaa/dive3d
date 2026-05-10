@@ -30,6 +30,7 @@ export default function DashboardPage() {
     const [watchedTutorialCount, setWatchedTutorialCount] = useState(0);
     const [claimedCertificates, setClaimedCertificates] = useState<{type: string; label: string; track: string; date: string}[]>([]);
     const [forceTour, setForceTour] = useState(false);
+    const [showCertHistoryModal, setShowCertHistoryModal] = useState(false);
     const [loadingProgress, setLoadingProgress] = useState(0);
 
     useEffect(() => {
@@ -44,12 +45,12 @@ export default function DashboardPage() {
 
         const userEmail = (localStorage.getItem('user_email') || '').toLowerCase();
 
-        // Baca tutorial yang sudah ditonton (selalu, untuk semua user)
-        const watched = localStorage.getItem('tutorial_watched');
+        // Baca tutorial yang sudah ditonton (spesifik per user)
+        const watched = localStorage.getItem(`tutorial_watched_${userEmail}`);
         if (watched) setWatchedTutorialCount(JSON.parse(watched).length);
 
-        // Baca riwayat sertifikat yang sudah diklaim
-        const claimed = localStorage.getItem('claimed_certificates');
+        // Baca riwayat sertifikat yang sudah diklaim (spesifik per user)
+        const claimed = localStorage.getItem(`claimed_certificates_${userEmail}`);
         if (claimed) setClaimedCertificates(JSON.parse(claimed));
 
         // TEST: vinzcan11 langsung semua selesai
@@ -138,12 +139,14 @@ export default function DashboardPage() {
     const completedQuizzesCount = dashboardData?.recent_quizzes?.filter((q: any) => q.score === 100).length || 0;
 
     const claimCertificate = (type: string, label: string, track: string, url: string) => {
-        const existing = JSON.parse(localStorage.getItem('claimed_certificates') || '[]');
+        const userEmail = (localStorage.getItem('user_email') || '').toLowerCase();
+        const storageKey = `claimed_certificates_${userEmail}`;
+        const existing = JSON.parse(localStorage.getItem(storageKey) || '[]');
         const alreadyClaimed = existing.some((c: any) => c.type === type);
         if (!alreadyClaimed) {
             const newEntry = { type, label, track, date: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) };
             const updated = [...existing, newEntry];
-            localStorage.setItem('claimed_certificates', JSON.stringify(updated));
+            localStorage.setItem(storageKey, JSON.stringify(updated));
             setClaimedCertificates(updated);
         }
         window.location.href = url;
@@ -568,9 +571,12 @@ export default function DashboardPage() {
                                 <p className="text-xs text-gray-500 mt-0.5">Sertifikat yang telah diperoleh</p>
                             </div>
                         </div>
-                        <Link href="/dashboard" className="text-xs text-cyan-400 hover:text-cyan-300 font-medium flex items-center gap-1">
+                        <button 
+                            onClick={() => setShowCertHistoryModal(true)}
+                            className="text-xs text-cyan-400 hover:text-cyan-300 font-medium flex items-center gap-1 cursor-pointer"
+                        >
                             Lihat Semua ➔
-                        </Link>
+                        </button>
                     </div>
                     
                     {/* Riwayat Sertifikat content */}
@@ -791,6 +797,60 @@ export default function DashboardPage() {
                     )}
                 </main>
             </div>
+
+            {/* MODAL: RIWAYAT SERTIFIKAT LENGKAP */}
+            {showCertHistoryModal && (
+                <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-black/80 backdrop-blur-md" onClick={() => setShowCertHistoryModal(false)}></div>
+                    <div className={`relative z-10 w-full max-w-2xl rounded-3xl border shadow-2xl animate-in zoom-in-95 duration-300 ${isDark ? 'bg-[#0B1221] border-white/10' : 'bg-white border-gray-200'}`}>
+                        <div className="flex items-center justify-between p-6 border-b border-white/5">
+                            <div className="flex items-center gap-3">
+                                <div className="text-2xl">📜</div>
+                                <div>
+                                    <h2 className="text-xl font-bold">Semua Sertifikat</h2>
+                                    <p className="text-xs text-gray-500">Daftar lengkap sertifikat yang telah Anda klaim</p>
+                                </div>
+                            </div>
+                            <button onClick={() => setShowCertHistoryModal(false)} className="text-gray-500 hover:text-white transition-colors">
+                                <X size={20} />
+                            </button>
+                        </div>
+
+                        <div className="p-6 max-h-[60vh] overflow-y-auto space-y-4">
+                            {claimedCertificates.length === 0 ? (
+                                <div className="text-center py-10">
+                                    <p className="text-gray-500 italic">Belum ada sertifikat yang diklaim.</p>
+                                </div>
+                            ) : (
+                                claimedCertificates.map((cert) => (
+                                    <div key={cert.type} className={`flex flex-col sm:flex-row sm:items-center justify-between p-5 rounded-2xl border ${isDark ? 'bg-white/5 border-white/5' : 'bg-gray-50 border-gray-200'}`}>
+                                        <div className="flex items-center gap-4 mb-4 sm:mb-0">
+                                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl ${cert.type === 'konservasi' ? 'bg-cyan-500/20 text-cyan-400' : 'bg-purple-500/20 text-purple-400'}`}>
+                                                <Scroll size={24} />
+                                            </div>
+                                            <div>
+                                                <p className="font-bold text-base">{cert.label}</p>
+                                                <p className="text-xs text-gray-500">Jalur: {cert.track} · {cert.date}</p>
+                                            </div>
+                                        </div>
+                                        <button
+                                            onClick={() => window.location.href = `/lms?track=${cert.type === 'konservasi' ? 'konservasi-laut' : 'konten-digital'}&module=all&action=certificate`}
+                                            className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all shadow-lg ${cert.type === 'konservasi' ? 'bg-cyan-500 text-white shadow-cyan-500/20 hover:bg-cyan-400' : 'bg-purple-500 text-white shadow-purple-500/20 hover:bg-purple-400'}`}>
+                                            Download (PDF)
+                                        </button>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+
+                        <div className={`p-6 border-t flex justify-center ${isDark ? 'border-white/5' : 'border-gray-100'}`}>
+                            <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold italic">
+                                Teruslah belajar untuk membuka sertifikat lainnya!
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Floating Bantuan Button - hanya untuk user biasa */}
             {userRole !== 'admin' && (
