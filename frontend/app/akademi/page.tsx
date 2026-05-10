@@ -13,6 +13,7 @@ const ModelViewer = dynamic(() => import('../../components/ModelViewer'), { ssr:
 
 const getModelUrl = (tab: string) => {
     switch(tab) {
+        case 'ekosistem': return 'https://drive.google.com/uc?export=download&id=13oNcbX4MyGTGHVirKpy9sadW2wKeT3En';
         case 'ikan': return '/models/ClownFish3D/ClownFish3d.glb';
         case 'karang': return '/models/usnm_74016-100k-2048-gltf_std/usnm_74016-100k-2048.gltf';
         case 'tridacna': return '/models/Tridacna/TridacnaAhnaf3D.glb';
