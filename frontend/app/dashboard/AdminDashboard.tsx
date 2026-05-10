@@ -16,7 +16,7 @@ type ModuleData = {
   icon: string;
 };
 
-export default function AdminDashboard() {
+export default function AdminDashboard({ isDark }: { isDark: boolean }) {
   const [view, setView] = useState<ViewState>('admin_dashboard');
   const [manageCategory, setManageCategory] = useState('');
   const [modules, setModules] = useState<ModuleData[]>([]);
@@ -114,7 +114,7 @@ export default function AdminDashboard() {
         setModules(updated);
       }
     } catch (e) { console.error(e); }
-    
+
     setNewTitle('');
     setNewDesc('');
     setNewIcon('📦');
@@ -201,16 +201,55 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="w-full flex items-center justify-center relative min-h-[80vh]">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-500/10 blur-[120px] rounded-full pointer-events-none" />
+    <div className="w-full flex flex-col items-center justify-start pt-20 pb-0 relative min-h-screen">
+      {/* Processing Overlay */}
+      {isAdminProcessing && (
+        <div className="fixed inset-0 z-[10000] flex flex-col items-center justify-center bg-black/80 backdrop-blur-xl animate-in fade-in duration-300">
+          <div className="relative mb-8">
+            {/* Outer Glow */}
+            <div className="absolute inset-0 bg-cyan-500/20 blur-3xl rounded-full animate-pulse" />
+
+            {/* Spinner */}
+            <div className="w-24 h-24 border-[6px] border-white/5 border-t-cyan-400 rounded-full animate-spin shadow-[0_0_30px_rgba(34,211,238,0.3)]" />
+
+            {/* Center Icon/Percent */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="text-2xl animate-bounce">⚡</span>
+            </div>
+          </div>
+
+          <div className="flex flex-col items-center gap-4">
+            <h3 className="text-xl font-black text-white tracking-widest uppercase animate-pulse">Sedang Memproses</h3>
+            <p className="text-gray-400 font-medium text-sm">Mohon tunggu sebentar, perubahan sedang dikirim ke server...</p>
+
+            {/* Mini Progress Bar for feel */}
+            <div className="w-64 h-1.5 bg-white/10 rounded-full overflow-hidden mt-2">
+              <div className="h-full bg-gradient-to-r from-blue-500 to-cyan-400 animate-shimmer" style={{ width: '100%', backgroundSize: '200% 100%' }} />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Background Enhancements */}
+      <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] ${isDark ? 'bg-blue-500/10' : 'bg-blue-400/10'} blur-[140px] rounded-full pointer-events-none`} />
+      {!isDark && (
+        <>
+          <div className="absolute top-20 left-10 w-64 h-64 bg-cyan-200/30 blur-[100px] rounded-full pointer-events-none" />
+          <div className="absolute bottom-40 right-10 w-80 h-80 bg-blue-100/40 blur-[120px] rounded-full pointer-events-none" />
+        </>
+      )}
 
       <div className="relative z-10 w-full max-w-5xl">
         {/* VIEW: ADMIN DASHBOARD */}
         {view === 'admin_dashboard' && (
           <div className="animate-in fade-in slide-in-from-bottom-8 duration-700">
             <div className="text-center mb-12">
-              <h1 className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300 mb-4 tracking-tight drop-shadow-sm">Pusat Kendali Admin</h1>
-              <p className="text-gray-400 text-lg max-w-2xl mx-auto font-medium">Kelola seluruh konten platform, moderasi karya pengguna, dan atur kuis dengan mudah.</p>
+              <h1 className={`text-4xl md:text-5xl font-black mb-4 tracking-tight drop-shadow-sm ${isDark ? 'text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300' : 'text-blue-950'}`}>
+                Pusat Kendali Admin
+              </h1>
+              <p className={`text-lg max-w-2xl mx-auto font-medium ${isDark ? 'text-gray-400' : 'text-blue-900/60'}`}>
+                Kelola seluruh konten platform, moderasi karya pengguna, dan atur kuis dengan mudah.
+              </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {[
@@ -219,13 +258,25 @@ export default function AdminDashboard() {
                 { label: 'User', icon: '👥', desc: 'Manajemen pengguna', color: 'from-emerald-500 to-teal-400' },
                 { label: 'Galeri', icon: '🖼️', desc: 'Moderasi karya digital', color: 'from-orange-500 to-yellow-400' }
               ].map((item, idx) => (
-                <div key={idx} onClick={() => openManageForm(item.label)} className="bg-[#000814] border border-white/5 rounded-[32px] p-6 hover:scale-105 hover:-translate-y-2 transition-all duration-300 cursor-pointer shadow-lg group relative overflow-hidden">
-                  <div className={`absolute inset-0 opacity-0 group-hover:opacity-10 bg-gradient-to-br ${item.color} transition-opacity duration-300`} />
-                  <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${item.color} flex items-center justify-center text-3xl mb-6 shadow-lg transform group-hover:rotate-12 transition-transform duration-300`}>
+                <div
+                  key={idx}
+                  onClick={() => openManageForm(item.label)}
+                  className={`border rounded-[40px] p-8 hover:scale-105 hover:-translate-y-2 transition-all duration-500 cursor-pointer shadow-2xl group relative overflow-hidden flex flex-col items-center text-center
+                    ${isDark ? 'bg-[#000814] border-white/5 shadow-blue-900/10' : 'bg-white border-blue-50 shadow-blue-500/10'}
+                  `}
+                >
+                  <div className={`absolute inset-0 bg-gradient-to-br ${item.color} opacity-0 group-hover:opacity-[0.03] transition-opacity duration-500`} />
+
+                  <div className={`w-20 h-20 rounded-3xl flex items-center justify-center text-3xl mb-6 shadow-xl bg-gradient-to-br ${item.color} text-white transform group-hover:rotate-12 transition-transform duration-500`}>
                     {item.icon}
                   </div>
-                  <h3 className="text-xl font-bold text-white mb-2">{item.label}</h3>
-                  <p className="text-sm text-gray-500 font-medium leading-relaxed">{item.desc}</p>
+
+                  <h3 className={`text-2xl font-black mb-2 tracking-tight ${isDark ? 'text-white' : 'text-blue-950'}`}>{item.label}</h3>
+                  <p className={`text-sm font-medium ${isDark ? 'text-gray-500' : 'text-blue-900/50'}`}>{item.desc}</p>
+
+                  <div className="mt-6 flex items-center gap-2 text-cyan-500 font-bold text-xs uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-4 group-hover:translate-y-0">
+                    Kelola Sekarang <span>→</span>
+                  </div>
                 </div>
               ))}
             </div>
@@ -234,7 +285,9 @@ export default function AdminDashboard() {
 
         {/* VIEW: ADMIN EDIT DATA */}
         {view === 'admin_edit_data' && (
-          <div className="w-full max-w-2xl p-8 rounded-[32px] bg-[#000814] border border-cyan-500/30 shadow-[0_0_50px_-12px_rgba(6,182,212,0.15)] relative z-10 animate-in slide-in-from-bottom-8 duration-500 max-h-[85vh] overflow-y-auto custom-scrollbar">
+          <div className={`w-full max-w-2xl p-8 rounded-[40px] border relative z-10 animate-in slide-in-from-bottom-8 duration-500 max-h-[85vh] overflow-y-auto custom-scrollbar shadow-2xl
+            ${isDark ? 'bg-[#000814] border-cyan-500/30 shadow-blue-950/20' : 'bg-white border-blue-100 shadow-blue-500/10'}
+          `}>
             {isAdminProcessing ? (
               <div className="py-24 flex flex-col items-center justify-center text-center">
                 <div className="w-16 h-16 border-4 border-cyan-500/30 border-t-cyan-400 rounded-full animate-spin mb-6" />
@@ -242,10 +295,10 @@ export default function AdminDashboard() {
               </div>
             ) : (
               <>
-                <div className="flex items-center justify-between mb-8 border-b border-white/10 pb-6 sticky top-0 bg-[#000814] z-20 pt-2">
+                <div className={`flex items-center justify-between mb-8 border-b pb-6 sticky top-0 z-20 pt-2 ${isDark ? 'bg-[#000814] border-white/10' : 'bg-white border-gray-100'}`}>
                   <div>
-                    <h1 className="text-3xl font-black text-white mb-2">{editingModuleSlug ? 'Edit' : 'Tambah'} {manageCategory}</h1>
-                    <p className="text-gray-400">Masukkan informasi detail untuk {manageCategory.toLowerCase()}.</p>
+                    <h1 className={`text-3xl font-black mb-2 ${isDark ? 'text-white' : 'text-blue-950'}`}>{editingModuleSlug ? 'Edit' : 'Tambah'} {manageCategory}</h1>
+                    <p className={isDark ? 'text-gray-400' : 'text-gray-500'}>Masukkan informasi detail untuk {manageCategory.toLowerCase()}.</p>
                   </div>
                   <button onClick={() => {
                     if (editingModuleSlug) {
@@ -261,12 +314,21 @@ export default function AdminDashboard() {
                 </div>
                 <div className="space-y-6 mb-8">
                   <div>
-                    <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Judul</label>
-                    <input type="text" value={newTitle} onChange={(e) => setNewTitle(e.target.value)} className="w-full px-5 py-4 rounded-xl bg-black/50 border border-white/10 text-white" />
+                    <label className={`block text-xs font-bold uppercase tracking-wider mb-2 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Judul</label>
+                    <input
+                      type="text"
+                      value={newTitle}
+                      onChange={(e) => setNewTitle(e.target.value)}
+                      className={`w-full px-5 py-4 rounded-xl border outline-none transition-all ${isDark ? 'bg-black/50 border-white/10 text-white focus:border-cyan-500' : 'bg-gray-50 border-gray-200 text-gray-900 focus:border-blue-500'}`}
+                    />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Deskripsi</label>
-                    <textarea value={newDesc} onChange={(e) => setNewDesc(e.target.value)} className="w-full px-5 py-4 rounded-xl bg-black/50 border border-white/10 text-white h-28" />
+                    <label className={`block text-xs font-bold uppercase tracking-wider mb-2 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Deskripsi</label>
+                    <textarea
+                      value={newDesc}
+                      onChange={(e) => setNewDesc(e.target.value)}
+                      className={`w-full px-5 py-4 rounded-xl border outline-none transition-all h-28 ${isDark ? 'bg-black/50 border-white/10 text-white focus:border-cyan-500' : 'bg-gray-50 border-gray-200 text-gray-900 focus:border-blue-500'}`}
+                    />
                   </div>
                 </div>
                 <div className="flex items-center justify-between pt-6 border-t border-white/10">
@@ -285,26 +347,26 @@ export default function AdminDashboard() {
                     <h3 className="text-xl font-bold text-white mb-6">Daftar Modul Saat Ini <span className="text-sm font-normal text-gray-500 ml-2">({modules.length} modul)</span></h3>
                     <div className="space-y-4 max-h-[400px] overflow-y-auto custom-scrollbar pr-2">
                       {modules.length === 0 ? (
-                         <div className="text-center py-8 text-gray-500">Belum ada modul.</div>
+                        <div className="text-center py-8 text-gray-500">Belum ada modul.</div>
                       ) : (
                         modules.map((mod) => (
-                          <div key={mod.id} className="p-5 rounded-2xl bg-white/5 border border-white/10 flex items-center gap-4 hover:border-cyan-500/30 transition-colors">
-                             <div className="w-12 h-12 rounded-xl bg-cyan-500/20 flex items-center justify-center text-2xl flex-shrink-0">
-                               {mod.icon}
-                             </div>
-                             <div className="flex-1">
-                               <h4 className="font-bold text-white text-lg leading-tight mb-1">{mod.title}</h4>
-                               <p className="text-xs text-gray-400 line-clamp-1">{mod.longDescription || mod.desc}</p>
-                             </div>
-                             <div className="ml-auto flex items-center gap-2 flex-shrink-0">
-                               <button onClick={() => {
-                                 setEditingModuleSlug(mod.slug);
-                                 setNewTitle(mod.title);
-                                 setNewDesc(mod.longDescription || mod.desc || '');
-                                 window.scrollTo({ top: 0, behavior: 'smooth' });
-                               }} className="px-3 py-1.5 rounded-lg bg-white/10 text-xs font-bold text-white hover:bg-cyan-500/20 hover:text-cyan-400 transition-colors">Edit</button>
-                               <button onClick={() => handleDeleteModule(mod.slug)} className="px-3 py-1.5 rounded-lg bg-red-500/10 text-xs font-bold text-red-400 hover:bg-red-500 hover:text-white transition-colors border border-red-500/20">Hapus</button>
-                             </div>
+                          <div key={mod.id} className={`p-5 rounded-2xl border flex items-center gap-4 transition-all ${isDark ? 'bg-white/5 border-white/10 hover:border-cyan-500/30' : 'bg-gray-50 border-gray-200 hover:border-blue-300 shadow-sm'}`}>
+                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0 ${isDark ? 'bg-cyan-500/20' : 'bg-blue-100'}`}>
+                              {mod.icon}
+                            </div>
+                            <div className="flex-1">
+                              <h4 className={`font-bold text-lg leading-tight mb-1 ${isDark ? 'text-white' : 'text-blue-900'}`}>{mod.title}</h4>
+                              <p className={`text-xs line-clamp-1 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{mod.longDescription || mod.desc}</p>
+                            </div>
+                            <div className="ml-auto flex items-center gap-2 flex-shrink-0">
+                              <button onClick={() => {
+                                setEditingModuleSlug(mod.slug);
+                                setNewTitle(mod.title);
+                                setNewDesc(mod.longDescription || mod.desc || '');
+                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                              }} className="px-3 py-1.5 rounded-lg bg-white/10 text-xs font-bold text-white hover:bg-cyan-500/20 hover:text-cyan-400 transition-colors">Edit</button>
+                              <button onClick={() => handleDeleteModule(mod.slug)} className="px-3 py-1.5 rounded-lg bg-red-500/10 text-xs font-bold text-red-400 hover:bg-red-500 hover:text-white transition-colors border border-red-500/20">Hapus</button>
+                            </div>
                           </div>
                         ))
                       )}
@@ -322,17 +384,17 @@ export default function AdminDashboard() {
             <div className="flex items-center justify-between mb-8 border-b border-white/10 pb-6 sticky top-0 bg-[#000814] z-20 pt-2">
               <div>
                 {selectedQuizModule && (
-                   <span className="inline-block px-3 py-1 rounded-full bg-pink-500/20 text-pink-400 text-xs font-bold mb-2">Modul: {selectedQuizModule.title}</span>
+                  <span className="inline-block px-3 py-1 rounded-full bg-pink-500/20 text-pink-400 text-xs font-bold mb-2">Modul: {selectedQuizModule.title}</span>
                 )}
                 <h1 className="text-3xl font-black text-white mb-2">Manajemen Soal Quiz</h1>
                 <p className="text-gray-400">{selectedQuizModule ? 'Tambah atau hapus soal untuk modul ini.' : 'Pilih modul pembelajaran untuk mengelola bank soal kuisnya.'}</p>
               </div>
               <button onClick={() => {
                 if (selectedQuizModule) {
-                   setSelectedQuizModule(null);
-                   setQuizModuleSlug('');
+                  setSelectedQuizModule(null);
+                  setQuizModuleSlug('');
                 } else {
-                   setView('admin_dashboard');
+                  setView('admin_dashboard');
                 }
               }} className="px-6 py-3 rounded-xl font-bold text-white bg-indigo-500/20 hover:bg-indigo-500/40 border border-indigo-500/30 transition-all flex items-center gap-2 shadow-lg">
                 ← Kembali
@@ -340,19 +402,19 @@ export default function AdminDashboard() {
             </div>
 
             {!selectedQuizModule ? (
-               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                 {modules.map((mod) => (
-                   <div key={mod.id} onClick={() => {
-                     setSelectedQuizModule(mod);
-                     setQuizModuleSlug(mod.id);
-                     loadQuizQuestions(mod.id);
-                   }} className="bg-white/5 border border-white/10 p-6 rounded-2xl cursor-pointer hover:bg-white/10 hover:border-pink-500/50 transition-all hover:-translate-y-1">
-                     <div className="text-4xl mb-4">{mod.icon}</div>
-                     <h3 className="font-bold text-white text-lg mb-1">{mod.title}</h3>
-                     <p className="text-xs text-gray-500 line-clamp-2">{mod.longDescription || mod.desc}</p>
-                   </div>
-                 ))}
-               </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {modules.map((mod) => (
+                  <div key={mod.id} onClick={() => {
+                    setSelectedQuizModule(mod);
+                    setQuizModuleSlug(mod.id);
+                    loadQuizQuestions(mod.id);
+                  }} className="bg-white/5 border border-white/10 p-6 rounded-2xl cursor-pointer hover:bg-white/10 hover:border-pink-500/50 transition-all hover:-translate-y-1">
+                    <div className="text-4xl mb-4">{mod.icon}</div>
+                    <h3 className="font-bold text-white text-lg mb-1">{mod.title}</h3>
+                    <p className="text-xs text-gray-500 line-clamp-2">{mod.longDescription || mod.desc}</p>
+                  </div>
+                ))}
+              </div>
             ) : (
               <>
                 {/* Form Tambah Soal */}
@@ -466,6 +528,97 @@ export default function AdminDashboard() {
           </div>
         )}
       </div>
+
+      {/* DETAILED ADMIN FOOTER */}
+      <footer className={`w-full mt-50 border-t relative z-10 transition-colors duration-500 ${isDark ? 'bg-black/20 border-white/5' : 'bg-white/50 border-blue-100 backdrop-blur-md'}`}>
+        <div className="max-w-7xl mx-auto px-6 py-16">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+            {/* Column 1: Branding */}
+            <div className="space-y-6">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-cyan-400 flex items-center justify-center text-white shadow-lg">
+                  <img src="/images/logo.png" alt="Logo" className="w-6 h-6 object-contain" />
+                </div>
+                <span className={`text-xl font-black tracking-tighter ${isDark ? 'text-white' : 'text-blue-950'}`}>DIVEXPLORE</span>
+              </div>
+              <p className={`text-sm leading-relaxed ${isDark ? 'text-gray-400' : 'text-blue-900/60'}`}>
+                Platform eksplorasi biota laut 3D interaktif tercanggih untuk edukasi dan konservasi ekosistem laut Indonesia.
+              </p>
+              <div className="flex gap-4">
+                {['Twitter', 'Instagram', 'Youtube', 'Github'].map(social => (
+                  <a key={social} href="#" className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${isDark ? 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-cyan-400' : 'bg-blue-50 text-blue-900/40 hover:bg-blue-100 hover:text-blue-600'}`}>
+                    <span className="text-xs font-bold uppercase">{social[0]}</span>
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            {/* Column 2: Sitemap */}
+            <div className="space-y-6">
+              <h4 className={`text-sm font-black uppercase tracking-widest ${isDark ? 'text-white' : 'text-blue-950'}`}>Navigasi</h4>
+              <ul className="space-y-4">
+                {['Beranda', 'Galeri Karya', 'Akademi Biota', 'Tutorial & Panduan', 'Pusat Bantuan'].map(item => (
+                  <li key={item}>
+                    <a href="#" className={`text-sm font-medium transition-colors ${isDark ? 'text-gray-500 hover:text-cyan-400' : 'text-blue-900/50 hover:text-blue-600'}`}>
+                      {item}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Column 3: Contact */}
+            <div className="space-y-6">
+              <h4 className={`text-sm font-black uppercase tracking-widest ${isDark ? 'text-white' : 'text-blue-950'}`}>Hubungi Kami</h4>
+              <ul className="space-y-4">
+                <li className="flex items-start gap-3">
+                  <span className="text-cyan-500">📍</span>
+                  <span className={`text-sm leading-relaxed ${isDark ? 'text-gray-500' : 'text-blue-900/60'}`}>
+                    Kampus UNY Karangmalang,<br />Caturtunggal, Depok, Sleman,<br />Yogyakarta 55281
+                  </span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <span className="text-cyan-500">📧</span>
+                  <a href="mailto:admin@divexplore.id" className={`text-sm font-medium transition-colors ${isDark ? 'text-gray-500 hover:text-cyan-400' : 'text-blue-900/60 hover:text-blue-600'}`}>
+                    admin@divexplore.id
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            {/* Column 4: Policies */}
+            <div className="space-y-6">
+              <h4 className={`text-sm font-black uppercase tracking-widest ${isDark ? 'text-white' : 'text-blue-950'}`}>Kebijakan</h4>
+              <ul className="space-y-4">
+                {['Kebijakan Privasi', 'Syarat & Ketentuan', 'Lisensi Konten', 'Keamanan Data'].map(item => (
+                  <li key={item}>
+                    <a href="#" className={`text-sm font-medium transition-colors ${isDark ? 'text-gray-500 hover:text-cyan-400' : 'text-blue-900/50 hover:text-blue-600'}`}>
+                      {item}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+              <div className={`p-4 rounded-2xl border ${isDark ? 'bg-cyan-500/5 border-cyan-500/20' : 'bg-blue-50 border-blue-100'}`}>
+                <p className={`text-[10px] font-bold leading-tight ${isDark ? 'text-cyan-400' : 'text-blue-600'}`}>
+                  Admin Dashboard v2.0 - Jalankan Platform dengan Integritas dan Keamanan.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom Copyright */}
+          <div className={`mt-16 pt-8 border-t flex flex-col md:flex-row justify-between items-center gap-4 ${isDark ? 'border-white/5' : 'border-gray-100'}`}>
+            <p className={`text-xs font-bold tracking-widest uppercase ${isDark ? 'text-gray-600' : 'text-gray-400'}`}>
+              © 2026 TIM DIVEXPLORE-3D · TEKNOLOGI INFORMASI UNY
+            </p>
+            <div className="flex gap-6">
+              <span className={`text-[10px] font-black tracking-[0.3em] uppercase ${isDark ? 'text-gray-800' : 'text-gray-300'}`}>
+                Designed for Future Oceans
+              </span>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

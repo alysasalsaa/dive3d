@@ -54,6 +54,7 @@ export default function CommunityGallery() {
     const [isLoading, setIsLoading] = useState(true);
     const [isMyLoading, setIsMyLoading] = useState(false);
     const [forceTour, setForceTour] = useState(false);
+    const [userName, setUserName] = useState<string | null>(null);
 
     // Form states
     const [uploadTitle, setUploadTitle] = useState('');
@@ -68,6 +69,7 @@ export default function CommunityGallery() {
         const token = localStorage.getItem('auth_token');
         setIsAdmin(role === 'admin');
         setIsLoggedIn(!!token);
+        setUserName(localStorage.getItem('user_name'));
         if (token) fetchMyUploads(token);
     }, []);
 
@@ -262,7 +264,7 @@ export default function CommunityGallery() {
             <nav className="fixed top-0 w-full z-50 px-6 py-5 grid grid-cols-3 items-center">
                 {/* Logo - left */}
                 <div className="flex justify-start">
-                    <div className={`flex items-center gap-3 backdrop-blur-xl py-2 px-5 rounded-full border shadow-xl transition-colors w-fit ${isDark ? 'bg-white/10 border-white/10' : 'bg-white/80 border-blue-100 shadow-sm'}`}>
+                    <div className={`flex items-center gap-3 backdrop-blur-xl py-2 px-5 rounded-full border shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer w-fit ${isDark ? 'bg-white/10 border-white/10' : 'bg-white/80 border-blue-100 shadow-sm'}`}>
                         <div className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg bg-white/5 border border-blue-500/20 overflow-hidden">
                             <img src="/images/logo.png" alt="Dive3D Logo" className="w-full h-full object-cover" />
                         </div>
@@ -275,15 +277,46 @@ export default function CommunityGallery() {
                     <NavbarLinks isDark={isDark} className="tour-nav" />
                 </div>
 
-                {/* Theme toggle - right */}
+                {/* Auth + Theme toggle - right */}
                 <div className="flex justify-end">
-                    <button
-                        onClick={toggleTheme}
-                        title={isDark ? 'Mode Gelap' : 'Mode Terang'}
-                        className={`tour-theme w-10 h-10 rounded-full flex items-center justify-center transition-all text-base backdrop-blur-md ${isDark ? 'bg-black/40 hover:bg-black/60 border border-white/20 shadow-lg shadow-black/20' : 'bg-white hover:bg-gray-100 border border-gray-200 shadow-sm'}`}
-                    >
-                        {isDark ? '🌙' : '☀️'}
-                    </button>
+                    <div className="flex items-center gap-2">
+                        {isLoggedIn ? (
+                            <div className="flex items-center gap-4 px-2">
+                                <span className={`text-sm font-bold ${isDark ? 'text-white' : 'text-blue-900'}`}>
+                                    Halo, {userName || 'Pengguna'}!
+                                </span>
+                                <button
+                                    onClick={() => {
+                                        localStorage.removeItem('auth_token');
+                                        localStorage.removeItem('user_role');
+                                        localStorage.removeItem('user_name');
+                                        localStorage.removeItem('user_email');
+                                        setIsLoggedIn(false);
+                                        setUserName(null);
+                                        setIsAdmin(false);
+                                        toast.success('Logout Berhasil!');
+                                        window.location.href = '/';
+                                    }}
+                                    className={`text-xs font-semibold px-3 py-1.5 rounded-full border transition-all ${isDark ? 'bg-red-500/10 text-red-400 border-red-500/20 hover:bg-red-500/20' : 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100'}`}
+                                >
+                                    Logout
+                                </button>
+                            </div>
+                        ) : (
+                            <Link href="/"
+                                className={`px-5 py-2 rounded-full text-sm font-semibold transition-all backdrop-blur-xl ${isDark ? 'text-white border border-white/20 hover:border-white/40 bg-black/40 hover:bg-black/60 shadow-lg shadow-black/20' : 'text-gray-700 hover:text-blue-700 border border-gray-200 hover:border-blue-300 bg-white'}`}
+                            >
+                                Masuk
+                            </Link>
+                        )}
+                        <button
+                            onClick={toggleTheme}
+                            title={isDark ? 'Mode Gelap' : 'Mode Terang'}
+                            className={`tour-theme w-10 h-10 rounded-full flex items-center justify-center transition-all text-base backdrop-blur-md ${isDark ? 'bg-black/40 hover:bg-black/60 border border-white/20 shadow-lg shadow-black/20' : 'bg-white hover:bg-gray-100 border border-gray-200 shadow-sm'}`}
+                        >
+                            {isDark ? '🌙' : '☀️'}
+                        </button>
+                    </div>
                 </div>
             </nav>
 
@@ -693,7 +726,7 @@ export default function CommunityGallery() {
                 <button
                     onClick={() => setForceTour(true)}
                     title="Tampilkan panduan tour"
-                    className="fixed bottom-6 right-6 z-[9999] flex items-center gap-2 px-4 py-3 rounded-full bg-cyan-500 hover:bg-cyan-400 text-black font-black text-sm shadow-2xl shadow-cyan-500/40 transition-all hover:-translate-y-1 hover:scale-105 active:scale-95"
+                    className="fixed bottom-6 right-6 z-40 flex items-center gap-2 px-4 py-3 rounded-full bg-cyan-500 hover:bg-cyan-400 text-black font-black text-sm shadow-2xl shadow-cyan-500/40 transition-all hover:-translate-y-1 hover:scale-105 active:scale-95"
                 >
                     <span className="text-base">💡</span>
                     <span className="hidden sm:inline">Bantuan</span>

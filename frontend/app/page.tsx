@@ -195,7 +195,7 @@ export default function HomePage() {
       <nav className="fixed top-0 w-full z-50 px-6 py-5 grid grid-cols-3 items-center">
         {/* Logo - left */}
         <div className="flex justify-start">
-          <div className={`tour-logo flex items-center gap-3 backdrop-blur-xl py-2 px-5 rounded-full border shadow-xl transition-colors ${isDark ? 'bg-white/10 border-white/10' : 'bg-white/80 border-blue-100 shadow-sm'}`}>
+          <div className={`tour-logo flex items-center gap-3 backdrop-blur-xl py-2 px-5 rounded-full border shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer ${isDark ? 'bg-white/10 border-white/10' : 'bg-white/80 border-blue-100 shadow-sm'}`}>
             <div className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg bg-white/5 border border-blue-500/20 overflow-hidden">
               <img src="/images/logo.png" alt="Dive3D Logo" className="w-full h-full object-cover" />
             </div>
@@ -538,7 +538,7 @@ export default function HomePage() {
         <button
           onClick={() => setForceTour(true)}
           title="Tampilkan panduan tour"
-          className="fixed bottom-6 right-6 z-[9999] flex items-center gap-2 px-4 py-3 rounded-full bg-cyan-500 hover:bg-cyan-400 text-black font-black text-sm shadow-2xl shadow-cyan-500/40 transition-all hover:-translate-y-1 hover:scale-105 active:scale-95"
+          className="fixed bottom-6 right-6 z-40 flex items-center gap-2 px-4 py-3 rounded-full bg-cyan-500 hover:bg-cyan-400 text-black font-black text-sm shadow-2xl shadow-cyan-500/40 transition-all hover:-translate-y-1 hover:scale-105 active:scale-95"
         >
           <span className="text-base">💡</span>
           <span className="hidden sm:inline">Bantuan</span>
