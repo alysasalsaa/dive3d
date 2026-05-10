@@ -5,6 +5,9 @@ import { usePathname } from 'next/navigation';
 import { useTheme } from '../../lib/useTheme';
 import AdminDashboard from './AdminDashboard';
 import dynamic from 'next/dynamic';
+import OnboardingTour from '../../components/OnboardingTour';
+import NavbarLinks from '../../components/Navbar';
+import { Step } from 'react-joyride';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -21,9 +24,16 @@ export default function DashboardPage() {
     const [topScore, setTopScore] = useState(0);
     const [watchedTutorialCount, setWatchedTutorialCount] = useState(0);
     const [claimedCertificates, setClaimedCertificates] = useState<{type: string; label: string; track: string; date: string}[]>([]);
+    const [forceTour, setForceTour] = useState(false);
 
     useEffect(() => {
-        const role = localStorage.getItem('user_role') || 'user';
+        if (forceTour) {
+            setActiveMenu(0);
+        }
+    }, [forceTour]);
+
+    useEffect(() => {
+        const role = (localStorage.getItem('user_role') || 'user').toLowerCase();
         setUserRole(role);
 
         const userEmail = (localStorage.getItem('user_email') || '').toLowerCase();
@@ -139,8 +149,45 @@ export default function DashboardPage() {
     const totalVideos = 5;
     const totalKuis = 4;
 
+    const dashboardTourSteps: Step[] = [
+        {
+            target: '.tour-sidebar',
+            content: 'Ini menu navigasi kamu! Dari sini kamu bisa loncat ke Akademi, lihat klasemen Leaderboard, atau Klaim Hadiah.',
+            placement: 'right',
+        },
+        {
+            target: '.tour-profile',
+            content: 'Profil kamu ada di sini. Kumpulin XP terus biar level dan pangkat kamu naik terus! 🚀',
+            placement: 'bottom',
+        },
+        {
+            target: '.tour-academic',
+            content: 'Pantau seberapa rajin kamu belajar dari ringkasan akademik ini.',
+            placement: 'bottom',
+        },
+        {
+            target: '.tour-trophy',
+            content: 'Setiap nilai sempurna di kuis bakal ngebuka trofi 3D eksklusif. Ayo kumpulin semuanya! 🏆',
+            placement: 'top',
+        },
+        {
+            target: '.tour-certificates',
+            content: 'Kalau semua modul udah beres, kamu bisa klaim dan download sertifikat resmi kamu di sini. Keren kan? 📜',
+            placement: 'top',
+            skipScroll: true,
+        }
+    ];
+
     return (
         <div className={`flex h-screen font-sans overflow-hidden transition-colors duration-300 ${isDark ? 'bg-[#00040a] text-white' : 'bg-sky-50 text-gray-900'}`}>
+            {userRole !== 'admin' && (
+                <OnboardingTour 
+                    steps={dashboardTourSteps} 
+                    tourKey="userDashboard" 
+                    forceRun={forceTour} 
+                    onFinish={() => setForceTour(false)} 
+                />
+            )}
 
             {/* Ambient glow background */}
             <div className="fixed inset-0 pointer-events-none z-0">
@@ -148,105 +195,113 @@ export default function DashboardPage() {
                 <div className="absolute bottom-1/4 right-0 w-[400px] h-[400px] bg-cyan-500/5 blur-[100px] rounded-full" />
             </div>
 
-            {/* SIDEBAR */}
-            <aside className={`relative z-10 flex flex-col border-r backdrop-blur-2xl transition-all duration-500 ease-in-out flex-shrink-0 ${isSidebarOpen ? 'w-60' : 'w-[72px]'} ${isDark ? 'border-white/5 bg-white/[0.03]' : 'border-gray-200 bg-white shadow-sm'}`}>
-
-                {/* Logo */}
-                <div className={`h-20 flex items-center px-4 border-b ${isDark ? 'border-white/5' : 'border-gray-100'}`}>
-                    <div
-                        className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 cursor-pointer overflow-hidden bg-white/5 border border-white/10`}
-                        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                    >
-                        {/* Ganti '/logo.png' dengan nama file logo Anda jika berbeda */}
-                        <img src="/images/logo.png" alt="Dive3D Logo" className="w-full h-full object-cover" />
-                    </div>
-                    <span className={`ml-3 text-base font-black tracking-widest whitespace-nowrap ${isDark ? "text-white" : "text-blue-900"} transition-all duration-500 ${isSidebarOpen ? 'opacity-100 max-w-[200px]' : 'opacity-0 max-w-0 overflow-hidden'}`}>
-                        DIVEXPLORE
-                    </span>
-                </div>
-
-                {/* Menu */}
-                {userRole !== 'admin' && (
-                <ul className="flex-1 py-4 px-2 space-y-1 overflow-x-hidden">
-                    {menuItems.map((item, idx) => (
-                        <li
-                            key={idx}
-                            onClick={item.action}
-                            title={!isSidebarOpen ? item.label : ''}
-                            className={`flex items-center rounded-xl cursor-pointer transition-all duration-200 group
-                                ${isSidebarOpen ? 'px-3 py-2.5 gap-3' : 'justify-center p-3'}
-                                ${activeMenu === idx
-                                    ? 'bg-gradient-to-r from-blue-600/30 to-cyan-500/20 border border-blue-500/30 text-cyan-400'
-                                    : isDark
-                                      ? 'text-gray-500 hover:text-white hover:bg-white/5 border border-transparent'
-                                      : 'text-gray-500 hover:text-blue-700 hover:bg-blue-50 border border-transparent'
-                                }`}
+            {/* SIDEBAR - Sembunyikan jika Admin */}
+            {userRole !== 'admin' && (
+                <aside className={`relative z-10 flex flex-col border-r backdrop-blur-2xl transition-all duration-500 ease-in-out flex-shrink-0 ${isSidebarOpen ? 'w-60' : 'w-[72px]'} ${isDark ? 'border-white/5 bg-white/[0.03]' : 'border-gray-200 bg-white shadow-sm'}`}>
+                    {/* Logo */}
+                    <div className={`h-20 flex items-center px-4 border-b ${isDark ? 'border-white/5' : 'border-gray-100'}`}>
+                        <div
+                            className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 cursor-pointer overflow-hidden bg-white/5 border border-white/10`}
+                            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
                         >
-                            <span className="text-lg flex-shrink-0">{item.icon}</span>
-                            <span className={`text-sm font-semibold whitespace-nowrap transition-all duration-500 ${isSidebarOpen ? 'opacity-100 max-w-[200px]' : 'opacity-0 max-w-0 overflow-hidden pointer-events-none'}`}>
-                                {item.label}
-                            </span>
-                        </li>
-                    ))}
-                </ul>
-                )}
-
-                {/* Logout */}
-                <div className={`p-2 border-t ${isDark ? 'border-white/5' : 'border-gray-100'}`}>
-                    <button
-                        onClick={() => { localStorage.removeItem('auth_token'); localStorage.removeItem('user_role'); localStorage.removeItem('user_name'); localStorage.removeItem('user_email'); window.location.href = '/'; }}
-                        title={!isSidebarOpen ? 'Keluar' : ''}
-                        className={`w-full flex items-center rounded-xl text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200 border border-transparent
-                            ${isSidebarOpen ? 'px-3 py-2.5 gap-3' : 'justify-center p-3'}`}
-                    >
-                        <span className="text-lg flex-shrink-0">🚪</span>
-                        <span className={`text-sm font-semibold whitespace-nowrap transition-all duration-500 ${isSidebarOpen ? 'opacity-100 max-w-[200px]' : 'opacity-0 max-w-0 overflow-hidden pointer-events-none'}`}>
-                            Keluar
+                            <img src="/images/logo.png" alt="Dive3D Logo" className="w-full h-full object-cover" />
+                        </div>
+                        <span className={`ml-3 text-base font-black tracking-widest whitespace-nowrap ${isDark ? "text-white" : "text-blue-900"} transition-all duration-500 ${isSidebarOpen ? 'opacity-100 max-w-[200px]' : 'opacity-0 max-w-0 overflow-hidden'}`}>
+                            DIVEXPLORE
                         </span>
-                    </button>
-                </div>
-            </aside>
+                    </div>
+
+                    {/* Menu */}
+                    <ul className="tour-sidebar flex-1 py-4 px-2 space-y-1 overflow-x-hidden">
+                        {menuItems.map((item, idx) => (
+                            <li
+                                key={idx}
+                                onClick={item.action}
+                                title={!isSidebarOpen ? item.label : ''}
+                                className={`flex items-center rounded-xl cursor-pointer transition-all duration-200 group
+                                    ${isSidebarOpen ? 'px-3 py-2.5 gap-3' : 'justify-center p-3'}
+                                    ${activeMenu === idx
+                                        ? 'bg-gradient-to-r from-blue-600/30 to-cyan-500/20 border border-blue-500/30 text-cyan-400'
+                                        : isDark
+                                          ? 'text-gray-500 hover:text-white hover:bg-white/5 border border-transparent'
+                                          : 'text-gray-500 hover:text-blue-700 hover:bg-blue-50 border border-transparent'
+                                    }`}
+                            >
+                                <span className="text-lg flex-shrink-0">{item.icon}</span>
+                                <span className={`text-sm font-semibold whitespace-nowrap transition-all duration-500 ${isSidebarOpen ? 'opacity-100 max-w-[200px]' : 'opacity-0 max-w-0 overflow-hidden pointer-events-none'}`}>
+                                    {item.label}
+                                </span>
+                            </li>
+                        ))}
+                    </ul>
+
+                    {/* Logout */}
+                    <div className={`p-2 border-t ${isDark ? 'border-white/5' : 'border-gray-100'}`}>
+                        <button
+                            onClick={() => { localStorage.removeItem('auth_token'); localStorage.removeItem('user_role'); localStorage.removeItem('user_name'); localStorage.removeItem('user_email'); window.location.href = '/'; }}
+                            title={!isSidebarOpen ? 'Keluar' : ''}
+                            className={`w-full flex items-center rounded-xl text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200 border border-transparent
+                                ${isSidebarOpen ? 'px-3 py-2.5 gap-3' : 'justify-center p-3'}`}
+                        >
+                            <span className="text-lg flex-shrink-0">🚪</span>
+                            <span className={`text-sm font-semibold whitespace-nowrap transition-all duration-500 ${isSidebarOpen ? 'opacity-100 max-w-[200px]' : 'opacity-0 max-w-0 overflow-hidden pointer-events-none'}`}>
+                                Keluar
+                            </span>
+                        </button>
+                    </div>
+                </aside>
+            )}
 
             {/* MAIN CONTENT */}
             <main className="relative z-10 flex-1 flex flex-col overflow-y-auto">
 
                 {/* TOP HEADER */}
-                <header className={`sticky top-0 z-20 px-6 py-4 border-b backdrop-blur-2xl flex justify-between items-center ${isDark ? 'border-white/5 bg-[#00040a]/80' : 'border-gray-200 bg-sky-50/80'}`}>
+                <header className={`sticky top-0 z-20 px-6 py-5 border-b backdrop-blur-2xl grid grid-cols-3 items-center ${isDark ? 'border-white/5 bg-[#00040a]/80' : 'border-gray-200 bg-sky-50/80'}`}>
+                    {/* Logo & Admin Profile - Left */}
                     <div className="flex items-center gap-4">
-                        <div className="w-9 h-9 bg-gradient-to-br from-blue-400 to-cyan-400 rounded-full flex-shrink-0 shadow-lg shadow-blue-500/20" />
-                        <div>
-                            <p className={`font-bold text-sm leading-none ${isDark ? "text-white" : "text-gray-900"}`}>{userName} {userRole === 'admin' && <span className="ml-2 px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-400 text-[10px] uppercase tracking-wider">Admin</span>}</p>
-                            {userRole !== 'admin' && <p className="text-cyan-400 text-xs mt-0.5">Level {level} · {rankName}</p>}
-                        </div>
+                        {userRole === 'admin' ? (
+                            <>
+                                <div className={`flex items-center gap-3 backdrop-blur-xl py-2 px-5 rounded-full border shadow-xl transition-colors ${isDark ? 'bg-white/10 border-white/10' : 'bg-white/80 border-blue-100 shadow-sm'}`}>
+                                    <div className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg bg-white/5 border border-blue-500/20 overflow-hidden">
+                                        <img src="/images/logo.png" alt="Dive3D Logo" className="w-full h-full object-cover" />
+                                    </div>
+                                    <span className={`text-lg font-black tracking-widest pr-1 ${isDark ? 'text-white' : 'text-blue-900'}`}>DIVEXPLORE</span>
+                                </div>
+                                <div className="flex flex-col">
+                                    <p className={`font-black text-sm leading-none ${isDark ? "text-white" : "text-gray-900"}`}>{userName}</p>
+                                    <span className="px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-400 text-[9px] uppercase font-black tracking-widest mt-1.5 inline-block">ADMIN</span>
+                                </div>
+                            </>
+                        ) : (
+                            <div className="flex items-center gap-4">
+                                <div className="w-9 h-9 bg-gradient-to-br from-blue-400 to-cyan-400 rounded-full flex-shrink-0 shadow-lg shadow-blue-500/20" />
+                                <div>
+                                    <p className={`font-bold text-sm leading-none ${isDark ? "text-white" : "text-gray-900"}`}>{userName}</p>
+                                    <p className="text-cyan-400 text-xs mt-0.5">Level {level} · {rankName}</p>
+                                </div>
+                            </div>
+                        )}
                     </div>
 
-                    {/* Navbar */}
-                    <div className={`hidden md:flex items-center gap-1 backdrop-blur-2xl p-1.5 rounded-full border ${isDark ? "bg-white/5 border-white/10" : "bg-white/80 border-gray-200 shadow-sm"}`}>
-                        {[
-                            { href: '/', label: 'Beranda' },
-                            { href: '/gallery', label: 'Galeri' },
-                            { href: '/akademi', label: 'Akademi' },
-                            { href: '/tutorial', label: 'Tutorial' },
-                            { href: '/dashboard', label: 'Dashboard' },
-                        ].map(({ href, label }) => {
-                            const isActive = pathname === href;
-                            return (
-                                <Link key={href} href={href}
-                                    className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${isActive
-                                        ? 'bg-gradient-to-r from-blue-600 to-cyan-500 text-white shadow-lg shadow-blue-500/20'
-                                        : isDark ? 'text-gray-400 hover:text-white hover:bg-white/5' : 'text-gray-600 hover:text-blue-700 hover:bg-blue-50'}`}
-                                >
-                                    {label}
-                                </Link>
-                            );
-                        })}
+                    {/* Navbar - Center */}
+                    <div className="flex justify-center">
+                        <NavbarLinks isDark={isDark} />
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    {/* Icons & Logout - Right */}
+                    <div className="flex items-center justify-end gap-4">
+                        {userRole === 'admin' && (
+                            <button
+                                onClick={() => { localStorage.clear(); window.location.href = '/'; }}
+                                className={`hidden md:block px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider border transition-all ${isDark ? 'bg-red-500/10 text-red-400 border-red-500/20 hover:bg-red-500/20' : 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100'}`}
+                            >
+                                Logout
+                            </button>
+                        )}
                         <button
                             onClick={toggleTheme}
                             title={isDark ? 'Mode Gelap' : 'Mode Terang'}
-                            className={`w-9 h-9 rounded-full flex items-center justify-center transition-all text-sm ${isDark ? 'bg-white/10 hover:bg-white/20 border border-white/10' : 'bg-white hover:bg-gray-100 border border-gray-200 shadow-sm'}`}
+                            className={`w-10 h-10 rounded-full flex items-center justify-center transition-all text-base backdrop-blur-md ${isDark ? 'bg-black/40 hover:bg-black/60 border border-white/20 shadow-lg shadow-black/20' : 'bg-white hover:bg-gray-100 border border-gray-200 shadow-sm'}`}
                         >
                             {isDark ? '🌙' : '☀️'}
                         </button>
@@ -258,14 +313,15 @@ export default function DashboardPage() {
                 </header>
 
                 {/* DASHBOARD CONTENT */}
-                {userRole === 'admin' ? (
-                    <AdminDashboard />
-                ) : (
-                <>
+                <div className={userRole === 'admin' ? "min-h-[110vh] p-6" : ""}>
+                    {userRole === 'admin' ? (
+                        <AdminDashboard />
+                    ) : (
+                    <>
                 {activeMenu === 0 && (
                 <div className="p-6 space-y-6 max-w-7xl mx-auto w-full">
                     {/* Profile & XP Row */}
-                    <div className={`flex flex-col md:flex-row justify-between items-center rounded-2xl p-6 border ${isDark ? 'bg-[#0B1221] border-white/5' : 'bg-white border-gray-200 shadow-sm'}`}>
+                    <div className={`tour-profile flex flex-col md:flex-row justify-between items-center rounded-2xl p-6 border ${isDark ? 'bg-[#0B1221] border-white/5' : 'bg-white border-gray-200 shadow-sm'}`}>
                         <div className="flex items-center gap-5">
                             <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-400 to-cyan-400 flex items-center justify-center text-3xl shadow-lg shadow-cyan-500/20">
                                 🤿
@@ -297,7 +353,7 @@ export default function DashboardPage() {
                     {/* Grid 3 Cols (Row 1) */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         {/* Akademik */}
-                        <div className={`rounded-2xl p-6 border flex flex-col justify-between ${isDark ? 'bg-[#0B1221] border-white/5' : 'bg-white border-gray-200 shadow-sm'}`}>
+                        <div className={`tour-academic rounded-2xl p-6 border flex flex-col justify-between ${isDark ? 'bg-[#0B1221] border-white/5' : 'bg-white border-gray-200 shadow-sm'}`}>
                             <div className="flex items-start gap-3 mb-6">
                                 <div className="text-xl text-gray-400">📖</div>
                                 <div>
@@ -394,7 +450,7 @@ export default function DashboardPage() {
                         </div>
 
                         {/* Koleksi Lencana */}
-                        <div className={`rounded-2xl p-6 border flex flex-col justify-between ${isDark ? 'bg-[#0B1221] border-amber-500/30' : 'bg-amber-50 border-amber-300 shadow-sm'}`}>
+                        <div className={`tour-trophy rounded-2xl p-6 border flex flex-col justify-between ${isDark ? 'bg-[#0B1221] border-amber-500/30' : 'bg-amber-50 border-amber-300 shadow-sm'}`}>
                             <div className="flex items-start gap-3 mb-6">
                                 <div className="text-xl text-orange-400">🏅</div>
                                 <div>
@@ -427,7 +483,7 @@ export default function DashboardPage() {
                         </div>
 
                         {/* Claim Sertifikat */}
-                        <div className={`rounded-2xl p-6 border ${isDark ? 'bg-[#0B1221] border-yellow-500/30' : 'bg-yellow-50 border-yellow-300 shadow-sm'}`}>
+                        <div className={`tour-certificates rounded-2xl p-6 border ${isDark ? 'bg-[#0B1221] border-yellow-500/30' : 'bg-yellow-50 border-yellow-300 shadow-sm'}`}>
                             <div className="flex items-start gap-3 mb-5">
                                 <div className="text-xl text-yellow-400">📜</div>
                                 <div>
@@ -699,14 +755,27 @@ export default function DashboardPage() {
                 )}
                 </>
                 )}
+                </div>
 
                 {/* FOOTER */}
-                <footer className={`mt-auto px-6 py-6 border-t text-center ${isDark ? "border-white/5" : "border-gray-200"}`}>
+                <footer className={`mt-auto px-6 py-4 border-t text-center ${isDark ? "border-white/5" : "border-gray-200"}`}>
                     <p className={`text-[10px] tracking-[0.4em] font-bold uppercase ${isDark ? "text-gray-600" : "text-gray-400"}`}>
                         © 2026 Tim DiveXplore-3D · Teknologi Informasi UNY
                     </p>
                 </footer>
             </main>
+
+            {/* Floating Bantuan Button - hanya untuk user biasa */}
+            {userRole !== 'admin' && (
+                <button
+                    onClick={() => setForceTour(true)}
+                    title="Tampilkan panduan tour"
+                    className="fixed bottom-6 right-6 z-[9999] flex items-center gap-2 px-4 py-3 rounded-full bg-cyan-500 hover:bg-cyan-400 text-black font-black text-sm shadow-2xl shadow-cyan-500/40 transition-all hover:-translate-y-1 hover:scale-105 active:scale-95"
+                >
+                    <span className="text-base">💡</span>
+                    <span className="hidden sm:inline">Bantuan</span>
+                </button>
+            )}
         </div>
     );
 }
