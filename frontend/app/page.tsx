@@ -437,16 +437,15 @@ export default function HomePage() {
               <p className="text-white text-sm font-semibold flex items-center gap-2"><Clapperboard size={20} /> Trailer DIVEXPLORE</p>
               <button onClick={() => setShowTrailer(false)} className="text-gray-400 hover:text-white transition-colors">✕</button>
             </div>
-            <div className="aspect-video bg-gray-900 flex items-center justify-center text-gray-500 text-sm">
-              <video
-                src="/videos/trailer.mp4"
-                controls
-                autoPlay
-                className="w-full h-full object-cover"
-                poster="/images/hero-bg.jpg"
-              >
-                Browser Anda tidak mendukung tag video HTML5.
-              </video>
+            <div className="aspect-video bg-black">
+              <iframe
+                className="w-full h-full"
+                src="https://www.youtube.com/embed/ufEgoTFJtPc?autoplay=1"
+                title="Divexplore 3D Trailer"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
             </div>
           </div>
         </div>
