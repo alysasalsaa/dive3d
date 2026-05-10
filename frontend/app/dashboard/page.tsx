@@ -45,12 +45,12 @@ export default function DashboardPage() {
 
         const userEmail = (localStorage.getItem('user_email') || '').toLowerCase();
 
-        // Baca tutorial yang sudah ditonton (selalu, untuk semua user)
-        const watched = localStorage.getItem('tutorial_watched');
+        // Baca tutorial yang sudah ditonton (spesifik per user)
+        const watched = localStorage.getItem(`tutorial_watched_${userEmail}`);
         if (watched) setWatchedTutorialCount(JSON.parse(watched).length);
 
-        // Baca riwayat sertifikat yang sudah diklaim
-        const claimed = localStorage.getItem('claimed_certificates');
+        // Baca riwayat sertifikat yang sudah diklaim (spesifik per user)
+        const claimed = localStorage.getItem(`claimed_certificates_${userEmail}`);
         if (claimed) setClaimedCertificates(JSON.parse(claimed));
 
         // TEST: vinzcan11 langsung semua selesai
@@ -139,12 +139,14 @@ export default function DashboardPage() {
     const completedQuizzesCount = dashboardData?.recent_quizzes?.filter((q: any) => q.score === 100).length || 0;
 
     const claimCertificate = (type: string, label: string, track: string, url: string) => {
-        const existing = JSON.parse(localStorage.getItem('claimed_certificates') || '[]');
+        const userEmail = (localStorage.getItem('user_email') || '').toLowerCase();
+        const storageKey = `claimed_certificates_${userEmail}`;
+        const existing = JSON.parse(localStorage.getItem(storageKey) || '[]');
         const alreadyClaimed = existing.some((c: any) => c.type === type);
         if (!alreadyClaimed) {
             const newEntry = { type, label, track, date: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) };
             const updated = [...existing, newEntry];
-            localStorage.setItem('claimed_certificates', JSON.stringify(updated));
+            localStorage.setItem(storageKey, JSON.stringify(updated));
             setClaimedCertificates(updated);
         }
         window.location.href = url;
