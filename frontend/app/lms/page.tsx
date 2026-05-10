@@ -136,10 +136,31 @@ type ModuleData = {
 export default function LMSPage() {
   const router = useRouter();
   const [view, setView] = useState<ViewState | null>(null);
+  const [backOrigin, setBackOrigin] = useState<{ href: string; label: string }>({ href: '/', label: 'Beranda' });
 
   useEffect(() => {
     const role = localStorage.getItem('user_role');
     setUserName(localStorage.getItem('user_name'));
+
+    // Deteksi halaman asal untuk tombol Kembali
+    const params = new URLSearchParams(window.location.search);
+    const fromParam = params.get('from');
+    if (fromParam === 'akademi') {
+      setBackOrigin({ href: '/akademi', label: 'Halaman Akademi' });
+    } else if (fromParam === 'dashboard') {
+      setBackOrigin({ href: '/dashboard', label: 'Dashboard' });
+    } else {
+      // Cek referrer browser sebagai fallback
+      const ref = document.referrer;
+      if (ref.includes('/akademi')) {
+        setBackOrigin({ href: '/akademi', label: 'Halaman Akademi' });
+      } else if (ref.includes('/dashboard')) {
+        setBackOrigin({ href: '/dashboard', label: 'Dashboard' });
+      } else {
+        setBackOrigin({ href: '/', label: 'Beranda' });
+      }
+    }
+
     if (role === 'admin') {
       // Admin tidak diizinkan masuk ke ruang kelas LMS, arahkan ke Pusat Kendali di Dashboard
       window.location.href = '/dashboard';
@@ -839,6 +860,17 @@ export default function LMSPage() {
         {/* ========================================= */}
         {view === 'user_dashboard' && (
           <div className="w-full max-w-4xl p-8 rounded-[32px] bg-[#000814] border border-white/10 shadow-2xl relative z-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            {/* Tombol Kembali */}
+            <div className="mb-6">
+              <button
+                onClick={() => router.push(backOrigin.href)}
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 transition-all border border-white/5 hover:border-white/20 text-sm group"
+              >
+                <span className="text-lg leading-none group-hover:-translate-x-0.5 transition-transform">←</span>
+                <span>Kembali ke {backOrigin.label}</span>
+              </button>
+            </div>
+
             <div className="flex items-center gap-4 mb-8">
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center text-white shadow-lg shadow-emerald-500/20">
                 <GraduationCap size={32} />
@@ -986,6 +1018,30 @@ export default function LMSPage() {
                       >
                         <span>Lanjut Membaca (Scroll ↓)</span>
                       </button>
+                    ) : selectedTrack?.id === 'konten-digital' ? (
+                      // Track Konten Digital: tidak ada kuis, langsung selesaikan modul
+                      completedQuizzes.includes(`Kuis: ${selectedModule?.title}`) ? (
+                        <div className="px-6 py-4 rounded-xl font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 shadow-inner flex items-center gap-3">
+                          <CheckCircle2 size={20} />
+                          <div>
+                            <p className="text-sm">Modul Selesai</p>
+                            <p className="text-xs text-emerald-400/80 font-medium">Anda telah menyelesaikan modul ini.</p>
+                          </div>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => {
+                            if (selectedModule) {
+                              setCompletedQuizzes(prev => [...prev, `Kuis: ${selectedModule.title}`]);
+                            }
+                            setView('user_modules');
+                          }}
+                          className="px-8 py-4 rounded-xl font-bold text-white bg-gradient-to-r from-emerald-500 to-teal-400 hover:scale-[1.02] transition-all shadow-xl shadow-emerald-500/25 flex items-center gap-2"
+                        >
+                          <CheckCircle2 size={20} />
+                          <span>Selesai &amp; Lanjut</span>
+                        </button>
+                      )
                     ) : completedQuizzes.includes(`Kuis: ${selectedModule?.title}`) ? (
                       <div className="px-6 py-4 rounded-xl font-bold text-blue-400 bg-blue-500/10 border border-blue-500/20 shadow-inner flex items-center gap-3">
                         <FileText size={24} />

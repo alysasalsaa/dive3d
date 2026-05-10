@@ -125,7 +125,7 @@ export default function DashboardPage() {
 
     const menuItems: { icon: React.ReactNode; label: string; action: () => void }[] = [
         { icon: <BarChart2 size={20} />, label: 'Dashboard', action: () => setActiveMenu(0) },
-        { icon: <BookOpen size={20} />, label: 'Mulai Akademi', action: () => window.location.href = '/lms' },
+        { icon: <BookOpen size={20} />, label: 'Mulai Akademi', action: () => window.location.href = '/lms?from=dashboard' },
         { icon: <Crown size={20} />, label: 'Leaderboard', action: () => setActiveMenu(2) },
         { icon: <Gift size={20} />, label: 'Klaim Hadiah', action: () => setActiveMenu(3) },
     ];
@@ -440,7 +440,7 @@ export default function DashboardPage() {
                                     <span className="text-3xl font-bold text-white">{completedQuizzesCount}</span>
                                     <p className="text-xs text-gray-500 mt-1">{completedQuizzesCount === 0 ? 'Belum ada kuis yang diselesaikan' : 'Kuis terselesaikan'}</p>
                                 </div>
-                                <Link href="/lms" className="text-xs text-cyan-400 hover:text-cyan-300 font-medium flex items-center gap-1">
+                                <Link href="/lms?from=dashboard" className="text-xs text-cyan-400 hover:text-cyan-300 font-medium flex items-center gap-1">
                                     Lihat Kuis ➔
                                 </Link>
                             </div>
@@ -492,7 +492,7 @@ export default function DashboardPage() {
                                     <div className="flex-grow flex flex-col items-center justify-center py-4 text-center bg-black/20 rounded-xl border border-white/5">
                                         <div className="text-4xl mb-2 opacity-30"><Lock size={24} /></div>
                                         <p className="text-xs text-gray-400">Selesaikan kuis untuk membuka Trofi Ikan Emas!</p>
-                                        <Link href="/lms" className="mt-3 text-xs text-cyan-400 hover:text-cyan-300 font-medium">Mulai Akademi →</Link>
+                                        <Link href="/lms?from=dashboard" className="mt-3 text-xs text-cyan-400 hover:text-cyan-300 font-medium">Mulai Akademi →</Link>
                                     </div>
                                 );
 

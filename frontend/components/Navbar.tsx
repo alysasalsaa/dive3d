@@ -7,9 +7,9 @@ import { motion, useSpring } from 'framer-motion';
 
 const navLinks = [
   { href: '/',          label: 'Beranda' },
+  { href: '/tutorial',  label: 'Tutorial' },
   { href: '/gallery',   label: 'Galeri' },
   { href: '/akademi',   label: 'Akademi' },
-  { href: '/tutorial',  label: 'Tutorial' },
   { href: '/dashboard', label: 'Dashboard' },
 ];
 

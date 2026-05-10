@@ -453,7 +453,7 @@ export default function AkademiPage() {
                                             </div>
 
                                             <div className="flex gap-4">
-                                                <Link href={`/lms?track=konservasi-laut&module=${lmsModules[currentLMSIndex].slug}`} className="px-8 py-4 bg-blue-600 text-white text-[15px] font-bold rounded-full shadow-lg shadow-blue-600/20 hover:bg-blue-700 transition-all hover:-translate-y-1 text-center w-full md:w-auto">
+                                                <Link href={`/lms?track=konservasi-laut&module=${lmsModules[currentLMSIndex].slug}&from=akademi`} className="px-8 py-4 bg-blue-600 text-white text-[15px] font-bold rounded-full shadow-lg shadow-blue-600/20 hover:bg-blue-700 transition-all hover:-translate-y-1 text-center w-full md:w-auto">
                                                     Mulai Belajar Modul Ini
                                                 </Link>
                                             </div>
