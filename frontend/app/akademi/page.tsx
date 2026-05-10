@@ -11,8 +11,132 @@ import { Step } from 'react-joyride';
 
 const ModelViewer = dynamic(() => import('../../components/ModelViewer'), { ssr: false });
 
+const modelInfoData: Record<string, { title: string, sciName: string, desc: string, funFact: string }> = {
+    'ikan': {
+        title: 'Ikan Badut (Clownfish)',
+        sciName: 'Amphiprioninae',
+        desc: 'Ikan hias kecil berwarna cerah ini hidup bersimbiosis dengan anemon laut. Anemon melindunginya dari predator, sementara ikan badut membersihkan parasit dari anemon.',
+        funFact: 'Tubuh mereka dilapisi lendir khusus yang membuatnya kebal dari sengatan mematikan anemon laut!'
+    },
+    'butterfly': {
+        title: 'Ikan Kepe-kepe',
+        sciName: 'Chaetodontidae',
+        desc: 'Sering dijumpai di sekitar terumbu karang tropis. Bentuk tubuhnya pipih dan coraknya sangat cerah untuk mengecoh pemangsa di sela-sela karang.',
+        funFact: 'Beberapa spesies memiliki "mata palsu" di bagian belakang tubuhnya untuk membingungkan arah predator.'
+    },
+    'parrot': {
+        title: 'Ikan Kakatua',
+        sciName: 'Scaridae',
+        desc: 'Dinamakan kakatua karena susunan giginya menyatu seperti paruh burung. Mereka sangat berjasa memakan alga yang bisa mematikan pertumbuhan karang.',
+        funFact: 'Kotoran ikan kakatua berupa pasir putih bersih. Sebagian besar pasir putih di pantai tropis berasal dari ikan ini!'
+    },
+    'karang': {
+        title: 'Terumbu Karang',
+        sciName: 'Anthozoa',
+        desc: 'Terumbu karang bukanlah batu, melainkan kumpulan ribuan hewan kecil bersimbiosis dengan alga. Mereka membangun struktur kapur besar yang jadi rumah jutaan biota laut.',
+        funFact: 'Meski tampak seperti daratan, karang hidup dan hanya tumbuh beberapa sentimeter saja setiap tahunnya.'
+    },
+    'karang-acro': {
+        title: 'Karang Acropora',
+        sciName: 'Acroporidae',
+        desc: 'Salah satu jenis karang pembangun terumbu utama yang tumbuh dengan bentuk bercabang seperti tanduk rusa.',
+        funFact: 'Acropora adalah tipe karang yang sangat sensitif terhadap perubahan suhu laut dan rentan mengalami pemutihan.'
+    },
+    'coral1': {
+        title: 'Koloni Karang Massif',
+        sciName: 'Faviidae',
+        desc: 'Struktur karang yang padat dan kokoh. Pola permukaannya sering kali bergelombang menyerupai bentuk otak manusia.',
+        funFact: 'Saking kuat dan kerasnya, karang ini sering menjadi tameng alami untuk menahan hantaman ombak badai.'
+    },
+    'coral2': {
+        title: 'Karang Meja (Table Coral)',
+        sciName: 'Acropora spp.',
+        desc: 'Berbentuk pipih dan melebar bagai sebuah meja. Permukaan luas ini berfungsi untuk menangkap cahaya matahari secara maksimal.',
+        funFact: 'Ikan-ikan kecil sering menjadikan bagian bawah karang meja ini sebagai "payung" untuk bersembunyi.'
+    },
+    'coral3': {
+        title: 'Karang Berbatu (Stony Coral)',
+        sciName: 'Scleractinia',
+        desc: 'Komponen utama pembentuk fondasi terumbu laut dalam. Menghasilkan zat kapur secara terus-menerus.',
+        funFact: 'Hanya mencari mangsa berupa plankton mikroskopis di malam hari dengan menjulurkan tentakelnya.'
+    },
+    'tridacna': {
+        title: 'Kerang Kima',
+        sciName: 'Tridacna',
+        desc: 'Kerang yang menempel mati di terumbu karang. Cangkangnya memiliki bibir bergelombang lebar dan corak mantel yang berwarna-warni cemerlang.',
+        funFact: 'Corak warna-warni kima selalu berbeda-beda pada setiap individunya, layaknya sidik jari manusia!'
+    },
+    'tridacna-gigas': {
+        title: 'Kima Raksasa',
+        sciName: 'Tridacna gigas',
+        desc: 'Spesies kerang terbesar di lautan dunia. Bisa tumbuh hingga panjang lebih dari 1 meter dan berat lebih dari 200 kg.',
+        funFact: 'Legenda mengatakan kerang raksasa ini bisa menjepit manusia, padahal sebenarnya ia lambat menutup cangkangnya.'
+    },
+    'zooplankton': {
+        title: 'Zooplankton (Daphnia)',
+        sciName: 'Daphnia pulex',
+        desc: 'Hewan mikroskopis yang melayang bebas di kedalaman laut. Ini adalah sumber makanan terpenting bagi berbagai makhluk laut hingga paus raksasa.',
+        funFact: 'Mereka memiliki kebiasaan migrasi unik: naik ke permukaan laut saat malam, dan kembali tenggelam ke dalam saat siang.'
+    },
+    'fitoplankton': {
+        title: 'Fitoplankton',
+        sciName: 'Phytoplankton',
+        desc: 'Tumbuhan renik (mikroskopis) yang mengambang di lautan. Mereka menjadi ujung pangkal (produsen) di jaring rantai makanan samudra.',
+        funFact: 'Lebih dari 50% oksigen di Bumi—yang kita hirup saat ini—ternyata diproduksi oleh mereka di lautan!'
+    },
+    'penyu': {
+        title: 'Penyu Hijau',
+        sciName: 'Chelonia mydas',
+        desc: 'Reptil purba penjelajah samudra tropis. Penyu dewasa merupakan hewan herbivora yang menjaga keseimbangan populasi padang lamun.',
+        funFact: 'Warna hijau pada namanya tidak berasal dari tempurung, melainkan dari lemak hijau di bawah kulit akibat diet alga/lamun.'
+    },
+    'lumba-lumba': {
+        title: 'Lumba-Lumba Hidung Botol',
+        sciName: 'Tursiops truncatus',
+        desc: 'Mamalia laut cerdas yang bersahabat. Hidup berkelompok (pod) dan saling berkomunikasi menggunakan gelombang ekolokasi atau sonar alami.',
+        funFact: 'Lumba-lumba tidur dengan memejamkan satu matanya bergantian agar setengah otaknya tetap sadar dan tidak tenggelam.'
+    },
+    'dugong': {
+        title: 'Dugong (Sapi Laut)',
+        sciName: 'Dugong dugon',
+        desc: 'Mamalia laut pemalu yang bergerak lambat. Habitat utamanya adalah perairan dangkal yang kaya akan padang lamun.',
+        funFact: 'Siluet dugong dari jauh dianggap sebagai inspirasi legenda putri duyung (mermaid) oleh para pelaut zaman kuno.'
+    },
+    'rumput': {
+        title: 'Rumput Laut',
+        sciName: 'Macroalgae',
+        desc: 'Berbeda dengan tanaman darat, mereka tidak punya akar dan daun sejati. Hanya menempel di substrat batu dan menyerap nutrisi langsung dari air laut.',
+        funFact: 'Rumput laut menghasilkan zat karagenan yang digunakan luas pada es krim, kosmetik, hingga kapsul obat.'
+    },
+    'rumput2': {
+        title: 'Padang Lamun (Seagrass)',
+        sciName: 'Zosteraceae',
+        desc: 'Satu-satunya tumbuhan berbunga (Angiospermae) yang bisa beradaptasi penuh hidup di dalam air laut yang asin.',
+        funFact: 'Kemampuan padang lamun dalam menyerap gas karbon diperkirakan 35 kali lipat lebih tangguh dibanding hutan darat.'
+    },
+    'rumput3': {
+        title: 'Alga Cokelat (Kelp)',
+        sciName: 'Phaeophyceae',
+        desc: 'Jenis alga besar yang tumbuh merambat vertikal seperti pohon, hingga membentuk "hutan" kelp lebat yang menopang ribuan spesies laut.',
+        funFact: 'Dalam kondisi habitat optimal, Giant Kelp mampu memanjang sangat kilat hingga mencapai 60 cm per harinya!'
+    },
+    'botol2': {
+        title: 'Sampah Botol Plastik',
+        sciName: 'Polietilena Tereftalat (PET)',
+        desc: 'Sampah anorganik buatan manusia. Jutaan ton plastik ini terdampar di lautan setiap tahun, mencekik biota laut dan mengotori terumbu karang.',
+        funFact: 'Di lautan, satu botol plastik ini butuh waktu hingga 450 tahun lamanya untuk bisa terurai dan tetap menjadi ancaman mikroplastik.'
+    },
+    'ekosistem': {
+        title: 'Ekosistem Terumbu Karang',
+        sciName: 'Coral Reef Ecosystem',
+        desc: 'Jejaring kehidupan bawah laut yang sangat kompleks dan indah. Meski hanya menutupi kurang dari 1% dasar samudra, tempat ini menjadi rumah bagi lebih dari 25% dari seluruh spesies laut di Bumi.',
+        funFact: 'Satu ekosistem karang sehat mampu melindungi garis pantai dari amukan badai secara alami, fungsinya sama seperti tembok beton penahan ombak!'
+    }
+};
+
 const getModelUrl = (tab: string) => {
     switch(tab) {
+        case 'ekosistem': return 'https://huggingface.co/buckets/alysasalsaa/dive3d-models/resolve/ekosistem3d.glb';
         case 'ikan': return '/models/ClownFish3D/ClownFish3d.glb';
         case 'karang': return '/models/usnm_74016-100k-2048-gltf_std/usnm_74016-100k-2048.gltf';
         case 'tridacna': return '/models/Tridacna/TridacnaAhnaf3D.glb';
@@ -24,7 +148,6 @@ const getModelUrl = (tab: string) => {
         case 'butterfly': return '/models/Butterfly Fish/Butterflyfish3D-compressed.glb';
         case 'parrot': return '/models/Parrot Fish/ParrotFish3D-compressed.glb';
         case 'fitoplankton': return '/models/Fitoplankton/FitoplanktonfromAhnaf3d.glb';
-        case 'botol': return '/models/Botol Plastik/botol plastik.glb';
         case 'botol2': return '/models/Botol Plastik/botol plastik banyak.glb';
         case 'coral1': return '/models/Coral/Coral3_3D.glb';
         case 'coral2': return '/models/Coral/CoralfromAhnaf2_3D.glb';
@@ -32,8 +155,7 @@ const getModelUrl = (tab: string) => {
         case 'karang-acro': return '/models/Karang/Karang Acropora (bercabang)3D.glb';
         case 'rumput': return '/models/Rumput Laut/Seaweed3D.glb';
         case 'rumput2': return '/models/Rumput Laut/SeaweedAgain3D.glb';
-        case 'rumput3': return '/models/Rumput Laut/rumputlautExtra3D.glb';
-        case 'rumput4': return '/models/Rumput Laut/rumputlautLagi3D.glb';
+        case 'rumput3': return '/models/Rumput Laut/rumputlautLagi3D.glb';
         default: return null;
     }
 };
@@ -374,6 +496,38 @@ export default function AkademiPage() {
                                 
                                 <div className="tour-3d-viewer relative w-full flex-grow bg-[#001020] rounded-[32px] overflow-hidden group border-2 border-[#0a1e3f] shadow-2xl min-h-[700px] md:min-h-[800px]">
                                     
+                                    {/* HUD Info Panel (Floating Glassmorphism) */}
+                                    {modelInfoData[active3DTab] && (
+                                        <div className="absolute top-6 left-6 z-10 w-[300px] md:w-[360px] pointer-events-none">
+                                            <div className={`p-6 rounded-[24px] backdrop-blur-2xl border shadow-2xl transition-all duration-500 animate-in fade-in slide-in-from-left-8 ${isDark ? 'bg-black/40 border-white/10 shadow-cyan-500/10' : 'bg-white/70 border-white shadow-blue-500/10'}`}>
+                                                <div className="flex items-center gap-2 mb-3">
+                                                    <span className={`w-2 h-2 rounded-full animate-pulse ${isDark ? 'bg-cyan-400' : 'bg-blue-600'}`}></span>
+                                                    <span className={`text-[10px] uppercase font-black tracking-[0.2em] ${isDark ? 'text-cyan-400' : 'text-blue-600'}`}>
+                                                        {modelInfoData[active3DTab].sciName}
+                                                    </span>
+                                                </div>
+                                                <h3 className={`text-2xl font-black mb-3 leading-tight drop-shadow-md ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                                                    {modelInfoData[active3DTab].title}
+                                                </h3>
+                                                <div className={`w-10 h-1 rounded-full mb-4 ${isDark ? 'bg-white/20' : 'bg-blue-200'}`}></div>
+                                                <p className={`text-sm mb-6 leading-relaxed font-semibold ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                                                    {modelInfoData[active3DTab].desc}
+                                                </p>
+                                                
+                                                <div className={`p-4 rounded-xl border relative overflow-hidden ${isDark ? 'bg-gradient-to-br from-cyan-500/10 to-blue-500/5 border-cyan-500/20' : 'bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-200'}`}>
+                                                    <div className="absolute -right-4 -top-4 text-5xl opacity-10">💡</div>
+                                                    <div className="flex items-center gap-2 mb-2 relative z-10">
+                                                        <span className="text-base">💡</span>
+                                                        <span className={`text-[11px] font-black uppercase tracking-widest ${isDark ? 'text-cyan-300' : 'text-blue-800'}`}>Fakta Unik Konservasi</span>
+                                                    </div>
+                                                    <p className={`text-[13px] leading-relaxed font-bold relative z-10 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                                                        {modelInfoData[active3DTab].funFact}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+
                                     {/* 3D Model Viewer */}
                                     <div className="absolute inset-0 w-full h-full z-0">
                                         {getModelUrl(active3DTab) ? (
@@ -401,6 +555,7 @@ export default function AkademiPage() {
                                     className={`tour-3d-tabs mt-6 p-2 rounded-3xl flex items-center justify-start overflow-x-auto gap-3 w-full mx-auto border select-none ${isDark ? 'bg-[#001020] border-white/10 shadow-lg' : 'bg-white border-gray-200 shadow-sm'}`}
                                 >
                                     {[
+                                        { id: 'ekosistem', label: 'Ekosistem Besar', icon: '🌊' },
                                         { id: 'ikan', label: 'Ikan', icon: '🐟' },
                                         { id: 'butterfly', label: 'Butterfly Fish', icon: '🐠' },
                                         { id: 'parrot', label: 'Parrot Fish', icon: '🐡' },
@@ -418,9 +573,7 @@ export default function AkademiPage() {
                                         { id: 'dugong', label: 'Dugong', icon: '🦭' },
                                         { id: 'rumput', label: 'Rumput Laut 1', icon: '🌿' },
                                         { id: 'rumput2', label: 'Rumput Laut 2', icon: '🌱' },
-                                        { id: 'rumput3', label: 'Rumput Laut 3', icon: '🌾' },
-                                        { id: 'rumput4', label: 'Rumput Laut 4', icon: '🍃' },
-                                        { id: 'botol', label: 'Botol Plastik', icon: '🥤' },
+                                        { id: 'rumput3', label: 'Rumput Laut 3', icon: '🍃' },
                                         { id: 'botol2', label: 'Botol Plastik Banyak', icon: '🗑️' },
                                     ].map(cat => (
                                         <button 

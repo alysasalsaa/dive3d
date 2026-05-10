@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import dynamic from 'next/dynamic';
@@ -14,18 +14,28 @@ const models = [
     badge: '🪸 Spesimen 3D Interaktif',
     badgeColor: 'cyan',
     title: 'Model Terumbu Karang',
-    desc: 'Putar dan perbesar model untuk mempelajari struktur terumbu karang secara langsung. Gunakan kursor atau sentuhan untuk berinteraksi.',
+    desc: 'Terumbu karang adalah "hutan hujan laut" yang menjadi rumah bagi 25% spesies laut meski hanya menutupi kurang dari 1% dasar samudra. Organisme ini tumbuh sangat lambat, hanya beberapa sentimeter per tahun.',
     url: '/models/usnm_74016-100k-2048-gltf_std/usnm_74016-100k-2048.gltf',
     credit: '📦 USNM 74016 — Smithsonian 3D Digitization',
+    stats: {
+      "Tipe": "Invertebrata",
+      "Habitat": "Perairan Dangkal",
+      "Ancaman Utama": "Perubahan Iklim",
+    }
   },
   {
     key: 'clownfish',
     badge: '🐟 Spesimen 3D Interaktif',
     badgeColor: 'orange',
     title: 'Model Ikan Badut (Clownfish)',
-    desc: 'Putar dan perbesar model untuk mempelajari karakteristik Ikan Badut secara langsung. Gunakan kursor atau sentuhan untuk berinteraksi.',
+    desc: 'Ikan badut kebal terhadap sengatan anemon laut berkat lapisan lendir khusus di tubuhnya. Mereka hidup berdampingan secara harmonis; anemon memberikan perlindungan, dan ikan badut membersihkan parasit dari anemon.',
     url: '/models/ClownFish3D/ClownFish3d.glb',
     credit: '📦 Koleksi Divexplore 3D',
+    stats: {
+      "Nama Ilmiah": "Amphiprioninae",
+      "Habitat": "Terumbu Karang",
+      "Simbiosis": "Mutualisme (Anemon)",
+    }
   },
 ];
 
@@ -42,6 +52,11 @@ const badgeClassLight: Record<string, string> = {
 export default function Model3DPage() {
   const pathname = usePathname();
   const { isDark, toggleTheme } = useTheme();
+  const [loadedModels, setLoadedModels] = useState<Record<string, boolean>>({});
+
+  const handleLoadModel = (key: string) => {
+    setLoadedModels((prev) => ({ ...prev, [key]: true }));
+  };
 
   const navLinks = [
     { href: '/', label: 'Beranda' },
@@ -147,12 +162,58 @@ export default function Model3DPage() {
               <h2 className={`text-3xl md:text-4xl font-black mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
                 {model.title}
               </h2>
-              <p className={`text-sm max-w-xl ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+              <p className={`text-base md:text-lg max-w-3xl leading-relaxed ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                 {model.desc}
               </p>
             </div>
 
-            <ModelViewer url={model.url} className="w-full h-[560px]" />
+            <div className={`relative group rounded-[2.5rem] overflow-hidden border transition-all duration-500 ${isDark ? 'bg-white/[0.02] border-white/10 hover:border-blue-500/30' : 'bg-blue-50 border-blue-100 shadow-xl'}`}>
+              {loadedModels[model.key] ? (
+                <ModelViewer url={model.url} className="w-full h-[560px] cursor-grab active:cursor-grabbing" />
+              ) : (
+                <div className={`w-full h-[560px] flex flex-col items-center justify-center relative overflow-hidden ${isDark ? 'bg-gradient-to-br from-blue-900/20 to-cyan-900/10' : 'bg-gradient-to-br from-blue-100/50 to-cyan-50/50'}`}>
+                  {/* Ornamen Latar Belakang */}
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-cyan-500/20 blur-[80px] rounded-full pointer-events-none" />
+                  
+                  <button 
+                    onClick={() => handleLoadModel(model.key)}
+                    className="relative z-10 flex flex-col items-center gap-5 group/btn"
+                  >
+                    <div className={`w-24 h-24 rounded-full flex items-center justify-center border backdrop-blur-xl group-hover/btn:scale-110 transition-all duration-500 shadow-2xl ${isDark ? 'bg-cyan-500/20 border-cyan-400/30 shadow-cyan-500/20 group-hover/btn:bg-cyan-500/30 group-hover/btn:border-cyan-400/50 text-cyan-300' : 'bg-white/80 border-cyan-200 shadow-cyan-500/10 group-hover/btn:bg-white text-cyan-600'}`}>
+                      <svg className="w-8 h-8 ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    </div>
+                    <div className="flex flex-col items-center gap-1.5">
+                      <span className={`font-black tracking-widest text-sm uppercase px-5 py-2.5 rounded-full border backdrop-blur-md shadow-lg ${isDark ? 'bg-black/60 text-cyan-300 border-white/10' : 'bg-white/90 text-cyan-700 border-cyan-100'}`}>
+                        Muat 3D Interaktif
+                      </span>
+                      <span className={`text-[10px] font-bold uppercase tracking-widest ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+                        Mungkin memakan waktu memuat (±10MB)
+                      </span>
+                    </div>
+                  </button>
+                </div>
+              )}
+              
+              {/* Floating Info Panel - Glassmorphism */}
+              <div className="absolute top-6 left-6 w-64 p-5 rounded-2xl bg-black/60 backdrop-blur-xl border border-white/10 shadow-2xl opacity-0 translate-x-[-20px] group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500 pointer-events-none hidden md:block">
+                <h4 className="text-white font-bold text-sm mb-4 uppercase tracking-widest flex items-center gap-2 border-b border-white/10 pb-3">
+                  <span>ℹ️</span> Info Spesimen
+                </h4>
+                <div className="space-y-4">
+                  {Object.entries(model.stats).map(([key, value]) => (
+                    <div key={key} className="flex flex-col">
+                      <span className="text-gray-400 text-[10px] uppercase font-bold tracking-widest mb-0.5">{key}</span>
+                      <span className="text-cyan-300 text-sm font-semibold">{value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Tooltip hint di tengah bawah */}
+              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 px-6 py-3 rounded-full bg-black/60 border border-white/10 text-xs font-bold text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity duration-500 backdrop-blur-md pointer-events-none flex items-center gap-2 shadow-xl">
+                <span>👆</span> Geser untuk memutar atau zoom
+              </div>
+            </div>
 
             <div className={`mt-4 flex items-center gap-3 text-xs ${isDark ? 'text-gray-600' : 'text-gray-400'}`}>
               <span>🖱️ Klik + Tarik untuk memutar</span>
