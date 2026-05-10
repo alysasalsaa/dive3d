@@ -3,16 +3,17 @@
 import React from 'react';
 import Link from 'next/link';
 import { useTheme } from '../../../lib/useTheme';
+import { Waves, Trophy, Fish, Recycle, Moon, Crown, Award, Lock } from '../../../components/DiveIcons';
 
-const ALL_BADGES = [
+const ALL_BADGES: { id: number; name: string; tooltip: string; icon: React.ReactNode; achieved: boolean; date: string; rarity: string }[] = [
     { id: 1, name: 'Penyelam Pemula', tooltip: 'Selesaikan modul pertama', icon: '🤿', achieved: true, date: '10 Mei 2026', rarity: 'common' },
     { id: 2, name: 'Pengamat Karang', tooltip: 'Selesaikan kuis ekosistem karang', icon: '🔍', achieved: true, date: '12 Mei 2026', rarity: 'common' },
-    { id: 3, name: 'Pelindung Laut', tooltip: 'Pelajari modul ancaman laut', icon: '🌊', achieved: true, date: '15 Mei 2026', rarity: 'rare' },
-    { id: 4, name: 'Juara Kuis', tooltip: 'Dapatkan nilai sempurna di 3 kuis', icon: '🏆', achieved: false, date: '-', rarity: 'epic' },
-    { id: 5, name: 'Ahli Spesies', tooltip: 'Selesaikan semua modul ensiklopedia', icon: '🐠', achieved: false, date: '-', rarity: 'rare' },
-    { id: 6, name: 'Konservator', tooltip: 'Bagikan 5 artikel tentang laut', icon: '♻️', achieved: false, date: '-', rarity: 'common' },
-    { id: 7, name: 'Penyelam Malam', tooltip: 'Login dan belajar di atas jam 21:00', icon: '🌙', achieved: true, date: '20 Mei 2026', rarity: 'epic' },
-    { id: 8, name: 'Legenda Samudra', tooltip: 'Selesaikan semua modul dan kuis', icon: '👑', achieved: false, date: '-', rarity: 'legendary' },
+    { id: 3, name: 'Pelindung Laut', tooltip: 'Pelajari modul ancaman laut', icon: <Waves size={20} />, achieved: true, date: '15 Mei 2026', rarity: 'rare' },
+    { id: 4, name: 'Juara Kuis', tooltip: 'Dapatkan nilai sempurna di 3 kuis', icon: <Trophy size={20} />, achieved: false, date: '-', rarity: 'epic' },
+    { id: 5, name: 'Ahli Spesies', tooltip: 'Selesaikan semua modul ensiklopedia', icon: <Fish size={20} />, achieved: false, date: '-', rarity: 'rare' },
+    { id: 6, name: 'Konservator', tooltip: 'Bagikan 5 artikel tentang laut', icon: <Recycle size={20} />, achieved: false, date: '-', rarity: 'common' },
+    { id: 7, name: 'Penyelam Malam', tooltip: 'Login dan belajar di atas jam 21:00', icon: <Moon size={18} />, achieved: true, date: '20 Mei 2026', rarity: 'epic' },
+    { id: 8, name: 'Legenda Samudra', tooltip: 'Selesaikan semua modul dan kuis', icon: <Crown size={20} />, achieved: false, date: '-', rarity: 'legendary' },
 ];
 
 export default function BadgesPage() {
@@ -56,7 +57,7 @@ export default function BadgesPage() {
                     <div className={`px-6 py-4 rounded-3xl border backdrop-blur-xl shrink-0 ${isDark ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200 shadow-sm'}`}>
                         <div className="text-sm font-bold text-gray-500 mb-1">Total Lencana Anda</div>
                         <div className="text-3xl font-black flex items-center gap-3">
-                            <span className="text-4xl">🏅</span>
+                            <Award size={20} />
                             <span className={isDark ? 'text-white' : 'text-blue-900'}>
                                 {ALL_BADGES.filter(b => b.achieved).length} <span className="text-gray-400 text-xl font-bold">/ {ALL_BADGES.length}</span>
                             </span>
@@ -114,7 +115,7 @@ export default function BadgesPage() {
                                             </span>
                                         ) : (
                                             <span className="text-gray-500 flex items-center gap-1.5">
-                                                <span className="w-4 h-4 rounded-full bg-gray-500/20 flex items-center justify-center">🔒</span> 
+                                                <span className="w-4 h-4 rounded-full bg-gray-500/20 flex items-center justify-center"><Lock size={24} /></span>
                                                 Terkunci
                                             </span>
                                         )}

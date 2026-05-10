@@ -44,7 +44,7 @@ class ContentController extends Controller
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
 
-        if ($httpCode !== 200) {
+        if ($httpCode !== 200 && $httpCode !== 201) {
             return response()->json(['message' => 'Gagal mengunggah ke Supabase Storage', 'detail' => $response], 500);
         }
 

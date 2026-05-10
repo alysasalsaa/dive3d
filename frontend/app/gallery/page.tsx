@@ -7,6 +7,7 @@ import toast from 'react-hot-toast';
 import OnboardingTour from '../../components/OnboardingTour';
 import NavbarLinks from '../../components/Navbar';
 import { Step } from 'react-joyride';
+import { Moon, Sun, Waves, Folder, Fish, Image, Clock, CheckCircle2, X, Trash2, Camera, Download, Rocket, Lightbulb } from '../../components/DiveIcons';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -31,8 +32,8 @@ const CATEGORIES = [
 
 const FORMATS = [
     { value: 'all', label: 'Semua Format' },
-    { value: 'photo', label: '📷 Foto' },
-    { value: 'video', label: '🎥 Video' },
+    { value: 'photo', label: 'Foto' },
+    { value: 'video', label: 'Video' },
 ];
 
 // Mock data dihapus karena sekarang kita menggunakan data asli dari API
@@ -314,7 +315,7 @@ export default function CommunityGallery() {
                             title={isDark ? 'Mode Gelap' : 'Mode Terang'}
                             className={`tour-theme w-10 h-10 rounded-full flex items-center justify-center transition-all text-base backdrop-blur-md ${isDark ? 'bg-black/40 hover:bg-black/60 border border-white/20 shadow-lg shadow-black/20' : 'bg-white hover:bg-gray-100 border border-gray-200 shadow-sm'}`}
                         >
-                            {isDark ? '🌙' : '☀️'}
+                            {isDark ? <Moon size={18} /> : <Sun size={18} />}
                         </button>
                     </div>
                 </div>
@@ -346,14 +347,14 @@ export default function CommunityGallery() {
                         onClick={() => setActiveTab('galeri')}
                         className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'galeri' ? 'bg-gradient-to-r from-blue-600 to-cyan-500 text-white shadow-lg' : isDark ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-800'}`}
                     >
-                        🌊 Galeri
+                        <Waves size={20} className="inline-block mr-1" /> Galeri
                     </button>
                     {isLoggedIn && (
                         <button
                             onClick={() => setActiveTab('karyaku')}
                             className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2 ${activeTab === 'karyaku' ? 'bg-gradient-to-r from-purple-600 to-pink-500 text-white shadow-lg' : isDark ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-800'}`}
                         >
-                            📁 Karyaku
+                            <Folder size={18} className="inline-block mr-1" /> Karyaku
                             {myUploads.filter(u => u.status === 'pending').length > 0 && (
                                 <span className="bg-yellow-500 text-black text-[10px] font-black px-1.5 py-0.5 rounded-full">
                                     {myUploads.filter(u => u.status === 'pending').length}
@@ -476,7 +477,7 @@ export default function CommunityGallery() {
                             </div>
                         ) : (
                             <div className={`text-center py-20 rounded-2xl border ${isDark ? 'bg-white/[0.03] border-white/10' : 'bg-white border-gray-100 shadow-sm'}`}>
-                                <span className="text-5xl">🐠</span>
+                                <Fish size={48} className="mx-auto" />
                                 <h3 className={`mt-4 text-xl font-bold ${isDark ? 'text-white' : 'text-gray-800'}`}>Belum ada karya yang dipublikasikan.</h3>
                                 <p className={`mt-2 ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>Jadilah yang pertama mengunggah karya!</p>
                             </div>
@@ -513,17 +514,17 @@ export default function CommunityGallery() {
                             </div>
                         ) : myUploads.length === 0 ? (
                             <div className={`text-center py-20 rounded-2xl border ${isDark ? 'bg-white/[0.03] border-white/10' : 'bg-white border-gray-100 shadow-sm'}`}>
-                                <span className="text-5xl">📁</span>
+                                <Folder size={48} className="mx-auto" />
                                 <h3 className={`mt-4 text-xl font-bold ${isDark ? 'text-white' : 'text-gray-800'}`}>Belum ada karya yang kamu unggah.</h3>
                                 <p className={`mt-2 ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>Klik tombol "Unggah Karya" untuk berbagi karyamu!</p>
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                                 {myUploads.map((item) => {
-                                    const statusMap: Record<string, { label: string; color: string; icon: string }> = {
-                                        pending:  { label: 'Menunggu Review', color: 'bg-yellow-500 text-black', icon: '⏳' },
-                                        approved: { label: 'Sudah Tayang',    color: 'bg-green-500 text-white',  icon: '✅' },
-                                        rejected: { label: 'Ditolak',         color: 'bg-red-500 text-white',    icon: '❌' },
+                                    const statusMap: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
+                                        pending:  { label: 'Menunggu Review', color: 'bg-yellow-500 text-black', icon: <Clock size={18} /> },
+                                        approved: { label: 'Sudah Tayang',    color: 'bg-green-500 text-white',  icon: <CheckCircle2 size={18} /> },
+                                        rejected: { label: 'Ditolak',         color: 'bg-red-500 text-white',    icon: <X size={18} /> },
                                     };
                                     const s = statusMap[item.status] || statusMap['pending'];
                                     return (
@@ -537,7 +538,7 @@ export default function CommunityGallery() {
                                                         <img src={resolveMediaUrl(item.image)} alt={item.title} className="w-full h-full object-cover" />
                                                     )
                                                 ) : (
-                                                    <div className="w-full h-full flex items-center justify-center text-4xl opacity-30">🖼️</div>
+                                                    <div className="w-full h-full flex items-center justify-center opacity-30"><Image size={40} /></div>
                                                 )}
                                                 {/* Status badge */}
                                                 <div className={`absolute top-3 left-3 px-3 py-1 rounded-full text-[11px] font-black flex items-center gap-1.5 shadow-lg ${s.color}`}>
@@ -583,7 +584,7 @@ export default function CommunityGallery() {
                     <div className={`rounded-[28px] shadow-2xl w-full max-w-lg relative z-10 overflow-hidden border ${isDark ? 'bg-[#050d1a] border-white/10' : 'bg-white border-gray-100'}`}>
                         <div className="bg-gradient-to-r from-blue-600 to-cyan-500 p-6 flex justify-between items-center">
                             <h3 className="text-white font-bold text-xl flex items-center gap-2">
-                                <span>📸</span> Unggah Karya Baru
+                                <Camera size={20} /> Unggah Karya Baru
                             </h3>
                             <button
                                 onClick={() => setIsModalOpen(false)}
@@ -614,7 +615,7 @@ export default function CommunityGallery() {
                                     </div>
                                 ) : (
                                     <>
-                                        <div className={`w-16 h-16 rounded-full flex items-center justify-center text-3xl mb-3 group-hover:scale-110 transition-transform ${isDark ? 'bg-white/10' : 'bg-white shadow-sm'}`}>📥</div>
+                                        <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform ${isDark ? 'bg-white/10' : 'bg-white shadow-sm'}`}><Download size={18} /></div>
                                         <p className={`font-bold ${isDark ? 'text-blue-300' : 'text-blue-700'}`}>Pilih media atau tarik ke sini</p>
                                         <p className="text-xs text-gray-500 mt-2">Semua format foto & video didukung (Tanpa Batas)</p>
                                     </>
@@ -657,7 +658,7 @@ export default function CommunityGallery() {
                                 </div>
                             </div>
                             <button onClick={handleUpload} disabled={isUploading} className={`w-full py-4 rounded-xl font-bold text-white transition-all shadow-lg hover:-translate-y-1 ${isUploading ? 'bg-gray-500 cursor-not-allowed' : 'bg-gradient-to-r from-blue-600 to-cyan-500 hover:shadow-blue-500/25'}`}>
-                                {isUploading ? '⏳ Mengunggah Karya...' : '🚀 Unggah Sekarang'}
+                                {isUploading ? <><Clock size={18} className="inline-block mr-1" /> Mengunggah Karya...</> : <><Rocket size={18} className="inline-block mr-1" /> Unggah Sekarang</>}
                             </button>
                         </div>
                     </div>
@@ -709,7 +710,7 @@ export default function CommunityGallery() {
                             <div className="mt-auto pt-8 space-y-3">
                                 {isAdmin && (
                                     <button onClick={() => handleDeleteContent(selectedItem.id)} className="w-full py-4 rounded-xl font-bold text-red-500 bg-red-500/10 hover:bg-red-500 hover:text-white transition-colors border border-red-500/20">
-                                        🗑️ Hapus Karya (Admin Akses)
+                                        <Trash2 size={18} className="inline-block mr-1" /> Hapus Karya (Admin Akses)
                                     </button>
                                 )}
                                 <button onClick={() => setSelectedItem(null)} className="w-full py-4 rounded-xl font-bold text-white bg-white/10 hover:bg-white/20 transition-colors border border-white/10 hover:border-white/20">
@@ -728,7 +729,7 @@ export default function CommunityGallery() {
                     title="Tampilkan panduan tour"
                     className="fixed bottom-6 right-6 z-40 flex items-center gap-2 px-4 py-3 rounded-full bg-cyan-500 hover:bg-cyan-400 text-black font-black text-sm shadow-2xl shadow-cyan-500/40 transition-all hover:-translate-y-1 hover:scale-105 active:scale-95"
                 >
-                    <span className="text-base">💡</span>
+                    <Lightbulb size={18} />
                     <span className="hidden sm:inline">Bantuan</span>
                 </button>
             )}

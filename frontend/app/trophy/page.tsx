@@ -3,14 +3,15 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
+import { Lock } from '../../components/DiveIcons';
 
 const BadgeViewer = dynamic(() => import('../../components/BadgeViewer'), { ssr: false });
 
 const BADGES = [
-    { score: 100, url: '/models/badges/FishTrophy_-compressed.glb',  label: '🏆 Trofi Ikan',     title: 'Trofi Ikan Mas',     desc: 'Simbol pencapaian tertinggi Anda! Fun fact: Lautan menutupi lebih dari 70% permukaan bumi dan menghasilkan lebih dari separuh oksigen dunia.', gradient: 'from-yellow-300 via-amber-400 to-yellow-600', ring: 'bg-amber-400/20', shadow: 'shadow-[0_0_100px_-20px_rgba(251,191,36,0.15)]' },
-    { score: 90,  url: '/models/badges/GoldMedal-fast-normal.glb',   label: '🥇 Medali Emas',    title: 'Medali Emas',        desc: 'Pencapaian luar biasa! Tahukah Anda? Terumbu karang sering disebut sebagai "hutan hujan laut" karena keanekaragaman hayatinya yang luar biasa.', gradient: 'from-yellow-200 via-yellow-400 to-amber-500', ring: 'bg-yellow-400/20', shadow: 'shadow-[0_0_100px_-20px_rgba(250,204,21,0.15)]' },
-    { score: 75,  url: '/models/badges/SilverMedal-fast-normal.glb', label: '🥈 Medali Perak',   title: 'Medali Perak',       desc: 'Kerja bagus! Fun fact: Paus biru adalah hewan terbesar yang pernah diketahui hidup di Bumi, suaranya bisa terdengar hingga 1.600 km di bawah air.', gradient: 'from-slate-200 via-slate-300 to-gray-400', ring: 'bg-slate-300/20', shadow: 'shadow-[0_0_100px_-20px_rgba(203,213,225,0.15)]' },
-    { score: 50,  url: '/models/badges/BronzeMedal__-compressed.glb',label: '🥉 Med. Perunggu',  title: 'Medali Perunggu',    desc: 'Langkah awal yang hebat! Tahukah Anda? Palung Mariana adalah titik terdalam di lautan, kedalamannya mencapai lebih dari 10.900 meter.', gradient: 'from-orange-300 via-orange-500 to-amber-700', ring: 'bg-orange-500/20', shadow: 'shadow-[0_0_100px_-20px_rgba(249,115,22,0.15)]' },
+    { score: 100, url: '/models/badges/FishTrophy_-compressed.glb',  label: 'Trofi Ikan',     title: 'Trofi Ikan Mas',     desc: 'Simbol pencapaian tertinggi Anda! Fun fact: Lautan menutupi lebih dari 70% permukaan bumi dan menghasilkan lebih dari separuh oksigen dunia.', gradient: 'from-yellow-300 via-amber-400 to-yellow-600', ring: 'bg-amber-400/20', shadow: 'shadow-[0_0_100px_-20px_rgba(251,191,36,0.15)]' },
+    { score: 90,  url: '/models/badges/GoldMedal-fast-normal.glb',   label: 'Medali Emas',    title: 'Medali Emas',        desc: 'Pencapaian luar biasa! Tahukah Anda? Terumbu karang sering disebut sebagai "hutan hujan laut" karena keanekaragaman hayatinya yang luar biasa.', gradient: 'from-yellow-200 via-yellow-400 to-amber-500', ring: 'bg-yellow-400/20', shadow: 'shadow-[0_0_100px_-20px_rgba(250,204,21,0.15)]' },
+    { score: 75,  url: '/models/badges/SilverMedal-fast-normal.glb', label: 'Medali Perak',   title: 'Medali Perak',       desc: 'Kerja bagus! Fun fact: Paus biru adalah hewan terbesar yang pernah diketahui hidup di Bumi, suaranya bisa terdengar hingga 1.600 km di bawah air.', gradient: 'from-slate-200 via-slate-300 to-gray-400', ring: 'bg-slate-300/20', shadow: 'shadow-[0_0_100px_-20px_rgba(203,213,225,0.15)]' },
+    { score: 50,  url: '/models/badges/BronzeMedal__-compressed.glb',label: 'Med. Perunggu',  title: 'Medali Perunggu',    desc: 'Langkah awal yang hebat! Tahukah Anda? Palung Mariana adalah titik terdalam di lautan, kedalamannya mencapai lebih dari 10.900 meter.', gradient: 'from-orange-300 via-orange-500 to-amber-700', ring: 'bg-orange-500/20', shadow: 'shadow-[0_0_100px_-20px_rgba(249,115,22,0.15)]' },
 ];
 
 export default function TrophyPage() {
@@ -53,7 +54,7 @@ export default function TrophyPage() {
             <div className="min-h-screen bg-[#00040a] flex flex-col items-center justify-center text-white text-center p-6 relative overflow-hidden">
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-red-500/5 blur-[150px] rounded-full pointer-events-none" />
                 <div className="relative z-10 flex flex-col items-center">
-                    <div className="text-8xl mb-6 opacity-30 drop-shadow-2xl">🔒</div>
+                    <div className="mb-6 opacity-30 drop-shadow-2xl"><Lock size={80} /></div>
                     <h1 className="text-4xl font-black mb-3 text-white">Trofi Masih Terkunci</h1>
                     <p className="text-gray-400 mb-8 max-w-md text-lg">Selesaikan minimal satu kuis dengan nilai kelulusan di Akademi untuk mendapatkan Trofi Spesial Anda!</p>
                     <Link href="/dashboard" className="px-8 py-4 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 hover:scale-105 transition-all shadow-xl shadow-blue-500/25 font-bold text-white">

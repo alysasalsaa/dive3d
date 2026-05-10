@@ -27,7 +27,7 @@ class GalleryController extends Controller
             "data" => $contents
         ]);
     }
-        public function paginated(Request $request): JsonResponse
+    public function paginated(Request $request): JsonResponse
     {
         $perPage = $request->input('per_page', 12);
 
@@ -48,5 +48,4 @@ class GalleryController extends Controller
             ]
         ]);
     }
- }
-
+}

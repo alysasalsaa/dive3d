@@ -9,6 +9,9 @@ import toast from 'react-hot-toast';
 import OnboardingTour from '../../components/OnboardingTour';
 import NavbarLinks from '../../components/Navbar';
 import { Step } from 'react-joyride';
+import {
+    Moon, Sun, GraduationCap, Waves, Lightbulb, Fish, CoralIcon, TurtleIcon, JellyfishIcon, Trash2, Leaf, Package, DiveIcon,
+} from '../../components/DiveIcons';
 
 const ModelViewer = dynamic(() => import('../../components/ModelViewer'), { ssr: false });
 
@@ -338,7 +341,7 @@ export default function AkademiPage() {
                         title={isDark ? 'Mode Gelap' : 'Mode Terang'}
                         className={`tour-theme w-10 h-10 rounded-full flex items-center justify-center transition-all text-base backdrop-blur-md ${isDark ? 'bg-black/40 hover:bg-black/60 border border-white/20 shadow-lg shadow-black/20' : 'bg-white hover:bg-gray-100 border border-gray-200 shadow-sm'}`}
                     >
-                        {isDark ? '🌙' : '☀️'}
+                        {isDark ? <Moon size={18} /> : <Sun size={18} />}
                     </button>
                   </div>
                 </div>
@@ -356,8 +359,8 @@ export default function AkademiPage() {
                     </div>
 
                     <div className="max-w-3xl">
-                        <div className={`inline-block px-4 py-1.5 mb-6 rounded-full border text-[11px] font-black tracking-[0.2em] uppercase ${isDark ? 'bg-cyan-500/15 border-cyan-400/30 text-cyan-300' : 'bg-cyan-500/10 border-cyan-400/20 text-cyan-600'}`}>
-                            🎓 Modul Pembelajaran 3D
+                        <div className={`inline-flex items-center gap-2 px-4 py-1.5 mb-6 rounded-full border text-[11px] font-black tracking-[0.2em] uppercase ${isDark ? 'bg-cyan-500/15 border-cyan-400/30 text-cyan-300' : 'bg-cyan-500/10 border-cyan-400/20 text-cyan-600'}`}>
+                            <GraduationCap size={24} /> Modul Pembelajaran 3D
                         </div>
                         <h1 className="text-5xl md:text-7xl font-black mb-6 leading-[1.05] tracking-tight">
                             Akademi{' '}
@@ -384,13 +387,13 @@ export default function AkademiPage() {
                             onClick={() => setActiveTab('lms')}
                             className={`flex-1 flex justify-center items-center gap-2 py-3 px-4 rounded-xl font-bold text-sm transition-all ${activeTab === 'lms' ? 'bg-white text-blue-600 shadow-md border-b-2 border-blue-600' : isDark ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-800'}`}
                         >
-                            <span className="text-lg">🌿</span> LMS
+                            <Leaf size={18} /> LMS
                         </button>
                         <button
                             onClick={() => setActiveTab('3d')}
                             className={`flex-1 flex justify-center items-center gap-2 py-3 px-4 rounded-xl font-bold text-sm transition-all ${activeTab === '3d' ? 'bg-white text-blue-600 shadow-md border-b-2 border-blue-600' : isDark ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-800'}`}
                         >
-                            <span className="text-lg">📦</span> 3D Interaktif
+                            <Package size={18} /> 3D Interaktif
                         </button>
                     </div>
 
@@ -420,7 +423,7 @@ export default function AkademiPage() {
                                         
                                         <div className="w-full md:w-1/2 aspect-[16/10] bg-blue-100 rounded-2xl overflow-hidden border border-gray-100 relative shadow-inner">
                                             <div className="w-full h-full flex items-center justify-center text-6xl transition-transform duration-700 hover:scale-105" style={{backgroundImage: `url(${lmsModules[currentLMSIndex].img})`, backgroundSize: 'cover', backgroundPosition: 'center'}}>
-                                                {!lmsModules[currentLMSIndex].img && "🌊"}
+                                                {!lmsModules[currentLMSIndex].img && <Waves size={20} />}
                                             </div>
                                             {/* Badge */}
                                             <div className="absolute top-4 left-4 w-12 h-12 bg-blue-600 text-white rounded-xl flex items-center justify-center text-xl font-black shadow-lg">
@@ -478,7 +481,7 @@ export default function AkademiPage() {
                                             <p className={`text-sm mb-6 font-medium leading-relaxed max-w-md ${isDark ? 'text-gray-400' : 'text-[#3b5275]'}`}>Kuis evaluasi telah terintegrasi di dalam setiap modul. Silakan klik "Mulai Belajar Modul Ini" di atas, pelajari materinya, dan kerjakan kuis di akhir modul tersebut untuk mendapatkan sertifikat kelulusan.</p>
                                         </div>
                                         <div className={`self-start px-5 py-2.5 rounded-xl flex items-center gap-3 font-bold text-sm border shadow-sm ${isDark ? 'bg-blue-500/10 border-blue-500/30 text-blue-400' : 'bg-blue-50 border-blue-200 text-blue-700'}`}>
-                                            <span className="text-lg">💡</span> Kuis tersedia di dalam Modul
+                                            <Lightbulb size={18} /> Kuis tersedia di dalam Modul
                                         </div>
                                     </div>
 
@@ -552,9 +555,9 @@ export default function AkademiPage() {
                                                 </p>
                                                 
                                                 <div className={`p-4 rounded-xl border relative overflow-hidden ${isDark ? 'bg-gradient-to-br from-cyan-500/10 to-blue-500/5 border-cyan-500/20' : 'bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-200'}`}>
-                                                    <div className="absolute -right-4 -top-4 text-5xl opacity-10">💡</div>
+                                                    <div className="absolute -right-4 -top-4 opacity-10"><Lightbulb size={18} /></div>
                                                     <div className="flex items-center gap-2 mb-2 relative z-10">
-                                                        <span className="text-base">💡</span>
+                                                        <Lightbulb size={18} />
                                                         <span className={`text-[11px] font-black uppercase tracking-widest ${isDark ? 'text-cyan-300' : 'text-blue-800'}`}>Fakta Unik Konservasi</span>
                                                     </div>
                                                     <p className={`text-[13px] leading-relaxed font-bold relative z-10 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
@@ -591,28 +594,28 @@ export default function AkademiPage() {
                                     style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', cursor: isDragging.current ? 'grabbing' : 'grab' }}
                                     className={`tour-3d-tabs mt-6 p-2 rounded-3xl flex items-center justify-start overflow-x-auto gap-3 w-full mx-auto border select-none ${isDark ? 'bg-[#001020] border-white/10 shadow-lg' : 'bg-white border-gray-200 shadow-sm'}`}
                                 >
-                                    {[
-                                        { id: 'ekosistem', label: 'Ekosistem Besar', icon: '🌊' },
-                                        { id: 'ikan', label: 'Clownfish', icon: '🐟' },
-                                        { id: 'butterfly', label: 'Butterfly Fish', icon: '🐠' },
-                                        { id: 'parrot', label: 'Parrot Fish', icon: '🐡' },
-                                        { id: 'karang', label: 'Karang', icon: '🪸' },
-                                        { id: 'karang-acro', label: 'Karang Acropora', icon: '🪸' },
-                                        { id: 'coral1', label: 'Coral 1', icon: '🐚' },
-                                        { id: 'coral2', label: 'Coral 2', icon: '🐚' },
-                                        { id: 'coral3', label: 'Coral 3', icon: '🐚' },
-                                        { id: 'tridacna', label: 'Tridacna', icon: '🐚' },
-                                        { id: 'tridacna-gigas', label: 'Tridacna Gigas', icon: '🦪' },
-                                        { id: 'zooplankton', label: 'Zooplankton', icon: '🦠' },
-                                        { id: 'fitoplankton', label: 'Fitoplankton', icon: '🦠' },
-                                        { id: 'penyu', label: 'Penyu Hijau', icon: '🐢' },
-                                        { id: 'lumba-lumba', label: 'Lumba-Lumba', icon: '🐬' },
-                                        { id: 'dugong', label: 'Dugong', icon: '🦭' },
-                                        { id: 'rumput', label: 'Rumput Laut 1', icon: '🌿' },
-                                        { id: 'rumput2', label: 'Rumput Laut 2', icon: '🌱' },
-                                        { id: 'rumput3', label: 'Rumput Laut 3', icon: '🍃' },
-                                        { id: 'botol2', label: 'Botol Plastik Banyak', icon: '🗑️' },
-                                    ].map(cat => (
+                                    {([
+                                        { id: 'ekosistem', label: 'Ekosistem Besar', icon: <Waves size={20} /> },
+                                        { id: 'ikan', label: 'Ikan', icon: <Fish size={20} /> },
+                                        { id: 'butterfly', label: 'Butterfly Fish', icon: <Fish size={20} /> },
+                                        { id: 'parrot', label: 'Parrot Fish', icon: <Fish size={20} /> },
+                                        { id: 'karang', label: 'Karang', icon: <CoralIcon size={20} /> },
+                                        { id: 'karang-acro', label: 'Karang Acropora', icon: <CoralIcon size={20} /> },
+                                        { id: 'coral1', label: 'Coral 1', icon: <CoralIcon size={20} /> },
+                                        { id: 'coral2', label: 'Coral 2', icon: <CoralIcon size={20} /> },
+                                        { id: 'coral3', label: 'Coral 3', icon: <CoralIcon size={20} /> },
+                                        { id: 'tridacna', label: 'Tridacna', icon: <CoralIcon size={20} /> },
+                                        { id: 'tridacna-gigas', label: 'Tridacna Gigas', icon: <CoralIcon size={20} /> },
+                                        { id: 'zooplankton', label: 'Zooplankton', icon: <JellyfishIcon size={20} /> },
+                                        { id: 'fitoplankton', label: 'Fitoplankton', icon: <JellyfishIcon size={20} /> },
+                                        { id: 'penyu', label: 'Penyu Hijau', icon: <TurtleIcon size={20} /> },
+                                        { id: 'lumba-lumba', label: 'Lumba-Lumba', icon: <Fish size={20} /> },
+                                        { id: 'dugong', label: 'Dugong', icon: <Fish size={20} /> },
+                                        { id: 'rumput', label: 'Rumput Laut 1', icon: <Leaf size={20} /> },
+                                        { id: 'rumput2', label: 'Rumput Laut 2', icon: <Leaf size={20} /> },
+                                        { id: 'rumput3', label: 'Rumput Laut 3', icon: <Leaf size={20} /> },
+                                        { id: 'botol2', label: 'Botol Plastik Banyak', icon: <Trash2 size={20} /> },
+                                    ] as { id: string; label: string; icon: React.ReactNode }[]).map(cat => (
                                         <button 
                                             key={cat.id} 
                                             onClick={() => setActive3DTab(cat.id)}
@@ -649,7 +652,7 @@ export default function AkademiPage() {
                     title="Tampilkan panduan tour"
                     className="fixed bottom-6 right-6 z-40 flex items-center gap-2 px-4 py-3 rounded-full bg-cyan-500 hover:bg-cyan-400 text-black font-black text-sm shadow-2xl shadow-cyan-500/40 transition-all hover:-translate-y-1 hover:scale-105 active:scale-95"
                 >
-                    <span className="text-base">💡</span>
+                    <Lightbulb size={18} />
                     <span className="hidden sm:inline">Bantuan</span>
                 </button>
             )}

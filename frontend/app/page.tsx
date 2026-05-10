@@ -7,6 +7,7 @@ import toast from 'react-hot-toast';
 import OnboardingTour from '../components/OnboardingTour';
 import NavbarLinks from '../components/Navbar';
 import { Step } from 'react-joyride';
+import { Moon, Sun, Eye, EyeOff, Clapperboard, Volume2, Fish, Lightbulb, Leaf, AlertTriangle, Shield } from '../components/DiveIcons';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -256,7 +257,7 @@ export default function HomePage() {
               title={isDark ? 'Mode Gelap' : 'Mode Terang'}
               className={`tour-theme w-10 h-10 rounded-full flex items-center justify-center transition-all text-base backdrop-blur-md ${isDark ? 'bg-black/40 hover:bg-black/60 border border-white/20 shadow-lg shadow-black/20' : 'bg-white hover:bg-gray-100 border border-gray-200 shadow-sm'}`}
             >
-              {isDark ? '🌙' : '☀️'}
+              {isDark ? <Moon size={18} /> : <Sun size={18} />}
             </button>
           </div>
         </div>
@@ -307,7 +308,7 @@ export default function HomePage() {
             </div>
 
             <div className={`inline-flex items-center gap-3 px-5 py-2.5 rounded-full text-sm font-semibold mb-12 transition-colors ${isDark ? 'bg-blue-900/40 text-blue-300' : 'bg-[#dff1ff] text-[#0066cc]'}`}>
-              <span className="text-lg">🌿</span> Bersama kita jaga laut, kehidupan, dan masa depan.
+              <Leaf size={18} /> Bersama kita jaga laut, kehidupan, dan masa depan.
             </div>
           </div>
 
@@ -315,7 +316,7 @@ export default function HomePage() {
           <div className={`rounded-2xl overflow-hidden border w-full max-w-xl lg:ml-auto p-2 backdrop-blur-md transition-colors shadow-2xl ${isDark ? 'bg-[#000814]/60 border-cyan-900/50' : 'bg-[#003366]/10 border-white/40'}`}>
             <div className={`rounded-xl overflow-hidden ${isDark ? 'bg-[#00102a]' : 'bg-[#002244]'}`}>
               <div className="px-4 py-3 flex items-center gap-2 border-b border-white/10">
-                <span className="text-base">🎬</span>
+                <Clapperboard size={20} className="text-white" />
                 <p className="text-sm font-semibold text-white">Trailer DIVEXPLORE</p>
               </div>
 
@@ -338,7 +339,7 @@ export default function HomePage() {
                   <div className="px-4 py-3 flex items-center gap-2 bg-black/60 backdrop-blur-md">
                     <span className="text-white text-xs font-medium">00:00 / 01:10</span>
                     <div className="ml-auto flex items-center gap-4">
-                      <button className="text-white hover:text-blue-300 text-lg transition-colors">🔊</button>
+                      <button className="text-white hover:text-blue-300 transition-colors"><Volume2 size={18} /></button>
                       <button className="text-white hover:text-blue-300 text-lg transition-colors">⛶</button>
                     </div>
                   </div>
@@ -370,7 +371,7 @@ export default function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Card 1 */}
             <div className={`p-8 rounded-2xl border backdrop-blur-md transition-transform hover:-translate-y-2 duration-300 ${isDark ? 'bg-black/50 border-white/10' : 'bg-white/10 border-white/20 shadow-xl'}`}>
-              <div className="w-14 h-14 rounded-full bg-blue-500/20 flex items-center justify-center text-3xl mb-6 shadow-[0_0_15px_rgba(59,130,246,0.5)]">🐠</div>
+              <div className="w-14 h-14 rounded-full bg-blue-500/20 flex items-center justify-center mb-6 shadow-[0_0_15px_rgba(59,130,246,0.5)]"><Fish size={20} /></div>
               <h3 className="text-2xl font-bold text-white mb-2">Mengapa Raja Ampat Istimewa?</h3>
               <p className="text-cyan-300 text-sm font-semibold mb-4 uppercase tracking-wider">Coral Triangle · Biodiversitas</p>
               <p className="text-gray-200 text-sm leading-relaxed mb-4">
@@ -388,7 +389,7 @@ export default function HomePage() {
 
             {/* Card 2 */}
             <div className={`p-8 rounded-2xl border backdrop-blur-md transition-transform hover:-translate-y-2 duration-300 ${isDark ? 'bg-black/50 border-white/10' : 'bg-white/10 border-white/20 shadow-xl'}`}>
-              <div className="w-14 h-14 rounded-full bg-red-500/20 flex items-center justify-center text-3xl mb-6 shadow-[0_0_15px_rgba(239,68,68,0.5)]">⚠️</div>
+              <div className="w-14 h-14 rounded-full bg-red-500/20 flex items-center justify-center mb-6 shadow-[0_0_15px_rgba(239,68,68,0.5)] text-red-400"><AlertTriangle size={24} /></div>
               <h3 className="text-2xl font-bold text-white mb-2">Ancaman Nyata Ekosistem</h3>
               <p className="text-red-300 text-sm font-semibold mb-4 uppercase tracking-wider">Dampak Manusia · Perubahan Iklim</p>
               <p className="text-gray-200 text-sm leading-relaxed mb-4">
@@ -407,7 +408,7 @@ export default function HomePage() {
 
             {/* Card 3 */}
             <div className={`p-8 rounded-2xl border backdrop-blur-md transition-transform hover:-translate-y-2 duration-300 ${isDark ? 'bg-black/50 border-white/10' : 'bg-white/10 border-white/20 shadow-xl'}`}>
-              <div className="w-14 h-14 rounded-full bg-green-500/20 flex items-center justify-center text-3xl mb-6 shadow-[0_0_15px_rgba(34,197,94,0.5)]">🛡️</div>
+              <div className="w-14 h-14 rounded-full bg-green-500/20 flex items-center justify-center mb-6 shadow-[0_0_15px_rgba(34,197,94,0.5)] text-green-400"><Shield size={24} /></div>
               <h3 className="text-2xl font-bold text-white mb-2">Strategi Pelestarian</h3>
               <p className="text-green-300 text-sm font-semibold mb-4 uppercase tracking-wider">MPA · Sasi Laut · Ekowisata</p>
               <p className="text-gray-200 text-sm leading-relaxed mb-4">
@@ -433,7 +434,7 @@ export default function HomePage() {
           <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setShowTrailer(false)}></div>
           <div className="relative z-10 w-full max-w-4xl bg-black rounded-2xl overflow-hidden shadow-2xl">
             <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
-              <p className="text-white text-sm font-semibold">🎬 Trailer DIVEXPLORE</p>
+              <p className="text-white text-sm font-semibold flex items-center gap-2"><Clapperboard size={20} /> Trailer DIVEXPLORE</p>
               <button onClick={() => setShowTrailer(false)} className="text-gray-400 hover:text-white transition-colors">✕</button>
             </div>
             <div className="aspect-video bg-gray-900 flex items-center justify-center text-gray-500 text-sm">
@@ -457,7 +458,7 @@ export default function HomePage() {
           onClick={() => setForceTour(true)}
           className="px-6 py-2 rounded-full border border-cyan-500/30 text-cyan-500 font-bold hover:bg-cyan-500/10 transition-colors text-sm flex items-center gap-2"
         >
-          <span>💡</span> Lihat Panduan Lagi
+          <Lightbulb size={18} /> Lihat Panduan Lagi
         </button>
         <p className={`text-[10px] tracking-[0.4em] font-bold uppercase ${isDark ? 'text-gray-600' : 'text-gray-400'}`}>
           © 2026 TIM DIVEXPLORE-3D • TEKNOLOGI INFORMASI UNY
@@ -515,7 +516,7 @@ export default function HomePage() {
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
                   >
-                    {showPassword ? '🙈' : '👁️'}
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                 </div>
               </div>
@@ -540,7 +541,7 @@ export default function HomePage() {
           title="Tampilkan panduan tour"
           className="fixed bottom-6 right-6 z-40 flex items-center gap-2 px-4 py-3 rounded-full bg-cyan-500 hover:bg-cyan-400 text-black font-black text-sm shadow-2xl shadow-cyan-500/40 transition-all hover:-translate-y-1 hover:scale-105 active:scale-95"
         >
-          <span className="text-base">💡</span>
+          <Lightbulb size={18} />
           <span className="hidden sm:inline">Bantuan</span>
         </button>
       )}

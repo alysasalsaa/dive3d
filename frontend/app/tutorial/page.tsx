@@ -8,6 +8,7 @@ import toast from 'react-hot-toast';
 import OnboardingTour from '../../components/OnboardingTour';
 import NavbarLinks from '../../components/Navbar';
 import { Step } from 'react-joyride';
+import { Moon, Sun, Lightbulb, Clapperboard, Eye, Clock, Fish, BubbleIcon } from '../../components/DiveIcons';
 
 export default function TutorialPage() {
   const pathname = usePathname();
@@ -55,7 +56,7 @@ export default function TutorialPage() {
       description: 'Belajar teknik foto bawah laut untuk hasil yang tajam dan memukau.',
       category: 'Fotografi',
       duration: '06:32',
-      icon: '📸',
+      icon: 'camera',
       color: 'from-blue-500 to-cyan-400',
       progress: 0,
       youtubeUrl: 'https://www.youtube.com/embed/OMmoUzmPprE?autoplay=1',
@@ -66,7 +67,7 @@ export default function TutorialPage() {
       description: 'Kuasai teknik pengambilan gambar video yang stabil dan sinematik.',
       category: 'Videografi',
       duration: '08:15',
-      icon: '🎥',
+      icon: 'video',
       color: 'from-purple-500 to-pink-500',
       progress: 0,
       youtubeUrl: 'https://www.youtube.com/embed/V2QpKo1LLJI?autoplay=1',
@@ -77,7 +78,7 @@ export default function TutorialPage() {
       description: 'Bangun cerita yang kuat untuk konten wisata bahari yang menarik.',
       category: 'Storytelling',
       duration: '07:40',
-      icon: '📖',
+      icon: 'reading',
       color: 'from-emerald-400 to-teal-500',
       progress: 0,
       youtubeUrl: 'https://www.youtube.com/embed/KdNHDwYYD2Y?autoplay=1',
@@ -88,7 +89,7 @@ export default function TutorialPage() {
       description: 'Panduan editing dan publikasi konten ke berbagai platform secara efektif.',
       category: 'Editing',
       duration: '09:10',
-      icon: '💻',
+      icon: 'monitor',
       color: 'from-amber-400 to-orange-500',
       progress: 0,
       youtubeUrl: 'https://www.youtube.com/embed/DJ5Wrlb3bxQ?autoplay=1',
@@ -99,7 +100,7 @@ export default function TutorialPage() {
       description: 'Pahami etika dan tanggung jawab saat membuat konten wisata bahari.',
       category: 'Etika',
       duration: '05:45',
-      icon: '🤝',
+      icon: 'handshake',
       color: 'from-red-400 to-rose-500',
       progress: 0,
       youtubeUrl: 'https://www.youtube.com/embed/dz_kxLtYFT0?autoplay=1',
@@ -200,7 +201,7 @@ export default function TutorialPage() {
               title={isDark ? 'Mode Gelap' : 'Mode Terang'}
               className={`tour-theme w-10 h-10 rounded-full flex items-center justify-center transition-all text-base backdrop-blur-md ${isDark ? 'bg-black/40 hover:bg-black/60 border border-white/20 shadow-lg shadow-black/20' : 'bg-white hover:bg-gray-100 border border-gray-200 shadow-sm'}`}
             >
-              {isDark ? '🌙' : '☀️'}
+              {isDark ? <Moon size={18} /> : <Sun size={18} />}
             </button>
           </div>
         </div>
@@ -224,7 +225,7 @@ export default function TutorialPage() {
 
           <div className="max-w-3xl">
             <div className={`inline-block px-4 py-1.5 mb-6 rounded-full border text-[11px] font-black tracking-[0.2em] uppercase backdrop-blur-md ${isDark ? 'bg-blue-500/10 border-blue-400/20 text-blue-300' : 'bg-blue-500/10 border-blue-400/20 text-blue-600'}`}>
-              💡 Pusat Bantuan & Panduan
+              <Lightbulb size={18} className="inline-block mr-1" /> Pusat Bantuan & Panduan
             </div>
             <h1 className="text-5xl md:text-7xl font-black mb-6 leading-[1.1] tracking-tight">
               Pusat{' '}
@@ -250,8 +251,8 @@ export default function TutorialPage() {
 
             <div className="flex items-center justify-between mb-5 relative z-10">
               <div className="flex items-center gap-3">
-                <div className={`w-11 h-11 rounded-2xl flex items-center justify-center text-xl ${isDark ? 'bg-cyan-500/15 border border-cyan-500/20' : 'bg-cyan-100 border border-cyan-200'}`}>
-                  🎬
+                <div className={`w-11 h-11 rounded-2xl flex items-center justify-center ${isDark ? 'bg-cyan-500/15 border border-cyan-500/20' : 'bg-cyan-100 border border-cyan-200'}`}>
+                  <Clapperboard size={20} />
                 </div>
                 <div>
                   <h3 className={`font-black text-sm ${isDark ? 'text-white' : 'text-gray-800'}`}>Progress Tutorial</h3>
@@ -350,7 +351,7 @@ export default function TutorialPage() {
                       {watchedVideos.has(tutorial.id) ? (
                         <>Selesai</>
                       ) : (
-                        <>🕒 Belum Ditonton</>
+                        <><Clock size={16} /> Belum Ditonton</>
                       )}
                     </span>
                   </div>
@@ -369,19 +370,19 @@ export default function TutorialPage() {
                       onClick={() => markWatched(tutorial.id)}
                       className={`mt-2 px-5 py-2.5 rounded-full text-sm font-bold bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500 hover:text-white transition-all flex items-center gap-2 self-center ${!isEven ? 'md:self-end' : 'md:self-start'}`}
                     >
-                      <span>👁️</span> Tandai Sudah Ditonton
+                      <Eye size={18} /> Tandai Sudah Ditonton
                     </button>
                   ) : (
                     <div className={`mt-2 px-5 py-2.5 rounded-full text-sm font-bold bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center gap-2 self-center ${!isEven ? 'md:self-end' : 'md:self-start'}`}>
-                      <span>🎬</span> Video Selesai Ditonton
+                      <Clapperboard size={20} /> Video Selesai Ditonton
                     </div>
                   )}
 
                   {/* Decorative Elements */}
-                  <div className={`hidden md:flex items-center gap-4 text-2xl opacity-40 animate-pulse mt-2 ${!isEven ? 'flex-row-reverse' : ''}`}>
-                    <span className="animate-[bounce_3s_infinite]">🫧</span>
-                    <span className="animate-[bounce_4s_infinite_0.5s]">🫧</span>
-                    <span className="animate-[bounce_5s_infinite_1s]">🐟</span>
+                  <div className={`hidden md:flex items-center gap-4 opacity-40 animate-pulse mt-2 ${!isEven ? 'flex-row-reverse' : ''}`}>
+                    <span className="animate-[bounce_3s_infinite]"><BubbleIcon size={20} /></span>
+                    <span className="animate-[bounce_4s_infinite_0.5s]"><BubbleIcon size={20} /></span>
+                    <span className="animate-[bounce_5s_infinite_1s]"><Fish size={20} /></span>
                   </div>
 
                 </div>
@@ -406,7 +407,7 @@ export default function TutorialPage() {
           title="Tampilkan panduan tour"
           className="fixed bottom-6 right-6 z-40 flex items-center gap-2 px-4 py-3 rounded-full bg-cyan-500 hover:bg-cyan-400 text-black font-black text-sm shadow-2xl shadow-cyan-500/40 transition-all hover:-translate-y-1 hover:scale-105 active:scale-95"
         >
-          <span className="text-base">💡</span>
+          <Lightbulb size={18} />
           <span className="hidden sm:inline">Bantuan</span>
         </button>
       )}

@@ -5,6 +5,11 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import {
+  Waves, File, FileText, Users, Lightbulb, Lock, CheckCircle2,
+  X, Download, Award, Scroll, GraduationCap, Sparkles, PenLine,
+  DiveIcon,
+} from '../../components/DiveIcons';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -85,27 +90,27 @@ const TRACKS: TrackData[] = [
     id: 'konservasi-laut',
     title: 'Konservasi Laut',
     desc: '4 modul tentang ekosistem dan pelestarian laut Raja Ampat.',
-    icon: '🪸',
+    icon: 'coral',
     color: 'from-blue-500 to-cyan-400',
     modules: [
-      { id: 'm1', slug: 'ekosistem-laut', title: 'Ekosistem Laut', desc: 'Mempelajari struktur dan fungsi ekosistem laut secara komprehensif.', icon: '🌊' },
-      { id: 'm2', slug: 'biota-laut', title: 'Biota Laut', desc: 'Eksplorasi ragam spesies ikan, moluska, dan invertebrata yang menghuni perairan Raja Ampat.', icon: '🐠' },
-      { id: 'm3', slug: 'terumbu-karang', title: 'Terumbu Karang', desc: 'Mempelajari pentingnya ekosistem terumbu karang dan ancaman yang dihadapinya.', icon: '🪸' },
-      { id: 'm4', slug: 'sampah-laut', title: 'Sampah Laut', desc: 'Pahami dampak polusi sampah plastik dan cara nyata untuk berkontribusi pada pelestarian laut.', icon: '♻️' },
+      { id: 'm1', slug: 'ekosistem-laut', title: 'Ekosistem Laut', desc: 'Mempelajari struktur dan fungsi ekosistem laut secara komprehensif.', icon: 'waves' },
+      { id: 'm2', slug: 'biota-laut', title: 'Biota Laut', desc: 'Eksplorasi ragam spesies ikan, moluska, dan invertebrata yang menghuni perairan Raja Ampat.', icon: 'fish' },
+      { id: 'm3', slug: 'terumbu-karang', title: 'Terumbu Karang', desc: 'Mempelajari pentingnya ekosistem terumbu karang dan ancaman yang dihadapinya.', icon: 'coral' },
+      { id: 'm4', slug: 'sampah-laut', title: 'Sampah Laut', desc: 'Pahami dampak polusi sampah plastik dan cara nyata untuk berkontribusi pada pelestarian laut.', icon: 'recycle' },
     ],
   },
   {
     id: 'konten-digital',
     title: 'Konten Digital Bahari',
     desc: '5 modul tentang pembuatan dan distribusi konten digital bertema bahari.',
-    icon: '🎬',
+    icon: 'clapperboard',
     color: 'from-purple-500 to-pink-400',
     modules: [
-      { id: 'kd1', slug: 'fotografi-bawah-laut', title: 'Fotografi Bawah Laut', desc: 'Teknik mengabadikan keindahan bawah laut dengan peralatan dan komposisi yang tepat.', icon: '📸' },
-      { id: 'kd2', slug: 'teknik-videografi', title: 'Teknik-Teknik Videografi', desc: 'Dasar-dasar dan teknik lanjutan produksi video bawah laut mulai dari peralatan hingga pengambilan gambar.', icon: '🎬' },
-      { id: 'kd3', slug: 'storytelling-digital', title: 'Storytelling Digital', desc: 'Cara membangun narasi yang kuat dan emosional melalui konten digital bahari.', icon: '✍️' },
-      { id: 'kd4', slug: 'editing-publishing', title: 'Editing dan Publishing Guide', desc: 'Panduan lengkap editing konten bahari dan strategi publishing ke berbagai platform digital.', icon: '🎞️' },
-      { id: 'kd5', slug: 'etika-konten', title: 'Etika dalam Membuat Konten', desc: 'Memahami tanggung jawab etis dalam pembuatan dan penyebaran konten bertema lingkungan laut.', icon: '⚖️' },
+      { id: 'kd1', slug: 'fotografi-bawah-laut', title: 'Fotografi Bawah Laut', desc: 'Teknik mengabadikan keindahan bawah laut dengan peralatan dan komposisi yang tepat.', icon: 'camera' },
+      { id: 'kd2', slug: 'teknik-videografi', title: 'Teknik-Teknik Videografi', desc: 'Dasar-dasar dan teknik lanjutan produksi video bawah laut mulai dari peralatan hingga pengambilan gambar.', icon: 'clapperboard' },
+      { id: 'kd3', slug: 'storytelling-digital', title: 'Storytelling Digital', desc: 'Cara membangun narasi yang kuat dan emosional melalui konten digital bahari.', icon: 'penline' },
+      { id: 'kd4', slug: 'editing-publishing', title: 'Editing dan Publishing Guide', desc: 'Panduan lengkap editing konten bahari dan strategi publishing ke berbagai platform digital.', icon: 'film' },
+      { id: 'kd5', slug: 'etika-konten', title: 'Etika dalam Membuat Konten', desc: 'Memahami tanggung jawab etis dalam pembuatan dan penyebaran konten bertema lingkungan laut.', icon: 'scale' },
     ],
   },
 ];
@@ -220,7 +225,7 @@ export default function LMSPage() {
   const [manageCategory, setManageCategory] = useState<string>('Modul');
   const [newTitle, setNewTitle] = useState('');
   const [newDesc, setNewDesc] = useState('');
-  const [newIcon, setNewIcon] = useState('📦');
+  const [newIcon, setNewIcon] = useState('package');
   const [isAdminProcessing, setIsAdminProcessing] = useState(false);
 
   // STATE ADMIN QUIZ
@@ -345,7 +350,7 @@ export default function LMSPage() {
           slug: `modul-${Date.now()}`,
           title: newTitle || 'Modul Baru',
           desc: newDesc || 'Deskripsi modul baru.',
-          icon: newIcon || '📦'
+          icon: newIcon || 'package'
         };
         setModules([...modules, newMod]);
       }
@@ -353,7 +358,7 @@ export default function LMSPage() {
       // Reset form
       setNewTitle('');
       setNewDesc('');
-      setNewIcon('📦');
+      setNewIcon('package');
 
       setIsAdminProcessing(false);
       // Sesuai flowchart: kembali ke "Ingin mengelola data?" (Dashboard)
@@ -365,7 +370,7 @@ export default function LMSPage() {
     setManageCategory(category);
     setNewTitle('');
     setNewDesc('');
-    setNewIcon('📦');
+    setNewIcon('package');
     if (category === 'Quiz') {
       loadQuizQuestions('ekosistem-laut');
       setView('admin_quiz');
@@ -570,8 +575,8 @@ export default function LMSPage() {
         {view === 'admin_dashboard' && (
           <div className="w-full max-w-4xl p-8 rounded-[32px] bg-[#000814] border border-white/10 shadow-2xl relative z-10 animate-in fade-in zoom-in-95 duration-500">
             <div className="flex items-center gap-4 mb-8">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-600 to-blue-500 flex items-center justify-center text-3xl shadow-lg shadow-purple-500/20">
-                👨‍💼
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-600 to-blue-500 flex items-center justify-center text-white shadow-lg shadow-purple-500/20">
+                <Users size={28} />
               </div>
               <div>
                 <h1 className="text-3xl font-black text-white">Admin Dashboard</h1>
@@ -630,19 +635,19 @@ export default function LMSPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[
-                { title: 'Modul', icon: '📚', color: 'from-blue-500 to-cyan-400', desc: 'Tambah atau ubah modul pembelajaran.' },
-                { title: 'Materi', icon: '📄', color: 'from-emerald-500 to-teal-400', desc: 'Kelola isi konten teks dan media.' },
-                { title: 'Quiz', icon: '📝', color: 'from-purple-500 to-pink-500', desc: 'Atur pertanyaan dan jawaban evaluasi.' },
-                { title: 'User', icon: '👥', color: 'from-orange-500 to-amber-400', desc: 'Manajemen akses dan profil mahasiswa.' },
-                { title: 'Galeri', icon: '🖼️', color: 'from-indigo-500 to-blue-500', desc: 'Setujui atau tolak karya unggahan pengguna.' }
+                { title: 'Modul', icon: 'book', color: 'from-blue-500 to-cyan-400', desc: 'Tambah atau ubah modul pembelajaran.' },
+                { title: 'Materi', icon: 'file', color: 'from-emerald-500 to-teal-400', desc: 'Kelola isi konten teks dan media.' },
+                { title: 'Quiz', icon: 'filetext', color: 'from-purple-500 to-pink-500', desc: 'Atur pertanyaan dan jawaban evaluasi.' },
+                { title: 'User', icon: 'users', color: 'from-orange-500 to-amber-400', desc: 'Manajemen akses dan profil mahasiswa.' },
+                { title: 'Galeri', icon: 'image', color: 'from-indigo-500 to-blue-500', desc: 'Setujui atau tolak karya unggahan pengguna.' }
               ].map((item) => (
                 <div
                   key={item.title}
                   onClick={() => openManageForm(item.title)}
                   className="group p-6 rounded-2xl bg-white/5 border border-white/10 hover:border-cyan-400/50 hover:bg-white/10 transition-all cursor-pointer flex flex-col items-start gap-4"
                 >
-                  <div className={`w-14 h-14 rounded-xl flex items-center justify-center text-3xl bg-gradient-to-br ${item.color} shrink-0`}>
-                    {item.icon}
+                  <div className={`w-14 h-14 rounded-xl flex items-center justify-center text-white bg-gradient-to-br ${item.color} shrink-0`}>
+                    <DiveIcon icon={item.icon} size={28} />
                   </div>
                   <div>
                     <h3 className="text-xl font-bold text-white mb-2 group-hover:text-cyan-400 transition-colors">Kelola {item.title}</h3>
@@ -700,13 +705,13 @@ export default function LMSPage() {
                     <div>
                       <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Pilih Ikon (Khusus Modul)</label>
                       <div className="flex gap-4">
-                        {['📦', '🐟', '🌿', '🐢', '🦀', '🌊'].map((emoji) => (
+                        {['package', 'fish', 'leaf', 'turtle', 'crab', 'waves'].map((iconKey) => (
                           <button
-                            key={emoji}
-                            onClick={() => setNewIcon(emoji)}
-                            className={`w-14 h-14 rounded-xl text-2xl flex items-center justify-center transition-all border ${newIcon === emoji ? 'bg-cyan-500/20 border-cyan-400' : 'bg-black/50 border-white/10 hover:border-white/30'}`}
+                            key={iconKey}
+                            onClick={() => setNewIcon(iconKey)}
+                            className={`w-14 h-14 rounded-xl flex items-center justify-center transition-all border ${newIcon === iconKey ? 'bg-cyan-500/20 border-cyan-400 text-cyan-300' : 'bg-black/50 border-white/10 hover:border-white/30 text-white'}`}
                           >
-                            {emoji}
+                            <DiveIcon icon={iconKey} size={24} />
                           </button>
                         ))}
                       </div>
@@ -757,7 +762,7 @@ export default function LMSPage() {
               </div>
             ) : pendingGallery.length === 0 ? (
               <div className="py-32 text-center border-2 border-dashed border-white/5 rounded-2xl bg-white/[0.02]">
-                <div className="text-6xl mb-4">✨</div>
+                <div className="flex justify-center mb-4 text-white/60"><Sparkles size={56} /></div>
                 <h3 className="text-xl font-bold text-white mb-2">Bersih Sepenuhnya!</h3>
                 <p className="text-gray-500">Tidak ada karya baru yang mengantre untuk disetujui.</p>
               </div>
@@ -774,11 +779,11 @@ export default function LMSPage() {
                       </div>
                       <p className="text-xs text-gray-500 mb-6">{new Date(item.created_at).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
                       <div className="flex gap-3 mt-auto">
-                        <button onClick={() => handleApproveGallery(item.id)} className="flex-1 py-2.5 rounded-xl bg-emerald-500/10 text-emerald-400 font-bold hover:bg-emerald-500/20 hover:scale-105 transition-all text-sm border border-emerald-500/20">
-                          ✅ Setujui
+                        <button onClick={() => handleApproveGallery(item.id)} className="flex-1 py-2.5 rounded-xl bg-emerald-500/10 text-emerald-400 font-bold hover:bg-emerald-500/20 hover:scale-105 transition-all text-sm border border-emerald-500/20 flex items-center justify-center gap-1.5">
+                          <CheckCircle2 size={16} className="inline" /> Setujui
                         </button>
-                        <button onClick={() => handleRejectGallery(item.id)} className="flex-1 py-2.5 rounded-xl bg-red-500/10 text-red-400 font-bold hover:bg-red-500/20 hover:scale-105 transition-all text-sm border border-red-500/20">
-                          ❌ Tolak
+                        <button onClick={() => handleRejectGallery(item.id)} className="flex-1 py-2.5 rounded-xl bg-red-500/10 text-red-400 font-bold hover:bg-red-500/20 hover:scale-105 transition-all text-sm border border-red-500/20 flex items-center justify-center gap-1.5">
+                          <X size={16} className="inline" /> Tolak
                         </button>
                       </div>
                     </div>
@@ -810,8 +815,8 @@ export default function LMSPage() {
                   onClick={() => handleSelectTrack(track)}
                   className="group p-8 rounded-[28px] bg-[#000814] border border-white/10 hover:border-cyan-400/40 hover:bg-white/5 transition-all cursor-pointer flex flex-col gap-5"
                 >
-                  <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-4xl bg-gradient-to-br ${track.color} shadow-lg`}>
-                    {track.icon}
+                  <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-white bg-gradient-to-br ${track.color} shadow-lg`}>
+                    <DiveIcon icon={track.icon} size={32} />
                   </div>
                   <div className="flex-1">
                     <h2 className="text-2xl font-black text-white mb-2 group-hover:text-cyan-400 transition-colors">{track.title}</h2>
@@ -835,8 +840,8 @@ export default function LMSPage() {
         {view === 'user_dashboard' && (
           <div className="w-full max-w-4xl p-8 rounded-[32px] bg-[#000814] border border-white/10 shadow-2xl relative z-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="flex items-center gap-4 mb-8">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center text-3xl shadow-lg shadow-emerald-500/20">
-                👨‍🎓
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center text-white shadow-lg shadow-emerald-500/20">
+                <GraduationCap size={32} />
               </div>
               <div>
                 <h1 className="text-3xl font-black text-white">User Dashboard</h1>
@@ -875,7 +880,7 @@ export default function LMSPage() {
               <div className="flex gap-4">
                 {hasCertificate && (
                   <button onClick={() => setView('user_certificate')} className="px-6 py-3 rounded-xl font-bold text-white bg-gradient-to-r from-emerald-500 to-teal-400 hover:scale-105 shadow-xl shadow-emerald-500/20 transition-all flex items-center gap-2">
-                    <span>📜 Cetak Sertifikat</span>
+                    <Scroll size={18} /><span>Cetak Sertifikat</span>
                   </button>
                 )}
                 <button onClick={() => setView('user_dashboard')} className="px-6 py-3 rounded-xl font-bold text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 transition-all border border-transparent hover:border-white/10">
@@ -888,7 +893,7 @@ export default function LMSPage() {
               {modules.map((mod) => (
                 <div key={mod.id} className="p-6 rounded-2xl bg-white/5 border border-white/10 hover:border-cyan-500/50 transition-all group flex flex-col">
                   <div className="h-40 rounded-xl bg-gradient-to-br from-blue-900/30 to-black mb-6 flex items-center justify-center group-hover:scale-[1.02] transition-transform border border-white/5">
-                    <span className="text-6xl drop-shadow-2xl">{mod.icon}</span>
+                    <span className="drop-shadow-2xl text-white"><DiveIcon icon={mod.icon} size={48} /></span>
                   </div>
                   <div className="flex-grow">
                     <h3 className="text-xl font-bold text-white mb-2">{mod.title}</h3>
@@ -899,7 +904,7 @@ export default function LMSPage() {
                       disabled
                       className="w-full py-3 rounded-xl font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 opacity-80 cursor-not-allowed flex items-center justify-center gap-2"
                     >
-                      <span>✅ Selesai</span>
+                      <CheckCircle2 size={16} className="inline" /><span>Selesai</span>
                     </button>
                   ) : (
                     <button
@@ -929,7 +934,7 @@ export default function LMSPage() {
               {/* KOLOM KIRI: Materi (2/3) */}
               <div className="col-span-2 p-8 rounded-[32px] bg-[#000814] border border-white/10 shadow-2xl">
                 <h1 className="text-3xl font-black text-white mb-4 flex items-center gap-3">
-                  <span className="text-4xl">{selectedModule?.icon}</span>
+                  <span className="text-white">{selectedModule && <DiveIcon icon={selectedModule.icon} size={36} />}</span>
                   Materi: {selectedModule?.title}
                 </h1>
 
@@ -961,8 +966,8 @@ export default function LMSPage() {
 
                 <div className="flex flex-col gap-4 pt-6 border-t border-white/10">
                   {readProgress >= 100 && (
-                    <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-medium text-center">
-                      ✅ Materi Selesai Dibaca!
+                    <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-medium text-center flex items-center justify-center gap-2">
+                      <CheckCircle2 size={18} className="inline" /> Materi Selesai Dibaca!
                     </div>
                   )}
 
@@ -983,7 +988,7 @@ export default function LMSPage() {
                       </button>
                     ) : completedQuizzes.includes(`Kuis: ${selectedModule?.title}`) ? (
                       <div className="px-6 py-4 rounded-xl font-bold text-blue-400 bg-blue-500/10 border border-blue-500/20 shadow-inner flex items-center gap-3">
-                        <span className="text-2xl">📝</span>
+                        <FileText size={24} />
                         <div>
                           <p className="text-sm">Kuis Selesai</p>
                           <p className="text-xs text-blue-400/80 font-medium">Anda sudah mengerjakan kuis ini sebelumnya.</p>
@@ -1008,7 +1013,7 @@ export default function LMSPage() {
               {/* KOLOM KANAN: Fun Facts (1/3) */}
               <div className="col-span-1 p-6 rounded-[32px] bg-[#000814] border border-white/10 shadow-2xl flex flex-col gap-4">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-lg">💡</span>
+                  <Lightbulb size={18} className="text-cyan-400" />
                   <h3 className="text-sm font-black uppercase tracking-widest text-cyan-400">Fun Facts</h3>
                 </div>
                 <p className="text-xs text-gray-500 -mt-2 mb-1">Fakta menarik terbuka seiring Anda membaca.</p>
@@ -1016,9 +1021,9 @@ export default function LMSPage() {
                 {(() => {
                   const facts = selectedModule ? FUN_FACTS[selectedModule.slug] : undefined;
                   const factConfig = [
-                    { threshold: 25, icon: '💡', border: 'border-cyan-500/40', bg: 'from-cyan-950/60 to-blue-950/60', label: 'text-cyan-400', num: 'bg-cyan-500/20 text-cyan-300' },
-                    { threshold: 50, icon: '🌊', border: 'border-teal-500/40', bg: 'from-teal-950/60 to-cyan-950/60', label: 'text-teal-400', num: 'bg-teal-500/20 text-teal-300' },
-                    { threshold: 75, icon: '🐠', border: 'border-blue-500/40', bg: 'from-blue-950/60 to-indigo-950/60', label: 'text-blue-400', num: 'bg-blue-500/20 text-blue-300' },
+                    { threshold: 25, icon: 'lightbulb', border: 'border-cyan-500/40', bg: 'from-cyan-950/60 to-blue-950/60', label: 'text-cyan-400', num: 'bg-cyan-500/20 text-cyan-300' },
+                    { threshold: 50, icon: 'waves', border: 'border-teal-500/40', bg: 'from-teal-950/60 to-cyan-950/60', label: 'text-teal-400', num: 'bg-teal-500/20 text-teal-300' },
+                    { threshold: 75, icon: 'fish', border: 'border-blue-500/40', bg: 'from-blue-950/60 to-indigo-950/60', label: 'text-blue-400', num: 'bg-blue-500/20 text-blue-300' },
                   ];
                   return factConfig.map((cfg, i) => {
                     const unlocked = readProgress >= cfg.threshold;
@@ -1036,7 +1041,7 @@ export default function LMSPage() {
                           <span className={`text-xs font-black px-2 py-0.5 rounded-full ${unlocked ? cfg.num : 'bg-white/5 text-gray-600'}`}>
                             #{i + 1}
                           </span>
-                          <span className={`text-lg ${unlocked ? '' : 'grayscale opacity-30'}`}>{cfg.icon}</span>
+                          <span className={`${unlocked ? cfg.label : 'text-gray-600 opacity-30'}`}><DiveIcon icon={cfg.icon} size={18} /></span>
                           <span className={`text-[10px] font-black uppercase tracking-widest ${unlocked ? cfg.label : 'text-gray-600'}`}>
                             Fun Fact
                           </span>
@@ -1045,7 +1050,7 @@ export default function LMSPage() {
                           <p className="text-xs text-white/80 leading-relaxed animate-in fade-in duration-700">{fact}</p>
                         ) : (
                           <div className="flex items-center gap-2">
-                            <span className="text-gray-600 text-lg">🔒</span>
+                            <Lock size={18} className="text-gray-600" />
                             <p className="text-xs text-gray-600">Baca hingga {cfg.threshold}% untuk membuka.</p>
                           </div>
                         )}
@@ -1086,7 +1091,7 @@ export default function LMSPage() {
 
             {/* Form tambah soal */}
             <div className="p-6 rounded-2xl bg-white/5 border border-white/10 mb-6 space-y-4">
-              <h3 className="text-white font-bold text-lg mb-2">✏️ Tambah Soal Baru</h3>
+              <h3 className="text-white font-bold text-lg mb-2 flex items-center gap-2"><PenLine size={18} /> Tambah Soal Baru</h3>
 
               <div>
                 <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Pertanyaan</label>
@@ -1131,7 +1136,7 @@ export default function LMSPage() {
 
             {/* Daftar soal yang sudah ada */}
             <div>
-              <h3 className="text-white font-bold mb-4">📋 Daftar Soal ({existingQuestions.length} soal)</h3>
+              <h3 className="text-white font-bold mb-4 flex items-center gap-2"><FileText size={18} /> Daftar Soal ({existingQuestions.length} soal)</h3>
               {existingQuestions.length === 0
                 ? <p className="text-gray-500 text-sm text-center py-6">Belum ada soal untuk modul ini.</p>
                 : <div className="space-y-3">
@@ -1175,7 +1180,7 @@ export default function LMSPage() {
               </div>
             ) : quizQuestions.length === 0 ? (
               <div className="py-12 text-center">
-                <p className="text-4xl mb-4">📭</p>
+                <div className="flex justify-center mb-4 text-gray-500"><File size={40} /></div>
                 <p className="text-gray-400">Soal quiz belum tersedia untuk modul ini.</p>
                 <p className="text-gray-500 text-sm mt-1">Hubungi admin untuk menambahkan soal.</p>
               </div>
@@ -1236,14 +1241,14 @@ export default function LMSPage() {
 
                 <div className="grid grid-cols-2 gap-4 mb-10">
                   <div className={`p-6 rounded-2xl border ${hasBadge ? 'bg-amber-500/10 border-amber-500/30' : 'bg-black/50 border-white/5 opacity-50'}`}>
-                    <div className="text-4xl mb-3">{hasBadge ? '🏅' : '🔒'}</div>
+                    <div className="mb-3 flex justify-center">{hasBadge ? <Award size={32} className="text-amber-400" /> : <Lock size={32} className="text-gray-500" />}</div>
                     <h3 className={`font-bold ${hasBadge ? 'text-amber-400' : 'text-gray-500'}`}>Badge</h3>
                   </div>
                   <div
                     onClick={() => hasCertificate && setView('user_certificate')}
                     className={`p-6 rounded-2xl border transition-all ${hasCertificate ? 'bg-cyan-500/10 border-cyan-500/30 cursor-pointer hover:bg-cyan-500/20 hover:scale-[1.02]' : 'bg-black/50 border-white/5 opacity-50 cursor-not-allowed'}`}
                   >
-                    <div className="text-4xl mb-3">{hasCertificate ? '📜' : '🔒'}</div>
+                    <div className="mb-3 flex justify-center">{hasCertificate ? <Scroll size={32} className="text-cyan-400" /> : <Lock size={32} className="text-gray-500" />}</div>
                     <h3 className={`font-bold ${hasCertificate ? 'text-cyan-400' : 'text-gray-500'}`}>Sertifikat</h3>
                     {hasCertificate && <p className="text-xs text-cyan-400/70 mt-1">Klik untuk cetak</p>}
                   </div>
@@ -1263,7 +1268,7 @@ export default function LMSPage() {
                         }}
                         className="w-full py-4 rounded-xl font-bold text-white bg-gradient-to-r from-emerald-500 to-teal-400 hover:scale-[1.02] transition-all shadow-lg shadow-emerald-500/25"
                       >
-                        Lanjut ke Modul Berikutnya: {nextModule.icon} {nextModule.title}
+                        Lanjut ke Modul Berikutnya: <DiveIcon icon={nextModule.icon} size={16} className="inline" /> {nextModule.title}
                       </button>
                     ) : null;
                   })()}
@@ -1324,7 +1329,7 @@ export default function LMSPage() {
                       </>
                     ) : (
                       <>
-                        <span>📥</span>
+                        <Download size={18} />
                         <span>Download PDF</span>
                       </>
                     )}
@@ -1370,8 +1375,8 @@ export default function LMSPage() {
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowBackConfirm(false)} />
           <div className="bg-[#001020] border border-white/10 rounded-[32px] p-8 max-w-md w-full relative z-10 animate-in fade-in zoom-in-95 duration-200 shadow-2xl">
-            <div className="w-20 h-20 bg-blue-500/10 text-blue-400 rounded-full flex items-center justify-center text-4xl mb-6 mx-auto">
-              🌊
+            <div className="w-20 h-20 bg-blue-500/10 text-blue-400 rounded-full flex items-center justify-center mb-6 mx-auto">
+              <Waves size={48} />
             </div>
             <h3 className="text-2xl font-black text-white text-center mb-2">Konfirmasi Keluar</h3>
             <p className="text-gray-400 text-center mb-8 text-sm leading-relaxed">Apakah Anda yakin ingin keluar dari sistem LMS dan kembali ke Halaman Akademi?</p>
