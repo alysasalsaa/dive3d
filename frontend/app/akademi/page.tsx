@@ -402,6 +402,7 @@ export default function AkademiPage() {
                                     className={`tour-3d-tabs mt-6 p-2 rounded-3xl flex items-center justify-start overflow-x-auto gap-3 w-full mx-auto border select-none ${isDark ? 'bg-[#001020] border-white/10 shadow-lg' : 'bg-white border-gray-200 shadow-sm'}`}
                                 >
                                     {[
+                                        { id: 'ekosistem', label: 'Ekosistem', icon: '🌊' },
                                         { id: 'ikan', label: 'Ikan', icon: '🐟' },
                                         { id: 'butterfly', label: 'Butterfly Fish', icon: '🐠' },
                                         { id: 'parrot', label: 'Parrot Fish', icon: '🐡' },
