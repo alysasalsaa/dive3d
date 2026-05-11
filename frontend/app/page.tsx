@@ -29,6 +29,7 @@ export default function HomePage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [lockoutCountdown, setLockoutCountdown] = useState(0);
+  const [videoDuration, setVideoDuration] = useState('00:00');
 
   const MAX_ATTEMPTS = 5;
   const LOCKOUT_DURATION = 15 * 60 * 1000; // 15 menit dalam ms
@@ -144,6 +145,30 @@ export default function HomePage() {
     setUserRole(role);
     setIsAdmin(role?.toLowerCase().trim() === 'admin');
     setUserName(localStorage.getItem('user_name'));
+
+    // Ambil durasi video dari YouTube secara dinamis
+    const videoId = 'BaXG2yKrtww';
+    const tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    const firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag);
+
+    (window as any).onYouTubeIframeAPIReady = () => {
+      const player = new (window as any).YT.Player('temp-player', {
+        height: '0',
+        width: '0',
+        videoId: videoId,
+        events: {
+          'onReady': (event: any) => {
+            const duration = event.target.getDuration();
+            const minutes = Math.floor(duration / 60);
+            const seconds = Math.floor(duration % 60);
+            setVideoDuration(`${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`);
+            event.target.destroy();
+          }
+        }
+      });
+    };
   }, []);
 
   const navLinks = [
@@ -321,7 +346,7 @@ export default function HomePage() {
               </div>
 
               <div className="relative aspect-[16/10] flex items-center justify-center bg-black/40 overflow-hidden">
-                <img src="https://img.youtube.com/vi/ufEgoTFJtPc/maxresdefault.jpg" alt="Trailer" className="absolute inset-0 w-full h-full object-cover opacity-80" />
+                <img src="https://img.youtube.com/vi/BaXG2yKrtww/maxresdefault.jpg" alt="Trailer" className="absolute inset-0 w-full h-full object-cover opacity-80" />
 
                 <button
                   onClick={() => setShowTrailer(true)}
@@ -337,7 +362,7 @@ export default function HomePage() {
                     <div className="h-full w-0 bg-blue-500"></div>
                   </div>
                   <div className="px-4 py-3 flex items-center gap-2 bg-black/60 backdrop-blur-md">
-                    <span className="text-white text-xs font-medium">00:00 / 01:58</span>
+                    <span className="text-white text-xs font-medium">00:00 / {videoDuration}</span>
                     <div className="ml-auto flex items-center gap-4">
                       <button className="text-white hover:text-blue-300 transition-colors"><Volume2 size={18} /></button>
                       <button className="text-white hover:text-blue-300 text-lg transition-colors">⛶</button>
@@ -440,7 +465,7 @@ export default function HomePage() {
             <div className="aspect-video bg-black">
               <iframe
                 className="w-full h-full"
-                src="https://www.youtube.com/embed/ufEgoTFJtPc?autoplay=1"
+                src="https://www.youtube.com/embed/BaXG2yKrtww?autoplay=1"
                 title="Divexplore 3D Trailer"
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -544,6 +569,8 @@ export default function HomePage() {
           <span className="hidden sm:inline">Bantuan</span>
         </button>
       )}
+      {/* Temporary element for YT API duration fetching */}
+      <div id="temp-player" className="hidden"></div>
     </div>
   );
 }
