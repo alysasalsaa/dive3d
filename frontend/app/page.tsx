@@ -478,12 +478,6 @@ export default function HomePage() {
 
       {/* FOOTER */}
       <footer className={`py-12 border-t px-6 flex flex-col items-center justify-center gap-6 ${isDark ? 'border-white/5' : 'border-gray-200'}`}>
-        <button
-          onClick={() => setForceTour(true)}
-          className="px-6 py-2 rounded-full border border-cyan-500/30 text-cyan-500 font-bold hover:bg-cyan-500/10 transition-colors text-sm flex items-center gap-2"
-        >
-          <Lightbulb size={18} /> Lihat Panduan Lagi
-        </button>
         <p className={`text-[10px] tracking-[0.4em] font-bold uppercase ${isDark ? 'text-gray-600' : 'text-gray-400'}`}>
           © 2026 TIM DIVEXPLORE-3D • TEKNOLOGI INFORMASI UNY
         </p>
