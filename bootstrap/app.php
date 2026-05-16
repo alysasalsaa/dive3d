@@ -17,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // Gunakan path literal agar tidak throw RouteNotFoundException
         // saat route bernama 'login' tidak terdaftar (pure API project)
         $middleware->redirectGuestsTo('/login');
+        $middleware->append(\App\Http\Middleware\SecureHeaders::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->render(function (AuthenticationException $e, Request $request) {
@@ -26,4 +27,5 @@ return Application::configure(basePath: dirname(__DIR__))
                 ], 401);
             }
         });
+    
     })->create();
